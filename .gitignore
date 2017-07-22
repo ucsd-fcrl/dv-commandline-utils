@@ -1,0 +1,10 @@
+# Exclude these directories anywhere in your tree
+bin/
+data/
+
+# Exclude these file types
+*.swp
+*.pyc
+
+# Exclude these file names
+.DS_Store
