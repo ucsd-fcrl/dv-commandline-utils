@@ -10,11 +10,19 @@ set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "build type" FORCE)
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
 
+set(EXNAME "dv-convert-dicom-series-to-volume")
+add_executable(${EXNAME} ${EXNAME}.cxx)
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+
 set(EXNAME "dv-convert-mesh")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
 
 set(EXNAME "dv-image-information")
+add_executable(${EXNAME} ${EXNAME}.cxx)
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+
+set(EXNAME "dv-resample-volume")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
 
