@@ -231,7 +231,7 @@ main( int argc, char** argv )
 
   if ( argc != 3 )
     {
-    std::cerr << "Usage: "
+    std::cerr << "Usage:\n"
               << argv[0]
               << " <InputFileName>"
               << " <Option>\n";

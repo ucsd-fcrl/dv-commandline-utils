@@ -10,5 +10,15 @@ set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "build type" FORCE)
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
 
-add_executable(dv-image-information dv-image-information.cxx)
-target_link_libraries(dv-image-information ${ITK_LIBRARIES})
+set(EXNAME "dv-image-information")
+add_executable(${EXNAME} ${EXNAME}.cxx)
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+
+set(EXNAME "dv-scale-mesh")
+add_executable(${EXNAME} ${EXNAME}.cxx)
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+
+set(EXNAME "dv-translate-mesh")
+add_executable(${EXNAME} ${EXNAME}.cxx)
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+
