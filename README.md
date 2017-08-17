@@ -19,6 +19,9 @@ $ mkdir ./bin && cd ./bin
 # Configure and generate
 $ ccmake ../src -DModule_IOSTL=ON
 # Follow the instructions (c..c..g..)
+
+# Build ITK
+$ make -j$(nproc)
 ```
 
 If ITK has been installed in `~/Developer/ITK/bin`, the following instructions will work; otherwise, modify the `ITK_DIR` variable in `./src/CMakeLists.txt` to match the appropriate directory.
@@ -30,4 +33,5 @@ $ mkdir ./dv-commandline-utils/bin
 $ cd ./dv-commandline-utils/bin
 $ ccmake ../src
 # Configure, configure, build...
+$ make -j$(nproc)
 ```
