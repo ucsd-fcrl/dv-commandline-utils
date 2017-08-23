@@ -23,13 +23,14 @@ main( int argc, char* argv[] )
   if (3 > argc)
     {
     std::cerr << "Usage:\n"
-              << argv[0] << " <inputDir> <outputDir> [spacing]" << std::endl;
+              << argv[0] << " <inputDir> <outputDir> [spacing] [ext]" << std::endl;
     return EXIT_FAILURE;
     }
 
   std::string inputDirectory = argv[1];
   std::string outputDirectory = argv[2];
   const double spacing = (argc > 3) ? atof(argv[3]) : 0.5;
+  const std::string ext = (argc > 4) ? argv[4] : "vtk";
 
   itk::FileTools::CreateDirectory(outputDirectory.c_str());
 
@@ -40,8 +41,8 @@ main( int argc, char* argv[] )
   std::vector<std::string> FileNames;
   while (
     itksys::SystemTools::FileExists(
-      inputDirectory + std::to_string(FileNames.size()) + ".vtk",true)
-        ) FileNames.emplace_back(std::to_string(FileNames.size()) + ".vtk");
+      inputDirectory + std::to_string(FileNames.size()) + "." + ext,true)
+        ) FileNames.emplace_back(std::to_string(FileNames.size()) + "." + ext);
 
   itkAssertOrThrowMacro(FileNames.size() > 0, "At least one image must be supplied.");
 
