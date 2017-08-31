@@ -38,3 +38,7 @@ set(EXNAME "dv-binarize-mesh")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
 
+set(EXNAME "dv-collapse-4d")
+add_executable(${EXNAME} ${EXNAME}.cxx)
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+
