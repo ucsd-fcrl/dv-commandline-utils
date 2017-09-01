@@ -42,3 +42,11 @@ set(EXNAME "dv-collapse-4d")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
 
+set(EXNAME "dv-permute-axes-3d")
+add_executable(${EXNAME} ${EXNAME}.cxx)
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+
+set(EXNAME "dv-flip-along-axes-3d")
+add_executable(${EXNAME} ${EXNAME}.cxx)
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+
