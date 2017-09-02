@@ -50,3 +50,7 @@ set(EXNAME "dv-flip-along-axes-3d")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
 
+set(EXNAME "dv-change-information-3d")
+add_executable(${EXNAME} ${EXNAME}.cxx)
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+
