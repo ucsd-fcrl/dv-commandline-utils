@@ -10,6 +10,10 @@ set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "build type" FORCE)
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
 
+find_package(Boost COMPONENTS program_options REQUIRED)
+include_directories(${Boost_INCLUDE_DIR})
+link_directories(${Boost_LIBRARY_DIR})
+
 set(EXNAME "dv-convert-dicom-series-to-volume")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
@@ -57,4 +61,8 @@ target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
 set(EXNAME "dv-change-information-3d")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+
+set(EXNAME "dv-binary-threshold")
+add_executable(${EXNAME} ${EXNAME}.cxx)
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_LIBRARIES})
 
