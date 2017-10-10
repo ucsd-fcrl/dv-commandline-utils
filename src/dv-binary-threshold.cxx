@@ -1,7 +1,10 @@
+// Boost
+#include <boost/program_options.hpp>
+
+// ITK
 #include <itkImageFileReader.h>
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkImageFileWriter.h>
-#include <boost/program_options.hpp>
 
 const unsigned int Dimension = 3;
 

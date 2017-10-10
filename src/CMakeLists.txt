@@ -11,58 +11,61 @@ find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
 
 find_package(Boost COMPONENTS program_options REQUIRED)
-include_directories(${Boost_INCLUDE_DIR})
-link_directories(${Boost_LIBRARY_DIR})
+include_directories(${Boost_INCLUDE_DIRS})
 
 set(EXNAME "dv-convert-dicom-series-to-volume")
 add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 set(EXNAME "dv-convert-mesh")
 add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 set(EXNAME "dv-image-information")
 add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 set(EXNAME "dv-resample-volume")
 add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 set(EXNAME "dv-resample-from-reference")
 add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 set(EXNAME "dv-scale-mesh")
 add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 set(EXNAME "dv-translate-mesh")
 add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 set(EXNAME "dv-binarize-mesh")
 add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 set(EXNAME "dv-collapse-4d")
 add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 set(EXNAME "dv-permute-axes-3d")
 add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 set(EXNAME "dv-flip-along-axes-3d")
 add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 set(EXNAME "dv-change-information-3d")
 add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES})
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 set(EXNAME "dv-binary-threshold")
 add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+
+set(EXNAME "dv-dicom-information")
+add_executable(${EXNAME} ${EXNAME}.cxx)
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 

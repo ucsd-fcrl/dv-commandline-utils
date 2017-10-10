@@ -1,3 +1,6 @@
+// Boost
+#include <boost/program_options.hpp>
+
 // ITK
 #include <itkImageFileReader.h>
 #include <itkExtractImageFilter.h>

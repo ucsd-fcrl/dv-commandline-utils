@@ -1,13 +1,16 @@
-// STD headers
-#include <map>
-#include <vector>
-#include <string>
+// Boost
+#include <boost/program_options.hpp>
 
-// ITK headers
+// ITK
 #include <itkImage.h>
 #include <itkGDCMImageIO.h>
 #include <itkImageSeriesReader.h>
 #include <itkImageFileWriter.h>
+
+// STD headers
+#include <map>
+#include <vector>
+#include <string>
 
 // GDCM headers
 #include <gdcmReader.h>
