@@ -15,11 +15,13 @@ typedef float      TCoordinate;
 typedef unsigned char  PixelType;
 typedef itk::Image< PixelType, Dimension >   ImageType;
 
-typedef itk::Mesh< TCoordinate, Dimension > TMesh;
-typedef itk::Mesh<double>                         MeshType;
+typedef itk::Mesh<float,Dimension>                         MeshType;
 typedef itk::BinaryMask3DMeshSource< ImageType, MeshType >   MeshSourceType;
 
+typedef itk::Mesh< TCoordinate, Dimension > TMesh;
 typedef itk::MeshFileWriter< TMesh >        TWriter;
+
+
 
 int main( int argc, char* argv[] )
 {
@@ -79,26 +81,26 @@ try
   // Writer
   //
 
-  // const auto writer = TWriter::New();
-  // writer->SetInput( meshSource->GetOutput() );
-  // writer->SetFileName( outputFileName );
-  //
-  // const auto o_ext = outputFileName.substr(outputFileName.size() - 3, 3);
-  // if (o_ext == "stl" || o_ext == "STL")
-  //   {
-  //   writer->SetMeshIO( itk::STLMeshIO::New() );
-  //   }
-  //
-  // try
-  //   {
-  //   writer->Update();
-  //   }
-  // catch ( itk::ExceptionObject & err )
-  //   {
-  //   std::cerr << "There was a problem writing the file." << std::endl;
-  //   std::cerr << err << std::endl;
-  //   return EXIT_FAILURE;
-  //   }
+  const auto writer = TWriter::New();
+  writer->SetInput( meshSource->GetOutput() );
+  writer->SetFileName( outputFileName );
+
+  const auto o_ext = outputFileName.substr(outputFileName.size() - 3, 3);
+  if (o_ext == "stl" || o_ext == "STL")
+    {
+    writer->SetMeshIO( itk::STLMeshIO::New() );
+    }
+
+  try
+    {
+    writer->Update();
+    }
+  catch ( itk::ExceptionObject & err )
+    {
+    std::cerr << "There was a problem writing the file." << std::endl;
+    std::cerr << err << std::endl;
+    return EXIT_FAILURE;
+    }
 
   return EXIT_SUCCESS;
 
