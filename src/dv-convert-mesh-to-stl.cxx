@@ -33,7 +33,6 @@ int main( int argc, char* argv[] )
 
   const std::string inputFileName(argv[1]);
   const std::string outputFileName(argv[2]);
-  const std::string meshLabel(argv[3]);
 
   //
   // Reader
@@ -58,7 +57,7 @@ int main( int argc, char* argv[] )
 //Meshing
 //
 MeshSourceType::Pointer meshSource = MeshSourceType::New();
-const PixelType objectValue = static_cast<PixelType>( atof( meshLabel ) );
+const PixelType objectValue = static_cast<PixelType>( std::atof( argv[3] ) );
 meshSource->SetObjectValue( objectValue );
 meshSource->SetInput( reader->GetOutput() );
 
