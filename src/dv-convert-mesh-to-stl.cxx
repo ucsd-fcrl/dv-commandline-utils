@@ -3,15 +3,22 @@
 
 // ITK
 #include <itkMesh.h>
-#include <itkMeshFileReader.h>
+#include <itkImageFileReader.h>
 #include <itkMeshFileWriter.h>
 #include <itkSTLMeshIO.h>
+#include <itkBinaryMask3DMeshSource.h>
+#include <itkImage.h>
 
 const unsigned int Dimension = 3;
 typedef float      TCoordinate;
 
+typedef unsigned char  PixelType;
+typedef itk::Image< PixelType, Dimension >   ImageType;
+
 typedef itk::Mesh< TCoordinate, Dimension > TMesh;
-typedef itk::MeshFileReader< TMesh >        TReader;
+typedef itk::Mesh<double>                         MeshType;
+typedef itk::BinaryMask3DMeshSource< ImageType, MeshType >   MeshSourceType;
+
 typedef itk::MeshFileWriter< TMesh >        TWriter;
 
 int main( int argc, char* argv[] )
@@ -20,32 +27,61 @@ int main( int argc, char* argv[] )
   if ( 3 != argc )
     {
     std::cerr << "Usage:\n"<< std::endl;
-    std::cerr << argv[0] << " <InputMesh> <OutputMesh>" << std::endl;
+    std::cerr << argv[0] << " <InputImage> <OutputMesh> <LabelValue>" << std::endl;
     return EXIT_FAILURE;
     }
 
   const std::string inputFileName(argv[1]);
   const std::string outputFileName(argv[2]);
+  const std::string meshLabel(argv[3]);
 
   //
   // Reader
   //
 
-  const auto reader = TReader::New();
+  typedef itk::ImageFileReader< ImageType >    ReaderType;
+  ReaderType::Pointer reader = ReaderType::New();
   reader->SetFileName( inputFileName );
 
-  const auto i_ext = inputFileName.substr(inputFileName.size() - 3, 3);
-  if (i_ext == "stl" || i_ext == "STL")
+  try
+      {
+      reader->Update();
+      }
+  catch( itk::ExceptionObject & exp )
+      {
+      std::cerr << "Exception thrown while reading the input file " << std::endl;
+      std::cerr << exp << std::endl;
+      return EXIT_FAILURE;
+      }
+
+//
+//Meshing
+//
+MeshSourceType::Pointer meshSource = MeshSourceType::New();
+const PixelType objectValue = static_cast<PixelType>( atof( meshLabel ) );
+meshSource->SetObjectValue( objectValue );
+meshSource->SetInput( reader->GetOutput() );
+
+try
     {
-    reader->SetMeshIO( itk::STLMeshIO::New() );
+    meshSource->Update();
     }
+  catch( itk::ExceptionObject & exp )
+    {
+    std::cerr << "Exception thrown during meshSource->Update() " << std::endl;
+    std::cerr << exp << std::endl;
+    return EXIT_FAILURE;
+    }
+
+    std::cout << "Nodes = " << meshSource->GetNumberOfNodes() << std::endl;
+    std::cout << "Cells = " << meshSource->GetNumberOfCells() << std::endl;
 
   //
   // Writer
   //
 
   const auto writer = TWriter::New();
-  writer->SetInput( reader->GetOutput() );
+  writer->SetInput( meshSource->GetOutput() );
   writer->SetFileName( outputFileName );
 
   const auto o_ext = outputFileName.substr(outputFileName.size() - 3, 3);
@@ -68,4 +104,3 @@ int main( int argc, char* argv[] )
   return EXIT_SUCCESS;
 
 }
-
