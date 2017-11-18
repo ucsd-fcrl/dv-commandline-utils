@@ -59,9 +59,9 @@ int main( int argc, char* argv[] )
   }
 
   //
-  // Adding Filtering
+  // Adding Filtering - Add the first two labels
   //
-
+  //std::cerr << "argv[3] value " << argv[3] <<std::endl;
   const auto filter1 = TFilter::New();
   filter1->SetInput(reader->GetOutput());
   filter1->SetInsideValue( 1 );
@@ -69,6 +69,7 @@ int main( int argc, char* argv[] )
   filter1->SetLowerThreshold( std::atof( argv[3] ) );
   filter1->SetUpperThreshold( std::atof( argv[3] ) );
 
+  //std::cerr << "argv[4] value " << argv[4] <<std::endl;
   const auto filter2 = TFilter::New();
   filter2->SetInput(reader->GetOutput());
   filter2->SetInsideValue( 1 );
@@ -82,23 +83,29 @@ int main( int argc, char* argv[] )
 
   addFilter->Update();
 
-  std::cerr << "Argc value " << argc <<std::endl;
-
-  //for (int i = 5; i <= argc; ++i)
-  //{
+  // Add any remaining labels
+  for (int i = 5; i < argc; ++i)
+  {
     const auto filter3 = TFilter::New();
     filter3->SetInput(reader->GetOutput());
     filter3->SetInsideValue( 1 );
     filter3->SetOutsideValue( 0 );
-    filter3->SetLowerThreshold( std::atof( argv[5] ) );
-    filter3->SetUpperThreshold( std::atof( argv[5] ) );
+    filter3->SetLowerThreshold( std::atof( argv[i] ) );
+    filter3->SetUpperThreshold( std::atof( argv[i] ) );
 
     addFilter->SetInput1(addFilter->GetOutput());
     addFilter->SetInput2(filter3->GetOutput());
 
     addFilter->Update();
+  }
 
-  //}
+  // Turn image back into binary
+  const auto filter4 = TFilter::New();
+  filter4->SetInput(addFilter->GetOutput());
+  filter4->SetInsideValue( 1 );
+  filter4->SetOutsideValue( 0 );
+  filter4->SetLowerThreshold( 1 );
+  filter4->SetUpperThreshold( 1000 );
 
   //
   //Meshing
@@ -106,7 +113,7 @@ int main( int argc, char* argv[] )
   MeshSourceType::Pointer meshSource = MeshSourceType::New();
   const PixelType objectValue = static_cast<PixelType>( 1 );
   meshSource->SetObjectValue( objectValue );
-  meshSource->SetInput( addFilter->GetOutput() );
+  meshSource->SetInput( filter4->GetOutput() );
 
   try
   {
