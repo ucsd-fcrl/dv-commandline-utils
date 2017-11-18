@@ -24,7 +24,7 @@ typedef itk::MeshFileWriter< TMesh >        TWriter;
 int main( int argc, char* argv[] )
 {
 
-  if ( 3 != argc )
+  if ( 4 != argc )
     {
     std::cerr << "Usage:\n"<< std::endl;
     std::cerr << argv[0] << " <InputImage> <OutputMesh> <LabelValue>" << std::endl;
@@ -79,26 +79,26 @@ try
   // Writer
   //
 
-  const auto writer = TWriter::New();
-  writer->SetInput( meshSource->GetOutput() );
-  writer->SetFileName( outputFileName );
-
-  const auto o_ext = outputFileName.substr(outputFileName.size() - 3, 3);
-  if (o_ext == "stl" || o_ext == "STL")
-    {
-    writer->SetMeshIO( itk::STLMeshIO::New() );
-    }
-
-  try
-    {
-    writer->Update();
-    }
-  catch ( itk::ExceptionObject & err )
-    {
-    std::cerr << "There was a problem writing the file." << std::endl;
-    std::cerr << err << std::endl;
-    return EXIT_FAILURE;
-    }
+  // const auto writer = TWriter::New();
+  // writer->SetInput( meshSource->GetOutput() );
+  // writer->SetFileName( outputFileName );
+  //
+  // const auto o_ext = outputFileName.substr(outputFileName.size() - 3, 3);
+  // if (o_ext == "stl" || o_ext == "STL")
+  //   {
+  //   writer->SetMeshIO( itk::STLMeshIO::New() );
+  //   }
+  //
+  // try
+  //   {
+  //   writer->Update();
+  //   }
+  // catch ( itk::ExceptionObject & err )
+  //   {
+  //   std::cerr << "There was a problem writing the file." << std::endl;
+  //   std::cerr << err << std::endl;
+  //   return EXIT_FAILURE;
+  //   }
 
   return EXIT_SUCCESS;
 
