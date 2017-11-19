@@ -79,3 +79,7 @@ target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY
 set(EXNAME "dv-convert-mesh-to-stl-multiple")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+
+set(EXNAME "dv-convert-labels-to-mesh")
+add_executable(${EXNAME} ${EXNAME}.cxx)
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
