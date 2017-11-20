@@ -9,44 +9,63 @@
 #include <itkImageFileWriter.h>
 #include <itkFileTools.h>
 
+#include <itkNearestNeighborInterpolateImageFunction.h>
+#include <itkLinearInterpolateImageFunction.h>
+#include <itkBSplineInterpolateImageFunction.h>
+
+namespace po = boost::program_options;
+
 // Typedefs
 const unsigned int Dimension = 3;
 
-typedef signed short                                     PixelType;
-typedef itk::Image< PixelType, Dimension >               ImageType;
-typedef itk::ImageFileReader< ImageType >                ReaderType;
-typedef itk::ImageFileWriter< ImageType >                WriterType;
-typedef itk::IdentityTransform< double, Dimension >      TransformType;
-typedef itk::ResampleImageFilter< ImageType, ImageType > ResampleType;
+using PixelType = signed short;
+using ImageType = itk::Image< PixelType, Dimension >;
+using ReaderType = itk::ImageFileReader< ImageType >;
+using WriterType = itk::ImageFileWriter< ImageType >;
+using TransformType = itk::IdentityTransform< double, Dimension >;
+using ResampleType = itk::ResampleImageFilter< ImageType, ImageType >;
+
+using NNInterpolateType = itk::NearestNeighborInterpolateImageFunction< ImageType >;
+using LNInterpolateType = itk::LinearInterpolateImageFunction< ImageType >;
+using BSInterpolateType = itk::BSplineInterpolateImageFunction< ImageType >;
 
 int
 main( int argc, char* argv[] )
 {
 
-  // Deal with commandline arguments
-  if (4 != argc)
+  // Declare the supported options.
+  po::options_description description("Allowed options");
+  description.add_options()
+    ("help", "Print usage information.")
+    ("input-image", po::value<std::string>()->required(), "Filename of input image.")
+    ("output-image", po::value<std::string>()->required(), "Filename of output image.")
+    ("spacing", po::value<double>(), "Desired spacing.")
+    ("interpolator", po::value<std::string>()->default_value("LN"), "Interpolator.")
+  ;
+
+  po::variables_map vm;
+  po::store(po::parse_command_line(argc, argv, description), vm);
+
+  if (vm.count("help"))
     {
-    std::cerr << "Usage:\n"
-              << argv[0] << " <inputImage> <outputImage> <spacing>" << std::endl;
-    return EXIT_FAILURE;
+    std::cout << description << '\n';
+    return EXIT_SUCCESS;
     }
 
-  const std::string inputImage = argv[1];
-  const std::string outputImage = argv[2];
-  const double spacing = std::atof(argv[3]);
+  po::notify(vm);
 
   const auto reader = ReaderType::New();
   const auto resample = ResampleType::New();
   const auto writer = WriterType::New();
 
-  reader->SetFileName( inputImage );
+  reader->SetFileName( vm["input-image"].as<std::string>() );
   reader->Update();
 
   const auto image = ImageType::New();
   image->Graft( reader->GetOutput() );
 
   ImageType::SpacingType outputSpacing;
-  outputSpacing.Fill( spacing );
+  outputSpacing.Fill( vm["spacing"].as<double>() );
   auto inputSize = image->GetLargestPossibleRegion().GetSize();
   auto inputSpacing = image->GetSpacing();
   ImageType::SizeType outputSize;
@@ -63,8 +82,29 @@ main( int argc, char* argv[] )
   resample->SetSize( outputSize );
   resample->SetInput( image );
 
+  if ("NN" == vm["interpolator"].as<std::string>())
+    {
+    const auto interp = NNInterpolateType::New();
+    resample->SetInterpolator( interp );
+    }
+  else if ("LN" == vm["interpolator"].as<std::string>())
+    {
+    const auto interp = LNInterpolateType::New();
+    resample->SetInterpolator( interp );
+    }
+  else if ("BS" == vm["interpolator"].as<std::string>())
+    {
+    const auto interp = BSInterpolateType::New();
+    resample->SetInterpolator( interp );
+    }
+  else
+    {
+    std::cerr << "Unrecognized interpolator." << std::endl;
+    return EXIT_FAILURE;
+    }
+
   writer->SetInput( resample->GetOutput() );
-  writer->SetFileName( outputImage );
+  writer->SetFileName( vm["output-image"].as<std::string>() );
   writer->Update();
 
   return EXIT_SUCCESS;
