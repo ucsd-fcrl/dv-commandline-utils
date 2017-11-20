@@ -24,67 +24,48 @@ main( int argc, char* argv[] )
 {
 
   // Deal with commandline arguments
-  if (3 > argc)
+  if (4 != argc)
     {
     std::cerr << "Usage:\n"
-              << argv[0] << " <inputDir> <outputDir> [spacing] [ext]" << std::endl;
+              << argv[0] << " <inputImage> <outputImage> <spacing>" << std::endl;
     return EXIT_FAILURE;
     }
 
-  std::string inputDirectory = argv[1];
-  std::string outputDirectory = argv[2];
-  const double spacing = (argc > 3) ? atof(argv[3]) : 0.5;
-  const std::string ext = (argc > 4) ? argv[4] : "vtk";
+  const std::string inputImage = argv[1];
+  const std::string outputImage = argv[2];
+  const double spacing = std::atof(argv[3]);
 
-  itk::FileTools::CreateDirectory(outputDirectory.c_str());
+  const auto reader = ReaderType::New();
+  const auto resample = ResampleType::New();
+  const auto writer = WriterType::New();
 
-  // Make sure that the directories have slashes at the end
-  if ('/' != inputDirectory.back()) inputDirectory += '/';
-  if ('/' != outputDirectory.back()) outputDirectory += '/';
+  reader->SetFileName( inputImage );
+  reader->Update();
 
-  std::vector<std::string> FileNames;
-  while (
-    itksys::SystemTools::FileExists(
-      inputDirectory + std::to_string(FileNames.size()) + "." + ext,true)
-        ) FileNames.emplace_back(std::to_string(FileNames.size()) + "." + ext);
+  const auto image = ImageType::New();
+  image->Graft( reader->GetOutput() );
 
-  itkAssertOrThrowMacro(FileNames.size() > 0, "At least one image must be supplied.");
-
-  auto reader = ReaderType::New();
-  auto resample = ResampleType::New();
-  auto writer = WriterType::New();
-
-  for (auto file : FileNames)
+  ImageType::SpacingType outputSpacing;
+  outputSpacing.Fill( spacing );
+  auto inputSize = image->GetLargestPossibleRegion().GetSize();
+  auto inputSpacing = image->GetSpacing();
+  ImageType::SizeType outputSize;
+  for (unsigned int i = 0; i < Dimension; ++i)
     {
-    reader->SetFileName( inputDirectory + file );
-    reader->Update();
-
-    auto image = ImageType::New();
-    image->Graft( reader->GetOutput() );
-
-    ImageType::SpacingType outputSpacing;
-    outputSpacing.Fill( spacing );
-    auto inputSize = image->GetLargestPossibleRegion().GetSize();
-    auto inputSpacing = image->GetSpacing();
-    ImageType::SizeType outputSize;
-    for (unsigned int i = 0; i < Dimension; ++i)
-      {
-      outputSize[i] = std::floor(double(inputSize[i]) * inputSpacing[i] / outputSpacing[i]);
-      }
-
-    resample->SetTransform( TransformType::New() );
-    resample->SetOutputStartIndex( image->GetLargestPossibleRegion().GetIndex() );
-    resample->SetOutputOrigin( image->GetOrigin() );
-    resample->SetOutputDirection( image->GetDirection() );
-    resample->SetOutputSpacing( outputSpacing );
-    resample->SetSize( outputSize );
-    resample->SetInput( image );
-
-    writer->SetInput( resample->GetOutput() );
-    writer->SetFileName( outputDirectory + file );
-    writer->Update();
-
+    outputSize[i] = std::floor(double(inputSize[i]) * inputSpacing[i] / outputSpacing[i]);
     }
+
+  resample->SetTransform( TransformType::New() );
+  resample->SetOutputStartIndex( image->GetLargestPossibleRegion().GetIndex() );
+  resample->SetOutputOrigin( image->GetOrigin() );
+  resample->SetOutputDirection( image->GetDirection() );
+  resample->SetOutputSpacing( outputSpacing );
+  resample->SetSize( outputSize );
+  resample->SetInput( image );
+
+  writer->SetInput( resample->GetOutput() );
+  writer->SetFileName( outputImage );
+  writer->Update();
 
   return EXIT_SUCCESS;
 
