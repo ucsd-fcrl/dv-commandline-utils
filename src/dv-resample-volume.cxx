@@ -40,7 +40,7 @@ main( int argc, char* argv[] )
     ("input-image", po::value<std::string>()->required(), "Filename of input image.")
     ("output-image", po::value<std::string>()->required(), "Filename of output image.")
     ("spacing", po::value<double>(), "Desired spacing.")
-    ("interpolator", po::value<std::string>()->default_value("LN"), "Interpolator.")
+    ("interpolator", po::value<unsigned int>()->default_value(1), "Order of BSpline interpolation (0 to 5 allowed).")
   ;
 
   po::variables_map vm;
@@ -82,25 +82,27 @@ main( int argc, char* argv[] )
   resample->SetSize( outputSize );
   resample->SetInput( image );
 
-  if ("NN" == vm["interpolator"].as<std::string>())
+  switch (vm["interpolator"].as<unsigned int>())
     {
-    const auto interp = NNInterpolateType::New();
-    resample->SetInterpolator( interp );
-    }
-  else if ("LN" == vm["interpolator"].as<std::string>())
-    {
-    const auto interp = LNInterpolateType::New();
-    resample->SetInterpolator( interp );
-    }
-  else if ("BS" == vm["interpolator"].as<std::string>())
-    {
-    const auto interp = BSInterpolateType::New();
-    resample->SetInterpolator( interp );
-    }
-  else
-    {
-    std::cerr << "Unrecognized interpolator." << std::endl;
-    return EXIT_FAILURE;
+    case 0:
+      {
+      const auto interp = NNInterpolateType::New();
+      resample->SetInterpolator( interp );
+      break;
+      }
+    case 1:
+      {
+      const auto interp = LNInterpolateType::New();
+      resample->SetInterpolator( interp );
+      break;
+      }
+    default:
+      {
+      const auto interp = BSInterpolateType::New();
+      interp->SetSplineOrder( vm["interpolator"].as<unsigned int>() );
+      resample->SetInterpolator( interp );
+      break;
+      }
     }
 
   writer->SetInput( resample->GetOutput() );
