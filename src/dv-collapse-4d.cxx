@@ -23,37 +23,42 @@ int
 main(int argc, char **argv)
 {
 
-  ////////////////
-  // Parameters //
-  ////////////////
+  po::options_description description("Allowed options");
+  description.add_options()
+    ("help", "Print usage information.")
+    ("input-image",           po::value<std::string>()->required(), "Filename of the input image.")
+    ("output-image",          po::value<std::string>()->required(), "Filename of the output image.")
+    ("dimension-to-collapse", po::value<unsigned int>()->required(), "Dimension to collapse.")
+  ;
 
-  if (4 != argc)
+  po::variables_map vm;
+  po::store(po::parse_command_line(argc, argv, description), vm);
+
+  if (vm.count("help"))
     {
-    std::cerr << "Usage: ";
-    std::cerr << argv[0] << " <4D Image File>"
-                         << " <3D Image File>"
-                         << " <Dimension to Collapse>"
-                         << std::endl;
-    return EXIT_FAILURE;
+    std::cout << description << '\n';
+    return EXIT_SUCCESS;
     }
 
-  const std::string Image4D = argv[1];
-  const std::string Image3D = argv[2];
-  const unsigned int DimToCollapse = std::atoi(argv[3]);
+  po::notify(vm);
 
-  if (DimToCollapse > 3)
+//  const std::string Image4D = argv[1];
+//  const std::string Image3D = argv[2];
+//  const unsigned int DimToCollapse = std::atoi(argv[3]);
+
+  if (vm["dimension-to-collapse"].as<unsigned int>() > 3)
     {
-    std::cerr << "Invalid dimension supplied: " << DimToCollapse << std::endl;
+    std::cerr << "Invalid dimension supplied: " << vm["dimension-to-collapse"].as<unsigned int>() << std::endl;
     return EXIT_FAILURE;
     }
 
   const auto reader = TReader::New();
-  reader->SetFileName( Image4D );
+  reader->SetFileName( vm["input-image"].as<std::string>() );
   reader->Update();
 
   auto region = reader->GetOutput()->GetLargestPossibleRegion();
 
-  region.GetModifiableSize()[DimToCollapse] = 0;
+  region.GetModifiableSize()[vm["dimension-to-collapse"].as<unsigned int>()] = 0;
 
   const auto extract = TExtract::New();
   extract->SetInput( reader->GetOutput() );
@@ -62,7 +67,7 @@ main(int argc, char **argv)
 
   const auto writer = TWriter::New();
   writer->SetInput( extract->GetOutput() );
-  writer->SetFileName( Image3D );
+  writer->SetFileName( vm["output-image"].as<std::string>() );
   writer->Update();
 
   return EXIT_SUCCESS;
