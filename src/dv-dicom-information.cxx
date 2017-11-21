@@ -1,13 +1,13 @@
 // Boost
 #include <boost/program_options.hpp>
 
+namespace po = boost::program_options;
+
 // ITK
 #include "itkImageFileReader.h"
 #include "itkGDCMImageIO.h"
 #include "itkMetaDataObject.h"
 #include "gdcmGlobal.h"
-
-namespace po = boost::program_options;
 
 template<unsigned int Dimension, typename TPixel>
 void

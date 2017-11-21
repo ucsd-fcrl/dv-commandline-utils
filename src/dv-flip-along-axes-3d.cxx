@@ -1,6 +1,8 @@
 // Boost
 #include <boost/program_options.hpp>
 
+namespace po = boost::program_options;
+
 // ITK
 #include <itkImageFileReader.h>
 #include <itkFlipImageFilter.h>
