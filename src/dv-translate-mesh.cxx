@@ -10,6 +10,7 @@ namespace po = boost::program_options;
 #include <itkSTLMeshIO.h>
 #include <itkTranslationTransform.h>
 #include <itkTransformMeshFilter.h>
+#include <itksys/SystemTools.hxx>
 
 const unsigned int Dimension = 3;
 typedef float      TCoordinate;
@@ -56,7 +57,11 @@ main( int argc, char* argv[] )
 
   const auto reader = TReader::New();
   reader->SetFileName( inputFileName );
-  reader->SetMeshIO( itk::STLMeshIO::New() );
+  const auto i_ext = itksys::SystemTools::GetFilenameLastExtension(vm["input-mesh"].as<std::string>());
+  if (i_ext == ".stl" || i_ext == ".STL")
+    {
+    reader->SetMeshIO( itk::STLMeshIO::New() );
+    }
 
   TTranslate::OutputVectorType displacement;
   for (std::size_t i = 0; i < 3; ++i) displacement[i] = T[i];
@@ -71,7 +76,11 @@ main( int argc, char* argv[] )
   const auto writer = TWriter::New();
   writer->SetInput( transform->GetOutput() );
   writer->SetFileName( outputFileName );
-  writer->SetMeshIO( itk::STLMeshIO::New() );
+  const auto o_ext = itksys::SystemTools::GetFilenameLastExtension(vm["output-mesh"].as<std::string>());
+  if (o_ext == ".stl" || o_ext == ".STL")
+    {
+    writer->SetMeshIO( itk::STLMeshIO::New() );
+    }
 
   try
     {
