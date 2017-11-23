@@ -13,13 +13,13 @@ namespace po = boost::program_options;
 #include <itksys/SystemTools.hxx>
 
 const unsigned int Dimension = 3;
-typedef float      TCoordinate;
+using TCoordinate = float;
 
-typedef itk::Mesh< TCoordinate, Dimension > TMesh;
-typedef itk::MeshFileReader< TMesh >        TReader;
-typedef itk::MeshFileWriter< TMesh >        TWriter;
-typedef itk::TranslationTransform< TCoordinate, Dimension > TTranslate;
-typedef itk::TransformMeshFilter< TMesh, TMesh, TTranslate > TTransform;
+using TMesh      = itk::Mesh< TCoordinate, Dimension >;
+using TReader    = itk::MeshFileReader< TMesh >;
+using TWriter    = itk::MeshFileWriter< TMesh >;
+using TTranslate = itk::TranslationTransform< TCoordinate, Dimension >;
+using TTransform = itk::TransformMeshFilter< TMesh, TMesh, TTranslate >;
 
 int
 main( int argc, char* argv[] )

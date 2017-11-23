@@ -25,12 +25,13 @@ namespace po = boost::program_options;
 #include "includes/dvDICOMHeaderAttributes.h"
 
 // Typedefs
-typedef signed short PixelType;
 const unsigned int Dimension = 3;
-typedef itk::Image< PixelType, Dimension >  ImageType;
-typedef itk::ImageSeriesReader< ImageType > ReaderType;
-typedef itk::GDCMImageIO                    ImageIOType;
-typedef itk::ImageFileWriter< ImageType > WriterType;
+using PixelType = signed short;
+
+using ImageType = itk::Image< PixelType, Dimension >;
+using ReaderType = itk::ImageSeriesReader< ImageType >;
+using ImageIOType = itk::GDCMImageIO;
+using WriterType = itk::ImageFileWriter< ImageType >;
 
 std::string
 AddSlash(const char* arr)

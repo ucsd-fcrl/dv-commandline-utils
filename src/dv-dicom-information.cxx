@@ -68,10 +68,10 @@ main(int argc, char**argv)
       return EXIT_FAILURE;
     }
 
-  typedef itk::MetaDataDictionary   DictionaryType;
+  using DictionaryType = itk::MetaDataDictionary;
   const  DictionaryType & dictionary = dicomIO->GetMetaDataDictionary();
 
-  typedef itk::MetaDataObject< std::string > MetaDataStringType;
+  using MetaDataStringType = itk::MetaDataObject< std::string >;
 
   DictionaryType::ConstIterator tagItr = dictionary.Find( vm["dicom-tag"].as<std::string>() );
 

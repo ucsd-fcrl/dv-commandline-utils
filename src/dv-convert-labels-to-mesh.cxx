@@ -14,16 +14,16 @@ namespace po = boost::program_options;
 #include <itkUnaryFunctorImageFilter.h>
 
 const unsigned int Dimension = 3;
-typedef float      TCoordinate;
+using TCoordinate = float;
 
-typedef unsigned char  PixelType;
-typedef itk::Image< PixelType, Dimension >   ImageType;
+using PixelType = unsigned char;
+using ImageType = itk::Image< PixelType, Dimension >;
 
-typedef itk::Mesh<float,Dimension>                         MeshType;
-typedef itk::BinaryMask3DMeshSource< ImageType, MeshType >   MeshSourceType;
+using MeshType       = itk::Mesh<float,Dimension>;
+using MeshSourceType = itk::BinaryMask3DMeshSource< ImageType, MeshType >;
 
-typedef itk::Mesh< TCoordinate, Dimension > TMesh;
-typedef itk::MeshFileWriter< TMesh >        TWriter;
+using TMesh   = itk::Mesh< TCoordinate, Dimension >;
+using TWriter = itk::MeshFileWriter< TMesh >;
 
 namespace itk
 {
@@ -31,16 +31,18 @@ namespace itk
   namespace Functor
   {
 
-    template< class TInput, class TOutput>    class MyFilter 
+    template< class TInput, class TOutput>
+    class MyFilter
     {
     public:
-      MyFilter() {};    ~MyFilter() {};
-      typedef typename NumericTraits<TInput>::RealType InputRealType;
+      MyFilter() {};
+      ~MyFilter() {};
+      using InputRealType = typename NumericTraits<TInput>::RealType;
 
       inline TOutput operator()( const TInput & A )
-      {
+      {
         // Checks the functLabels for the value. Returns 1 if included. 0 otherwise
-        return static_cast<TOutput>( functLabels.count(A) );
+        return static_cast<TOutput>( functLabels.count(A) );
       }
 
       void SetLabels( std::set<PixelType> value )
@@ -55,25 +57,29 @@ namespace itk
   template<class TInputImage, class TOutputImage>
   class MyFunctorImageFilter :
   public UnaryFunctorImageFilter< TInputImage,TOutputImage,
-  Functor::MyFilter< typename TInputImage::PixelType,typename TOutputImage::PixelType> >
+  Functor::MyFilter< typename TInputImage::PixelType, typename TOutputImage::PixelType> >
   {
   public:
 
 
-    typedef MyFunctorImageFilter          Self;
-    typedef UnaryFunctorImageFilter< ImageType, ImageType,
-    Functor::MyFilter< typename ImageType::PixelType,typename ImageType::PixelType > >  Superclass;
+    using Self = MyFunctorImageFilter;
+    using Superclass = UnaryFunctorImageFilter< ImageType,
+                                                ImageType,
+                                                Functor::MyFilter< typename ImageType::PixelType, typename ImageType::PixelType > >;
 
-    typedef SmartPointer< Self >          Pointer;  typedef SmartPointer< const Self >    ConstPointer;
+    using Pointer = SmartPointer< Self >;
+    using ConstPointer = SmartPointer< const Self >;
 
-    itkNewMacro( Self );
+    itkNewMacro( Self );
     itkTypeMacro( MyFunctorImageFilter, UnaryFunctorImageFilter );
 
-    typedef typename Superclass::FunctorType      FunctorType;
-    typedef typename FunctorType::InputRealType   InputRealType;
+    using FunctorType = Superclass::FunctorType;
+    using InputRealType = typename FunctorType::InputRealType;
 
     void SetLabels( std::set<PixelType> value )
-    {    this->GetFunctor().SetLabels( value );    }
+    {
+      this->GetFunctor().SetLabels( value );
+    }
 
   protected:
 
@@ -107,7 +113,7 @@ int main( int argc, char* argv[] )
   // Reader
   //
 
-  typedef itk::ImageFileReader< ImageType >    ReaderType;
+  using ReaderType = itk::ImageFileReader< ImageType >;
   ReaderType::Pointer reader = ReaderType::New();
   reader->SetFileName( inputFileName );
 
@@ -124,10 +130,10 @@ int main( int argc, char* argv[] )
   //
   // make unary filter which checks if pixels are in set
   //
-  typedef itk::MyFunctorImageFilter<ImageType,ImageType >  FilterType;
+  using FilterType = itk::MyFunctorImageFilter<ImageType, ImageType >;
   FilterType::Pointer filter = FilterType::New();
-  filter->SetLabels( labels ); 
-  filter->SetInput( reader->GetOutput() ); 
+  filter->SetLabels( labels );
+  filter->SetInput( reader->GetOutput() );
 
   //
   //Meshing

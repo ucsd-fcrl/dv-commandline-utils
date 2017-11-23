@@ -18,19 +18,19 @@ void
 BinarizeMesh(po::variables_map vm)
 {
 
-  typedef itk::Mesh< MeshPixelType, Dimension > MeshType;
+  using MeshType = itk::Mesh< MeshPixelType, Dimension >;
 
-  typedef itk::MeshFileReader< MeshType >  MeshReaderType;
+  using MeshReaderType = itk::MeshFileReader< MeshType >;
 
-  typedef itk::Image< ImagePixelType, Dimension > InputImageType;
-  typedef itk::ImageFileReader< InputImageType >  ImageReaderType;
+  using InputImageType = itk::Image< ImagePixelType, Dimension >;
+  using ImageReaderType = itk::ImageFileReader< InputImageType >;
 
-  typedef unsigned char                             OutputPixelType;
-  typedef itk::Image< OutputPixelType, Dimension >  OutputImageType;
+  using OutputPixelType = unsigned char;
+  using OutputImageType = itk::Image< OutputPixelType, Dimension >;
 
-  typedef itk::TriangleMeshToBinaryImageFilter< MeshType, OutputImageType > FilterType;
+  using FilterType = itk::TriangleMeshToBinaryImageFilter< MeshType, OutputImageType >;
 
-  typedef itk::ImageFileWriter< OutputImageType > WriterType;
+  using WriterType = itk::ImageFileWriter< OutputImageType >;
 
   const auto meshReader = MeshReaderType::New();
   meshReader->SetFileName( vm["input-mesh"].as<std::string>() );

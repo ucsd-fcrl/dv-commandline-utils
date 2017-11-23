@@ -12,13 +12,13 @@ namespace po = boost::program_options;
 #include <itkTransformMeshFilter.h>
 
 const unsigned int Dimension = 3;
-typedef float      TCoordinate;
+using TCoordinate = float;
 
-typedef itk::Mesh< TCoordinate, Dimension > TMesh;
-typedef itk::MeshFileReader< TMesh >        TReader;
-typedef itk::MeshFileWriter< TMesh >        TWriter;
-typedef itk::ScaleTransform< TCoordinate, Dimension > TScale;
-typedef itk::TransformMeshFilter< TMesh, TMesh, TScale > TTransform;
+using TMesh      = itk::Mesh< TCoordinate, Dimension >;
+using TReader    = itk::MeshFileReader< TMesh >;
+using TWriter    = itk::MeshFileWriter< TMesh >;
+using TScale     = itk::ScaleTransform< TCoordinate, Dimension >;
+using TTransform = itk::TransformMeshFilter< TMesh, TMesh, TScale >;
 
 int
 main( int argc, char* argv[] )

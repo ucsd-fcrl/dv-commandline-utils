@@ -18,12 +18,11 @@ resample( const std::string iImageFileName,
           const double outsideValue)
 {
 
-  typedef itk::Image< PixelType, Dimension >               ImageType;
-  typedef itk::ImageFileReader< ImageType >                ReaderType;
-  typedef itk::ImageFileWriter< ImageType >                WriterType;
-  typedef itk::IdentityTransform< double, Dimension >      TransformType;
-  typedef itk::ResampleImageFilter< ImageType, ImageType > ResampleType;
-
+  using ImageType     = itk::Image< PixelType, Dimension >;
+  using ReaderType    = itk::ImageFileReader< ImageType >;
+  using WriterType    = itk::ImageFileWriter< ImageType >;
+  using TransformType = itk::IdentityTransform< double, Dimension >;
+  using ResampleType  = itk::ResampleImageFilter< ImageType, ImageType >;
 
   const auto iReader = ReaderType::New();
   const auto rReader = ReaderType::New();
@@ -42,7 +41,6 @@ resample( const std::string iImageFileName,
   writer->SetInput( resample->GetOutput() );
   writer->SetFileName( oImageFileName );
   writer->Update();
-
 
 }
 

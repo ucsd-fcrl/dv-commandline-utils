@@ -8,16 +8,15 @@ namespace po = boost::program_options;
 #include <itkExtractImageFilter.h>
 #include <itkImageFileWriter.h>
 
-typedef unsigned short TIOPixel;
+using TIOPixel = unsigned short;
 
 const unsigned int Dimension = 3;
 
-typedef itk::Image< TIOPixel, Dimension >     TImage3D;
-typedef itk::Image< TIOPixel, Dimension + 1 > TImage4D;
-
-typedef itk::ImageFileReader< TImage4D >              TReader;
-typedef itk::ExtractImageFilter< TImage4D, TImage3D > TExtract;
-typedef itk::ImageFileWriter< TImage3D >              TWriter;
+using TImage3D = itk::Image< TIOPixel, Dimension >;
+using TImage4D = itk::Image< TIOPixel, Dimension + 1 >;
+using TReader  = itk::ImageFileReader< TImage4D >;
+using TExtract = itk::ExtractImageFilter< TImage4D, TImage3D >;
+using TWriter  =itk::ImageFileWriter< TImage3D >;
 
 int
 main(int argc, char **argv)

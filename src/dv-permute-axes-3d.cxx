@@ -10,11 +10,11 @@ namespace po = boost::program_options;
 
 const unsigned int Dimension = 3;
  
-typedef itk::Image<short, Dimension> TImage;
+using TImage = itk::Image<short, Dimension>;
 
-typedef itk::ImageFileReader<TImage> TReader;
-typedef itk::PermuteAxesImageFilter<TImage> TPermute;
-typedef itk::ImageFileWriter<TImage> TWriter;
+using TReader  = itk::ImageFileReader<TImage>;
+using TPermute = itk::PermuteAxesImageFilter<TImage>;
+using TWriter  = itk::ImageFileWriter<TImage>;
 
 int
 main(int argc, char ** argv)

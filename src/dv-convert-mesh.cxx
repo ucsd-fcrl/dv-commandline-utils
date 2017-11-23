@@ -10,11 +10,11 @@ namespace po = boost::program_options;
 #include <itkSTLMeshIO.h>
 
 const unsigned int Dimension = 3;
-typedef float      TCoordinate;
+using TCoordinate = float;
 
-typedef itk::Mesh< TCoordinate, Dimension > TMesh;
-typedef itk::MeshFileReader< TMesh >        TReader;
-typedef itk::MeshFileWriter< TMesh >        TWriter;
+using TMesh   = itk::Mesh< TCoordinate, Dimension >;
+using TReader = itk::MeshFileReader< TMesh >;
+using TWriter = itk::MeshFileWriter< TMesh >;
 
 int main( int argc, char* argv[] )
 {
