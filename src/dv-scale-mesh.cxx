@@ -9,7 +9,6 @@ namespace po = boost::program_options;
 #include <itkMeshFileWriter.h>
 #include <itkSTLMeshIO.h>
 #include <itkScaleTransform.h>
-//#include <itkTranslationTransform.h>
 #include <itkTransformMeshFilter.h>
 
 const unsigned int Dimension = 3;
@@ -19,29 +18,49 @@ typedef itk::Mesh< TCoordinate, Dimension > TMesh;
 typedef itk::MeshFileReader< TMesh >        TReader;
 typedef itk::MeshFileWriter< TMesh >        TWriter;
 typedef itk::ScaleTransform< TCoordinate, Dimension > TScale;
-//typedef itk::TranslationTransform< TCoordinate, Dimension > TTranslate;
 typedef itk::TransformMeshFilter< TMesh, TMesh, TScale > TTransform;
 
 int
 main( int argc, char* argv[] )
 {
 
-  if ( 6 != argc )
+  // Declare the supported options.
+  po::options_description description("Allowed options");
+  description.add_options()
+    ("help", "Print usage information.")
+    ("input-mesh",  po::value<std::string>()->required(), "Filename of the input mesh.")
+    ("output-mesh", po::value<std::string>()->required(), "Filename of the output image.")
+    ("x",           po::value<double>()->required(), "Translation in the x direction.")
+    ("y",           po::value<double>()->required(), "Translation in the y direction.")
+    ("z",           po::value<double>()->required(), "Translation in the z direction.")
+  ;
+
+  po::variables_map vm;
+  po::store(po::parse_command_line(argc, argv, description), vm);
+
+  if (vm.count("help"))
     {
-    std::cerr << "Usage: "<< std::endl;
-    std::cerr << argv[0] << " <InputMesh> <OutputMesh> <X> <Y> <Z>" << std::endl;
-    return EXIT_FAILURE;
+    std::cout << description << '\n';
+    return EXIT_SUCCESS;
     }
 
-  const std::string inputFileName(argv[1]);
-  const std::string outputFileName(argv[2]);
+  po::notify(vm);
+
+  const std::string inputFileName(vm["input-mesh"].as<std::string>());
+  const std::string outputFileName(vm["output-mesh"].as<std::string>());
 
   TScale::OutputVectorType scale;
-  for (std::size_t i = 0; i < 3; ++i) scale[i] = std::atof(argv[i+3]);
+  scale[0] = vm["x"].as<double>();
+  scale[1] = vm["y"].as<double>();
+  scale[2] = vm["z"].as<double>();
 
   const auto reader = TReader::New();
   reader->SetFileName( inputFileName );
-  reader->SetMeshIO( itk::STLMeshIO::New() );
+  const auto i_ext = itksys::SystemTools::GetFilenameLastExtension(vm["input-mesh"].as<std::string>());
+  if (i_ext == ".stl" || i_ext == ".STL")
+    {
+    reader->SetMeshIO( itk::STLMeshIO::New() );
+    }
 
   const auto translate = TScale::New();
   translate->SetScale( scale );
@@ -53,7 +72,11 @@ main( int argc, char* argv[] )
   const auto writer = TWriter::New();
   writer->SetInput( transform->GetOutput() );
   writer->SetFileName( outputFileName );
-  writer->SetMeshIO( itk::STLMeshIO::New() );
+  const auto o_ext = itksys::SystemTools::GetFilenameLastExtension(vm["output-mesh"].as<std::string>());
+  if (o_ext == ".stl" || o_ext == ".STL")
+    {
+    writer->SetMeshIO( itk::STLMeshIO::New() );
+    }
 
   try
     {
