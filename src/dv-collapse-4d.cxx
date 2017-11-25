@@ -3,20 +3,10 @@
 
 namespace po = boost::program_options;
 
-// ITK
-#include <itkImageFileReader.h>
-#include <itkExtractImageFilter.h>
-#include <itkImageFileWriter.h>
-
-using TIOPixel = unsigned short;
+#include "includes/dvCollapse4D.h"
 
 const unsigned int Dimension = 3;
-
-using TImage3D = itk::Image< TIOPixel, Dimension >;
-using TImage4D = itk::Image< TIOPixel, Dimension + 1 >;
-using TReader  = itk::ImageFileReader< TImage4D >;
-using TExtract = itk::ExtractImageFilter< TImage4D, TImage3D >;
-using TWriter  =itk::ImageFileWriter< TImage3D >;
+using TPixel = unsigned short;
 
 int
 main(int argc, char **argv)
@@ -26,8 +16,8 @@ main(int argc, char **argv)
   description.add_options()
     ("help", "Print usage information.")
     ("input-image",           po::value<std::string>()->required(), "Filename of the input image.")
-    ("output-image",          po::value<std::string>()->required(), "Filename of the output image.")
     ("dimension-to-collapse", po::value<unsigned int>()->required(), "Dimension to collapse.")
+    ("output-image",          po::value<std::string>()->required(), "Filename of the output image.")
   ;
 
   po::variables_map vm;
@@ -41,33 +31,17 @@ main(int argc, char **argv)
 
   po::notify(vm);
 
-//  const std::string Image4D = argv[1];
-//  const std::string Image3D = argv[2];
-//  const unsigned int DimToCollapse = std::atoi(argv[3]);
+  const auto IImage        = vm["input-image"].as<std::string>();
+  const auto DimToCollapse = vm["dimension-to-collapse"].as<unsigned int>();
+  const auto OImage        = vm["output-image"].as<std::string>();
 
-  if (vm["dimension-to-collapse"].as<unsigned int>() > 3)
+  if (DimToCollapse > 3)
     {
-    std::cerr << "Invalid dimension supplied: " << vm["dimension-to-collapse"].as<unsigned int>() << std::endl;
+    std::cerr << "Invalid dimension supplied: " << DimToCollapse << std::endl;
     return EXIT_FAILURE;
     }
 
-  const auto reader = TReader::New();
-  reader->SetFileName( vm["input-image"].as<std::string>() );
-  reader->Update();
-
-  auto region = reader->GetOutput()->GetLargestPossibleRegion();
-
-  region.GetModifiableSize()[vm["dimension-to-collapse"].as<unsigned int>()] = 0;
-
-  const auto extract = TExtract::New();
-  extract->SetInput( reader->GetOutput() );
-  extract->SetExtractionRegion( region );
-  extract->SetDirectionCollapseToSubmatrix();
-
-  const auto writer = TWriter::New();
-  writer->SetInput( extract->GetOutput() );
-  writer->SetFileName( vm["output-image"].as<std::string>() );
-  writer->Update();
+  dv::Collapse4D<Dimension, TPixel>(IImage, DimToCollapse, OImage);
 
   return EXIT_SUCCESS;
 

@@ -3,33 +3,10 @@
 
 namespace po = boost::program_options;
 
-// ITK
-#include <itkImageFileReader.h>
-#include <itkImageFileWriter.h>
+#include "includes/dvConvertImage.h"
 
-namespace dv
-{
-
-template<unsigned int Dimension, typename TPixel>
-void
-threshold(po::variables_map vm)
-{
-
-  using TImage = itk::Image<TPixel, Dimension>;
-  using TReader = itk::ImageFileReader<TImage>;
-  using TWriter = itk::ImageFileWriter<TImage>;
- 
-  const auto reader = TReader::New();
-  reader->SetFileName( vm["input-image"].as<std::string>() );
- 
-  const auto writer = TWriter::New();
-  writer->SetInput( reader->GetOutput() );
-  writer->SetFileName( vm["output-image"].as<std::string>() );
-  writer->Update();
-
-}
-
-}
+const unsigned int Dimension = 3;
+using TPixel = short;
 
 int
 main(int argc, char **argv)
@@ -54,7 +31,10 @@ main(int argc, char **argv)
 
   po::notify(vm);
 
-  dv::threshold<3, signed short>(vm);
+  const std::string IImage = vm["input-image"].as<std::string>();
+  const std::string OImage = vm["output-image"].as<std::string>();
+
+  dv::ConvertImage<Dimension, TPixel>(IImage, OImage);
 
   return EXIT_SUCCESS;
 }

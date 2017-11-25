@@ -3,17 +3,7 @@
 
 namespace po = boost::program_options;
 
-// ITK
-#include <itkImageFileReader.h>
-#include <itkChangeInformationImageFilter.h>
-#include <itkImageFileWriter.h>
-
-const unsigned int Dimension = 3;
- 
-using TImage  = itk::Image<unsigned short, Dimension>;
-using TReader = itk::ImageFileReader<TImage>;
-using TInfo   = itk::ChangeInformationImageFilter<TImage>;
-using TWriter = itk::ImageFileWriter<TImage>;
+#include "includes/dvChangeInformation3D.h"
 
 int
 main(int argc, char ** argv)
@@ -38,23 +28,11 @@ main(int argc, char ** argv)
 
   po::notify(vm);
 
-  const auto referenceReader = TReader::New();
-  referenceReader->SetFileName( vm["reference-image"].as<std::string>() );
-  referenceReader->Update();
+  const auto IImage = vm["input-image"].as<std::string>();
+  const auto RImage = vm["reference-image"].as<std::string>();
+  const auto OImage = vm["output-image"].as<std::string>();
 
-  const auto reader = TReader::New();
-  reader->SetFileName( vm["input-image"].as<std::string>() );
-
-  const auto info = TInfo::New();
-  info->SetInput( reader->GetOutput() );
-  info->SetReferenceImage( referenceReader->GetOutput() );
-  info->UseReferenceImageOn();
-  info->ChangeAll();
-
-  const auto writer = TWriter::New();
-  writer->SetInput( info->GetOutput() );
-  writer->SetFileName( vm["output-image"].as<std::string>() );
-  writer->Update();
+  dv::ChangeInformation3D<Dimension, TPixel>(IImage, RImage, OImage);
  
   return EXIT_SUCCESS;
 }
