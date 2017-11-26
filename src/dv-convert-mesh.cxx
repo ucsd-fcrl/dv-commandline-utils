@@ -3,69 +3,38 @@
 
 namespace po = boost::program_options;
 
-// ITK
-#include <itkMesh.h>
-#include <itkMeshFileReader.h>
-#include <itkMeshFileWriter.h>
-#include <itkSTLMeshIO.h>
+// Custom
+#include "includes/dvConvertMesh.h"
 
 const unsigned int Dimension = 3;
 using TCoordinate = float;
 
-using TMesh   = itk::Mesh< TCoordinate, Dimension >;
-using TReader = itk::MeshFileReader< TMesh >;
-using TWriter = itk::MeshFileWriter< TMesh >;
-
 int main( int argc, char* argv[] )
 {
 
-  if ( 3 != argc )
+  // Declare the supported options.
+  po::options_description description("Allowed options");
+  description.add_options()
+    ("help", "Print usage information.")
+    ("input-mesh",  po::value<std::string>()->required(), "Filename of the input mesh.")
+    ("output-mesh", po::value<std::string>()->required(), "Filename of the output mesh.")
+  ;
+
+  po::variables_map vm;
+  po::store(po::parse_command_line(argc, argv, description), vm);
+
+  if (vm.count("help"))
     {
-    std::cerr << "Usage:\n"<< std::endl;
-    std::cerr << argv[0] << " <InputMesh> <OutputMesh>" << std::endl;
-    return EXIT_FAILURE;
+    std::cout << description << '\n';
+    return EXIT_SUCCESS;
     }
 
-  const std::string inputFileName(argv[1]);
-  const std::string outputFileName(argv[2]);
+  po::notify(vm);
 
-  //
-  // Reader
-  //
+  const std::string IMesh(vm["input-mesh"].as<std::string>());
+  const std::string OMesh(vm["output-mesh"].as<std::string>());
 
-  const auto reader = TReader::New();
-  reader->SetFileName( inputFileName );
-
-  const auto i_ext = inputFileName.substr(inputFileName.size() - 3, 3);
-  if (i_ext == "stl" || i_ext == "STL")
-    {
-    reader->SetMeshIO( itk::STLMeshIO::New() );
-    }
-
-  //
-  // Writer
-  //
-
-  const auto writer = TWriter::New();
-  writer->SetInput( reader->GetOutput() );
-  writer->SetFileName( outputFileName );
-
-  const auto o_ext = outputFileName.substr(outputFileName.size() - 3, 3);
-  if (o_ext == "stl" || o_ext == "STL")
-    {
-    writer->SetMeshIO( itk::STLMeshIO::New() );
-    }
-
-  try
-    {
-    writer->Update();
-    }
-  catch ( itk::ExceptionObject & err )
-    {
-    std::cerr << "There was a problem writing the file." << std::endl;
-    std::cerr << err << std::endl;
-    return EXIT_FAILURE;
-    }
+  dv::ConvertMesh<Dimension, TCoordinate>(IMesh, OMesh);
 
   return EXIT_SUCCESS;
 

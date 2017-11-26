@@ -9,8 +9,9 @@ namespace po = boost::program_options;
 #include <itkImageFileWriter.h>
 
 const unsigned int Dimension = 3;
+using TPixel = short;
  
-using TImage = itk::Image<short, Dimension>;
+using TImage = itk::Image<TPixel, Dimension>;
 
 using TReader  = itk::ImageFileReader<TImage>;
 using TPermute = itk::PermuteAxesImageFilter<TImage>;
@@ -24,11 +25,9 @@ main(int argc, char ** argv)
   po::options_description description("Allowed options");
   description.add_options()
     ("help", "Print usage information.")
-    ("input-image",  po::value<std::string>()->required(), "Filename of the input image.")
-    ("output-image", po::value<std::string>()->required(), "Filename of the output image.")
-    ("x",            po::value<unsigned int>()->required(),      "Translation in the x direction.")
-    ("y",            po::value<unsigned int>()->required(),      "Translation in the y direction.")
-    ("z",            po::value<unsigned int>()->required(),      "Translation in the z direction.")
+    ("input-image",  po::value<std::string>()->required(),                             "Filename of the input image.")
+    ("output-image", po::value<std::string>()->required(),                             "Filename of the output image.")
+    ("order",        po::value<std::vector<unsigned int>>()->multitoken()->required(), "Desired axis order.")
   ;
 
   po::variables_map vm;
@@ -44,11 +43,14 @@ main(int argc, char ** argv)
 
   const std::string IImage = vm["input-image"].as<std::string>();
   const std::string OImage = vm["output-image"].as<std::string>();
+  const std::vector<unsigned int> orderVec = vm["order"].as<std::vector<unsigned int>>();
 
   itk::FixedArray<unsigned int, Dimension> order;
-  order[0] = vm["x"].as<unsigned int>();
-  order[1] = vm["y"].as<unsigned int>();
-  order[2] = vm["z"].as<unsigned int>();
+
+  for (unsigned int i = 0; i < Dimension; ++i)
+    {
+    order[i] = orderVec.at(i);
+    }  
 
   const auto reader = TReader::New();
   reader->SetFileName( IImage );

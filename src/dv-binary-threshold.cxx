@@ -4,9 +4,12 @@
 namespace po = boost::program_options;
 
 // Custom
+#include "includes/dvReadImageIOBase.h"
+#include "includes/dvImageInformationFunctors.h"
 #include "includes/dvBinaryThreshold.h"
 
 const unsigned int Dimension = 3;
+using TPixel = short;
 
 int
 main(int argc, char **argv)
@@ -35,7 +38,12 @@ main(int argc, char **argv)
 
   po::notify(vm);
 
-  dv::BinaryThreshold<Dimension, signed short>(vm);
+  const auto imageBase = dv::ReadImageIOBase(vm["input-image"].as<std::string>());
+  dv::GetComponentTypeFunction component_type;
+  const auto ct = component_type.GetInfo(imageBase);
+  std::cout << ct << std::endl;
+
+  dv::BinaryThreshold<Dimension, TPixel>(vm);
 
   return EXIT_SUCCESS;
 }
