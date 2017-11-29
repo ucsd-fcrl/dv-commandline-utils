@@ -10,6 +10,7 @@ namespace po = boost::program_options;
 #include <itkMesh.h>
 #include <itkMeshFileReader.h>
 #include <itkMeshFileWriter.h>
+#include <itkSTLMeshIO.h>
 
 // CPD
 #include <cpd/nonrigid.hpp>
@@ -17,6 +18,7 @@ namespace po = boost::program_options;
 // Custom
 #include "includes/dvITKPointSetToCPDMatrix.h"
 #include "includes/dvUpdateITKPointSetWithCPDMatrix.h"
+#include "includes/dvGetLowercaseFileExtension.h"
 
 const unsigned int Dimension = 3;
 using TCoordinate = float;
@@ -68,6 +70,10 @@ int main(int argc, char** argv)
   // Fixed
   const auto fReader = TMeshReader::New();
   fReader->SetFileName( fFileName );
+  if (".stl" == dv::GetLowercaseFileExtension(fFileName))
+    {
+    fReader->SetMeshIO( itk::STLMeshIO::New() );
+    }
   fReader->Update();
 
   const auto fMesh = TMesh::New();
@@ -78,6 +84,10 @@ int main(int argc, char** argv)
 
   // Moving
   const auto mReader = TMeshReader::New();
+  if (".stl" == dv::GetLowercaseFileExtension(mFileName))
+    {
+    mReader->SetMeshIO( itk::STLMeshIO::New() );
+    }
   mReader->SetFileName( mFileName );
   mReader->Update();
 
@@ -110,6 +120,10 @@ int main(int argc, char** argv)
   dv::UpdateITKPointSetWithCPDMatrix<TMesh>(oMesh, result.points);
 
   const auto writer = TMeshWriter::New();
+  if (".stl" == dv::GetLowercaseFileExtension(oFileName))
+    {
+    writer->SetMeshIO( itk::STLMeshIO::New() );
+    }
   writer->SetInput( oMesh );
   writer->SetFileName( oFileName );
   writer->Update();

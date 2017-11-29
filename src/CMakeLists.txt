@@ -12,8 +12,14 @@ include(${ITK_USE_FILE})
 find_package(Cpd REQUIRED)
 find_package(ITK REQUIRED)
 
-find_package(Boost COMPONENTS program_options REQUIRED)
+find_package(Boost COMPONENTS program_options filesystem system REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
+
+file(GLOB SRC src/*.cxx)
+message(${SRC})
+
+include_directories("includes/")
+add_library(dv-lib ${SRC})
 
 set(EXNAME "dv-convert-dicom-series-to-volume")
 add_executable(${EXNAME} ${EXNAME}.cxx)
@@ -81,4 +87,9 @@ target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY
 
 set(EXNAME "dv-nonrigid-cpd")
 add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} Cpd::Library-C++ ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(${EXNAME} dv-lib
+                                Cpd::Library-C++
+                                ${ITK_LIBRARIES}
+                                ${Boost_PROGRAM_OPTIONS_LIBRARY}
+                                ${Boost_FILESYSTEM_LIBRARY}
+                                ${Boost_SYSTEM_LIBRARY})
