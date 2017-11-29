@@ -1,3 +1,5 @@
+#ifndef dv_ConvertMesh_h
+#define dv_ConvertMesh_h
 
 // ITK
 #include <itkMesh.h>
@@ -49,3 +51,5 @@ ConvertMesh(const std::string &IMesh,
 }
 
 }
+
+#endif

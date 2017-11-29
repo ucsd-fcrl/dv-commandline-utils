@@ -1,3 +1,5 @@
+#ifndef dv_BinaryThreshold_h
+#define dv_BinaryThreshold_h
 
 // ITK
 #include <itkImageFileReader.h>
@@ -52,3 +54,4 @@ BinaryThreshold(po::variables_map vm)
 
 }
 
+#endif

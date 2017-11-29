@@ -1,3 +1,5 @@
+#ifndef dv_ImageInformationFunctors_h
+#define dv_ImageInformationFunctors_h
 
 namespace dv
 {
@@ -191,3 +193,4 @@ struct GetByteOrderFunction
 
 }
 
+#endif

@@ -1,3 +1,5 @@
+#ifndef dv_ITKPointSetToCPDMatrix_h
+#define dv_ITKPointSetToCPDMatrix_h
 
 #include <cpd/nonrigid.hpp>
 
@@ -27,3 +29,4 @@ ITKPointSetToCPDMatrix(typename TPointSet::Pointer points)
 }
 }
 
+#endif

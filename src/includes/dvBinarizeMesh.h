@@ -1,3 +1,5 @@
+#ifndef dv_BinarizeMesh_h
+#define dv_BinarizeMesh_h
 
 // ITK
 #include <itkMesh.h>
@@ -77,3 +79,4 @@ BinarizeMesh(po::variables_map vm)
 
 }
 
+#endif

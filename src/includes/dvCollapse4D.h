@@ -1,3 +1,5 @@
+#ifndef dv_Collapse4D_h
+#define dv_Collapse4D_h
 
 // ITK
 #include <itkImageFileReader.h>
@@ -39,3 +41,4 @@ void Collapse4D(const std::string &IImage,
 
 }
 
+#endif

@@ -1,3 +1,6 @@
+#ifndef dv_ReadImageIOBase_h
+#define dv_ReadImageIOBase_h
+
 #include <string>
 #include <itkImageFileReader.h>
 #include <itkImageIOBase.h>
@@ -28,3 +31,5 @@ ReadImageIOBase(const std::string &fileName)
 }
 
 }
+
+#endif

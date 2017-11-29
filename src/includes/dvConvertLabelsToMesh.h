@@ -1,3 +1,5 @@
+#ifndef dv_ConvertLabelsToMesh_h
+#define dv_ConvertLabelsToMesh_h
 
 // ITK
 #include <itkMesh.h>
@@ -67,3 +69,5 @@ ConvertLabelsToMesh(const std::string &IImage, const std::set<TPixel> &LabelSet,
 }
 
 }
+
+#endif

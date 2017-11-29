@@ -1,3 +1,5 @@
+#ifndef dv_FlipAlongAxes3D_h
+#define dv_FlipAlongAxes3D_h
 
 // ITK
 #include <itkImageFileReader.h>
@@ -36,3 +38,4 @@ FlipAlongAxes3D(const std::string &IImage,
 
 }
 
+#endif

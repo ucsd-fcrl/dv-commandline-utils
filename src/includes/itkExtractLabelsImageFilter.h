@@ -1,3 +1,6 @@
+#ifndef itk_ExtractLabelsImageFilter_h
+#define itk_ExtractLabelsImageFilter_h
+
 #include <itkImage.h>
 #include <itkUnaryFunctorImageFilter.h>
 
@@ -68,3 +71,5 @@ namespace itk
 
   };   // end of class
 };
+
+#endif

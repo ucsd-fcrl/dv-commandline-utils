@@ -1,3 +1,5 @@
+#ifndef dv_ChangeInformation3D_h
+#define dv_ChangeInformation3D_h
 
 // ITK
 #include <itkImageFileReader.h>
@@ -42,3 +44,4 @@ void ChangeInformation3D(const std::string &IImage,
 
 }
 
+#endif

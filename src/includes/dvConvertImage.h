@@ -1,3 +1,5 @@
+#ifndef dv_ConvertImage_h
+#define dv_ConvertImage_h
 
 // ITK
 #include <itkImageFileReader.h>
@@ -28,3 +30,4 @@ ConvertImage(const std::string &IImage,
 
 }
 
+#endif
