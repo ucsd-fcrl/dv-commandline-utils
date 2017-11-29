@@ -3,7 +3,7 @@
 
 namespace po = boost::program_options;
 
-#include "includes/dvConvertImage.h"
+#include <dvConvertImage.h>
 
 const unsigned int Dimension = 3;
 using TPixel = short;

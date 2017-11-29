@@ -3,7 +3,7 @@
 
 namespace po = boost::program_options;
 
-#include "includes/dvCollapse4D.h"
+#include <dvCollapse4D.h>
 
 const unsigned int Dimension = 3;
 using TPixel = unsigned short;

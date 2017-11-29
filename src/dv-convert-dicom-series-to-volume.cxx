@@ -22,7 +22,7 @@ namespace po = boost::program_options;
 #include <gdcmSorter.h>
 
 // Custom
-#include "includes/dvDICOMHeaderAttributes.h"
+#include <dvDICOMHeaderAttributes.h>
 
 // Typedefs
 const unsigned int Dimension = 3;

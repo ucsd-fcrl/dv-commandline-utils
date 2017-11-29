@@ -6,8 +6,10 @@ namespace po = boost::program_options;
 // ITK
 #include <itkImageFileReader.h>
 #include <itkImageIOBase.h>
-#include "includes/dvImageInformationFunctors.h"
-#include "includes/dvReadImageIOBase.h"
+
+// Custom
+#include <dvImageInformationFunctors.h>
+#include <dvReadImageIOBase.h>
 
 int
 main( int argc, char** argv )

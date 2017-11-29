@@ -4,9 +4,9 @@
 namespace po = boost::program_options;
 
 // Custom
-#include "includes/dvReadImageIOBase.h"
-#include "includes/dvImageInformationFunctors.h"
-#include "includes/dvBinaryThreshold.h"
+#include <dvReadImageIOBase.h>
+#include <dvImageInformationFunctors.h>
+#include <dvBinaryThreshold.h>
 
 const unsigned int Dimension = 3;
 using TPixel = short;

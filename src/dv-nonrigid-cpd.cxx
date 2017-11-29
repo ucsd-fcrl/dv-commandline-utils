@@ -16,9 +16,9 @@ namespace po = boost::program_options;
 #include <cpd/nonrigid.hpp>
 
 // Custom
-#include "includes/dvITKPointSetToCPDMatrix.h"
-#include "includes/dvUpdateITKPointSetWithCPDMatrix.h"
-#include "includes/dvGetLowercaseFileExtension.h"
+#include <dvITKPointSetToCPDMatrix.h>
+#include <dvUpdateITKPointSetWithCPDMatrix.h>
+#include <dvGetLowercaseFileExtension.h>
 
 const unsigned int Dimension = 3;
 using TCoordinate = float;

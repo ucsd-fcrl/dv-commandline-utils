@@ -4,7 +4,7 @@
 namespace po = boost::program_options;
 
 // Custom
-#include "includes/dvConvertLabelsToMesh.h"
+#include <dvConvertLabelsToMesh.h>
 
 const unsigned int Dimension = 3;
 using TCoordinate = float;

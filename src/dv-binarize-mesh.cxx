@@ -4,7 +4,7 @@
 namespace po = boost::program_options;
 
 // Custom
-#include "includes/dvBinarizeMesh.h"
+#include <dvBinarizeMesh.h>
 
 const unsigned int Dimension = 3;
 using ImagePixelType = unsigned char;

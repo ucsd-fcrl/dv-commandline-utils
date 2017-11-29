@@ -7,7 +7,7 @@ namespace po = boost::program_options;
 #include <itkFixedArray.h>
 
 // Custom
-#include "includes/dvFlipAlongAxes3D.h"
+#include <dvFlipAlongAxes3D.h>
 
 const unsigned int Dimension = 3;
 using TPixel = short;
