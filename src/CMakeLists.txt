@@ -79,6 +79,6 @@ set(EXNAME "dv-convert-labels-to-mesh")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
-set(EXNAME "dv-cpd")
+set(EXNAME "dv-nonrigid-cpd")
 add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} PRIVATE Cpd::Library-C++ ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(${EXNAME} Cpd::Library-C++ ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
