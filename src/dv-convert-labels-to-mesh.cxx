@@ -20,7 +20,7 @@ main( int argc, char* argv[] )
     ("help", "Print usage information.")
     ("input-image", po::value<std::string>()->required(),           "Filename of the input mesh.")
     ("output-mesh", po::value<std::string>()->required(),           "Filename of the output image.")
-    ("labels",      po::value<std::vector<TPixel>>()->multitoken(), "Labels to extract from input image.")
+    ("labels",      po::value<std::vector<unsigned short>>()->multitoken(), "Labels to extract from input image.")
   ;
 
   po::variables_map vm;
@@ -36,7 +36,7 @@ main( int argc, char* argv[] )
 
   const std::string inputFileName(vm["input-image"].as<std::string>());
   const std::string outputFileName(vm["output-mesh"].as<std::string>());
-  const std::vector<TPixel> labelVector = vm["labels"].as<std::vector<TPixel>>();
+  const std::vector<unsigned short> labelVector = vm["labels"].as<std::vector<unsigned short>>();
 
   //
   // make Set from labels given
