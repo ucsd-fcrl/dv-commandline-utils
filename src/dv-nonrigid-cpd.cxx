@@ -109,7 +109,7 @@ int main(int argc, char** argv)
 
   cpd::NonrigidResult result = nonrigid.run(fMat, mMat);
 
-  std::cout << "Runtime (ms): "    << result.runtime.count() << std::endl;
+  std::cout << "Runtime (seconds): "    << std::chrono::duration_cast<std::chrono::seconds>(result.runtime).count() << std::endl;
   std::cout << "Iterations: " << result.iterations << std::endl;
 
   // Output
