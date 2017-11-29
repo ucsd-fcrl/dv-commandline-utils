@@ -9,6 +9,9 @@ set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "build type" FORCE)
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
 
+find_package(Cpd REQUIRED)
+find_package(ITK REQUIRED)
+
 find_package(Boost COMPONENTS program_options REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
@@ -75,3 +78,7 @@ target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY
 set(EXNAME "dv-convert-labels-to-mesh")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+
+set(EXNAME "dv-cpd")
+add_executable(${EXNAME} ${EXNAME}.cxx)
+target_link_libraries(${EXNAME} PRIVATE Cpd::Library-C++ ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
