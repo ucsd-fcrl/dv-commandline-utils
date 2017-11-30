@@ -4,7 +4,7 @@ project(dv-image-information)
 
 set(CMAKE_CXX_FLAGS "-std=c++14" CACHE STRING "cxx compiler flags" FORCE)
 set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra" CACHE STRING "cxx debug compiler flags" FORCE)
-set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "build type" FORCE)
+#set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "build type" FORCE)
 
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})

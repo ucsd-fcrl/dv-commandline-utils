@@ -17,7 +17,9 @@ namespace dv
 
 template<unsigned int Dimension, typename MeshPixelType, typename ImagePixelType>
 void
-BinarizeMesh(po::variables_map vm)
+BinarizeMesh(const std::string &iMesh,
+             const std::string &rImage,
+             const std::string &oImage)
 {
 
   using MeshType = itk::Mesh< MeshPixelType, Dimension >;
@@ -35,45 +37,27 @@ BinarizeMesh(po::variables_map vm)
   using WriterType = itk::ImageFileWriter< OutputImageType >;
 
   const auto meshReader = MeshReaderType::New();
-  meshReader->SetFileName( vm["input-mesh"].as<std::string>() );
+  meshReader->SetFileName( iMesh );
 
-  const auto i_ext = vm["input-mesh"].as<std::string>().substr(vm["input-mesh"].as<std::string>().size() - 3, 3);
+  const auto i_ext = iMesh.substr(iMesh.size() - 3, 3);
   if (i_ext == "stl" || i_ext == "STL")
     {
     meshReader->SetMeshIO( itk::STLMeshIO::New() );
     }
 
   const auto imageReader = ImageReaderType::New();
-  imageReader->SetFileName( vm["reference-image"].as<std::string>() );
+  imageReader->SetFileName( rImage );
 
   const auto filter = FilterType::New();
   filter->SetInput( meshReader->GetOutput() );
   filter->SetInfoImage( imageReader->GetOutput() );
   filter->SetInsideValue( 1 );
-
-  try
-    {
-    filter->Update();
-    }
-  catch( itk::ExceptionObject & error )
-    {
-    std::cerr << "Error: " << error << std::endl;
-//    return EXIT_FAILURE;
-    }
+  filter->Update();
 
   const auto writer = WriterType::New();
-  writer->SetFileName( vm["output-image"].as<std::string>() );
+  writer->SetFileName( oImage );
   writer->SetInput( filter->GetOutput() );
-
-  try
-    {
-    writer->Update();
-    }
-  catch( itk::ExceptionObject & error )
-    {
-    std::cerr << "Error: " << error << std::endl;
-//    return EXIT_FAILURE;
-    }
+  writer->Update();
 
 }
 
