@@ -27,6 +27,11 @@ using TMesh = itk::Mesh<TCoordinate, Dimension>;
 using TMeshReader = itk::MeshFileReader<TMesh>;
 using TMeshWriter = itk::MeshFileWriter<TMesh>;
 
+void callback(const cpd::NonrigidResult &)
+{
+  std::cout << "Iteration complete." << std::endl;
+}
+
 int main(int argc, char** argv)
 {
 
@@ -106,6 +111,8 @@ int main(int argc, char** argv)
   nonrigid.linked( vm["linked"].as<bool>() );
   nonrigid.beta( vm["beta"].as<double>() );
   nonrigid.lambda( vm["lambda"].as<double>() );
+
+  nonrigid.add_callback(callback);
 
   cpd::NonrigidResult result = nonrigid.run(fMat, mMat);
 
