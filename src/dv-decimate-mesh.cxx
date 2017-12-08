@@ -13,13 +13,13 @@ namespace po = boost::program_options;
 const unsigned int Dimension = 3;
 using TCoordinate = float;
  
-typedef itk::QuadEdgeMesh< TCoordinate, Dimension >                      TMesh;
-typedef itk::MeshFileReader< TMesh >                                     TReader;
-typedef itk::MeshFileWriter< TMesh >                                     TWriter;
-typedef itk::NumberOfFacesCriterion< TMesh >                             TCriterion;
-typedef itk::SquaredEdgeLengthDecimationQuadEdgeMeshFilter< TMesh,
-                                                            TMesh,
-                                                            TCriterion > TDecimation;
+using TMesh       = itk::QuadEdgeMesh< TCoordinate, Dimension >;
+using TReader     = itk::MeshFileReader< TMesh >;
+using TWriter     = itk::MeshFileWriter< TMesh >;
+using TCriterion  = itk::NumberOfFacesCriterion< TMesh >;
+using TDecimation = itk::SquaredEdgeLengthDecimationQuadEdgeMeshFilter< TMesh,
+                                                                        TMesh,
+                                                                        TCriterion >;
  
 int
 main( int argc, char ** argv )
