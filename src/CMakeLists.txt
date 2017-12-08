@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.12)
 project(dv-image-information)
 
 set(CMAKE_CXX_FLAGS "-std=c++14" CACHE STRING "cxx compiler flags" FORCE)
-set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra" CACHE STRING "cxx debug compiler flags" FORCE)
+set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pg" CACHE STRING "cxx debug compiler flags" FORCE)
 #set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "build type" FORCE)
 
 find_package(ITK REQUIRED)
@@ -81,6 +81,10 @@ add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 set(EXNAME "dv-convert-labels-to-mesh")
+add_executable(${EXNAME} ${EXNAME}.cxx)
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+
+set(EXNAME "dv-decimate-mesh")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
