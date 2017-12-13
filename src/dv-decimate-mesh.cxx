@@ -6,7 +6,7 @@ namespace po = boost::program_options;
 // ITK
 #include <itkQuadEdgeMesh.h>
 #include <itkQuadEdgeMeshDecimationCriteria.h>
-#include <itkSquaredEdgeLengthDecimationQuadEdgeMeshFilter.h>
+#include <itkQuadricDecimationQuadEdgeMeshFilter.h>
 #include <itkMeshFileReader.h>
 #include <itkMeshFileWriter.h>
  
@@ -16,10 +16,10 @@ using TCoordinate = float;
 using TMesh       = itk::QuadEdgeMesh< TCoordinate, Dimension >;
 using TReader     = itk::MeshFileReader< TMesh >;
 using TWriter     = itk::MeshFileWriter< TMesh >;
-using TCriterion  = itk::NumberOfFacesCriterion< TMesh >;
-using TDecimation = itk::SquaredEdgeLengthDecimationQuadEdgeMeshFilter< TMesh,
-                                                                        TMesh,
-                                                                        TCriterion >;
+using TCriterion  = itk::NumberOfPointsCriterion< TMesh >;
+using TDecimation = itk::QuadricDecimationQuadEdgeMeshFilter< TMesh,
+                                                              TMesh,
+                                                              TCriterion >;
  
 int
 main( int argc, char ** argv )
@@ -29,10 +29,11 @@ main( int argc, char ** argv )
   po::options_description description("Allowed options");
   description.add_options()
     ("help", "Print usage information.")
-    ("input-mesh",  po::value<std::string>()->required(),    "Filename of the input mesh.")
-    ("output-mesh", po::value<std::string>()->required(),    "Filename of the output image.")
-    ("count",       po::value<unsigned int>()->required(),   "Target number of cells in output.")
-    ("verbose",     po::value<bool>()->default_value(false), "Verbosity.")
+    ("input-mesh",      po::value<std::string>()->required(),    "Filename of the input mesh.")
+    ("output-mesh",     po::value<std::string>()->required(),    "Filename of the output image.")
+    ("count",           po::value<unsigned int>()->required(),   "Target number of cells in output.")
+    ("change-topology", po::value<bool>()->default_value(false), "Allow change in topology?")
+    ("verbose",         po::value<bool>()->default_value(false), "Verbosity.")
   ;
 
   po::variables_map vm;
@@ -50,11 +51,12 @@ main( int argc, char ** argv )
   const std::string outputMeshName(vm["output-mesh"].as<std::string>());
   const unsigned int count = vm["count"].as<unsigned int>();
   const bool verbose = vm["verbose"].as<bool>();
+  const bool topology = vm["change-topology"].as<bool>();
 
   const auto criterion = TCriterion::New();
   const auto decimate = TDecimation::New();
  
-  criterion->SetTopologicalChange( false );
+  criterion->SetTopologicalChange( topology );
   criterion->SetNumberOfElements(  count );
 
   const auto reader = TReader::New();
