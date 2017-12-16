@@ -4,9 +4,9 @@
 namespace po = boost::program_options;
 
 #include <dvCollapse4D.h>
+#include <dvReadImageIOBase.h>
 
 const unsigned int Dimension = 3;
-using TPixel = unsigned short;
 
 int
 main(int argc, char **argv)
@@ -41,7 +41,43 @@ main(int argc, char **argv)
     return EXIT_FAILURE;
     }
 
-  dv::Collapse4D<Dimension, TPixel>(IImage, DimToCollapse, OImage);
+  switch (dv::ReadImageIOBase(IImage)->GetComponentType())
+    {
+    case itk::ImageIOBase::UCHAR:
+      dv::Collapse4D<3, unsigned char>(IImage, DimToCollapse, OImage);
+      break;
+    case itk::ImageIOBase::CHAR:
+      dv::Collapse4D<3, char>(IImage, DimToCollapse, OImage);
+      break;
+    case itk::ImageIOBase::USHORT:
+      dv::Collapse4D<3, unsigned short>(IImage, DimToCollapse, OImage);
+      break;
+    case itk::ImageIOBase::SHORT:
+      dv::Collapse4D<3, short>(IImage, DimToCollapse, OImage);
+      break;
+    case itk::ImageIOBase::UINT:
+      dv::Collapse4D<3, unsigned int>(IImage, DimToCollapse, OImage);
+      break;
+    case itk::ImageIOBase::INT:
+      dv::Collapse4D<3, int>(IImage, DimToCollapse, OImage);
+      break;
+    case itk::ImageIOBase::ULONG:
+      dv::Collapse4D<3, unsigned long>(IImage, DimToCollapse, OImage);
+      break;
+    case itk::ImageIOBase::LONG:
+      dv::Collapse4D<3, long>(IImage, DimToCollapse, OImage);
+      break;
+    case itk::ImageIOBase::FLOAT:
+      dv::Collapse4D<3, float>(IImage, DimToCollapse, OImage);
+      break;
+    case itk::ImageIOBase::DOUBLE:
+      dv::Collapse4D<3, double>(IImage, DimToCollapse, OImage);
+      break;
+    default:
+      std::cerr << "ERROR: Unrecognized pixel type." << std::endl;
+      return EXIT_FAILURE;
+      break;
+    }
 
   return EXIT_SUCCESS;
 

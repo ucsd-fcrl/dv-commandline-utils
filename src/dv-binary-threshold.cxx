@@ -9,7 +9,6 @@ namespace po = boost::program_options;
 #include <dvBinaryThreshold.h>
 
 const unsigned int Dimension = 3;
-using TPixel = short;
 
 int
 main(int argc, char **argv)
