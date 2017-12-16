@@ -5,10 +5,9 @@ namespace po = boost::program_options;
 
 // Custom
 #include <dvReadImageIOBase.h>
-#include <dvResampleVolume.h>
+#include <dvFillHolesInBinaryImage.h>
 
-int
-main( int argc, char* argv[] )
+int main( int argc, char** argv )
 {
 
   // Declare the supported options.
@@ -17,8 +16,6 @@ main( int argc, char* argv[] )
     ("help", "Print usage information.")
     ("input-image", po::value<std::string>()->required(), "Filename of input image.")
     ("output-image", po::value<std::string>()->required(), "Filename of output image.")
-    ("spacing", po::value<double>(), "Desired spacing.")
-    ("interpolator", po::value<unsigned int>()->default_value(1), "Order of BSpline interpolation (0 to 5 allowed).")
   ;
 
   po::variables_map vm;
@@ -32,42 +29,40 @@ main( int argc, char* argv[] )
 
   po::notify(vm);
 
-  const std::string IImage        = vm["input-image"].as<std::string>();
-  const std::string OImage        = vm["output-image"].as<std::string>();
-  const double spacing            = vm["spacing"].as<double>();
-  const unsigned int interpolator = vm["interpolator"].as<unsigned int>();
+  const std::string IImage = vm["input-image"].as<std::string>();
+  const std::string OImage = vm["output-image"].as<std::string>();
 
   switch (dv::ReadImageIOBase(IImage)->GetComponentType())
     {
     case itk::ImageIOBase::UCHAR:
-      dv::ResampleVolume<3, unsigned char>(IImage, OImage, spacing, interpolator);
+      dv::FillHolesInBinaryImage<3, unsigned char>(IImage, OImage);
       break;
     case itk::ImageIOBase::CHAR:
-      dv::ResampleVolume<3, char>(IImage, OImage, spacing, interpolator);
+      dv::FillHolesInBinaryImage<3, char>(IImage, OImage);
       break;
     case itk::ImageIOBase::USHORT:
-      dv::ResampleVolume<3, unsigned short>(IImage, OImage, spacing, interpolator);
+      dv::FillHolesInBinaryImage<3, unsigned short>(IImage, OImage);
       break;
     case itk::ImageIOBase::SHORT:
-      dv::ResampleVolume<3, short>(IImage, OImage, spacing, interpolator);
+      dv::FillHolesInBinaryImage<3, short>(IImage, OImage);
       break;
     case itk::ImageIOBase::UINT:
-      dv::ResampleVolume<3, unsigned int>(IImage, OImage, spacing, interpolator);
+      dv::FillHolesInBinaryImage<3, unsigned int>(IImage, OImage);
       break;
     case itk::ImageIOBase::INT:
-      dv::ResampleVolume<3, int>(IImage, OImage, spacing, interpolator);
+      dv::FillHolesInBinaryImage<3, int>(IImage, OImage);
       break;
     case itk::ImageIOBase::ULONG:
-      dv::ResampleVolume<3, unsigned long>(IImage, OImage, spacing, interpolator);
+      dv::FillHolesInBinaryImage<3, unsigned long>(IImage, OImage);
       break;
     case itk::ImageIOBase::LONG:
-      dv::ResampleVolume<3, long>(IImage, OImage, spacing, interpolator);
+      dv::FillHolesInBinaryImage<3, long>(IImage, OImage);
       break;
     case itk::ImageIOBase::FLOAT:
-      dv::ResampleVolume<3, float>(IImage, OImage, spacing, interpolator);
+      dv::FillHolesInBinaryImage<3, float>(IImage, OImage);
       break;
     case itk::ImageIOBase::DOUBLE:
-      dv::ResampleVolume<3, double>(IImage, OImage, spacing, interpolator);
+      dv::FillHolesInBinaryImage<3, double>(IImage, OImage);
       break;
     default:
       std::cerr << "ERROR: Unrecognized pixel type." << std::endl;
@@ -76,6 +71,4 @@ main( int argc, char* argv[] )
     }
 
   return EXIT_SUCCESS;
-
 }
-
