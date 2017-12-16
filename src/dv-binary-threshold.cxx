@@ -38,12 +38,46 @@ main(int argc, char **argv)
 
   po::notify(vm);
 
-  const auto imageBase = dv::ReadImageIOBase(vm["input-image"].as<std::string>());
-  dv::GetComponentTypeFunction component_type;
-  const auto ct = component_type.GetInfo(imageBase);
-  std::cout << ct << std::endl;
+  const auto IImage = vm["input-image"].as<std::string>();
 
-  dv::BinaryThreshold<Dimension, TPixel>(vm);
+
+  switch (dv::ReadImageIOBase(IImage)->GetComponentType())
+    {
+    case itk::ImageIOBase::UCHAR:
+      dv::BinaryThreshold<3, unsigned char>(vm);
+      break;
+    case itk::ImageIOBase::CHAR:
+      dv::BinaryThreshold<3, char>(vm);
+      break;
+    case itk::ImageIOBase::USHORT:
+      dv::BinaryThreshold<3, unsigned short>(vm);
+      break;
+    case itk::ImageIOBase::SHORT:
+      dv::BinaryThreshold<3, short>(vm);
+      break;
+    case itk::ImageIOBase::UINT:
+      dv::BinaryThreshold<3, unsigned int>(vm);
+      break;
+    case itk::ImageIOBase::INT:
+      dv::BinaryThreshold<3, int>(vm);
+      break;
+    case itk::ImageIOBase::ULONG:
+      dv::BinaryThreshold<3, unsigned long>(vm);
+      break;
+    case itk::ImageIOBase::LONG:
+      dv::BinaryThreshold<3, long>(vm);
+      break;
+    case itk::ImageIOBase::FLOAT:
+      dv::BinaryThreshold<3, float>(vm);
+      break;
+    case itk::ImageIOBase::DOUBLE:
+      dv::BinaryThreshold<3, double>(vm);
+      break;
+    default:
+      std::cerr << "ERROR: Unrecognized pixel type." << std::endl;
+      return EXIT_FAILURE;
+      break;
+    }
 
   return EXIT_SUCCESS;
 }
