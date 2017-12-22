@@ -30,6 +30,8 @@ void BinaryOpening(const std::string &IImage,
   const auto openingFilter = TOpen::New();
   openingFilter->SetInput( reader->GetOutput() );
   openingFilter->SetKernel(structuringElement);
+  openingFilter->SetForegroundValue( 1 );
+  openingFilter->SetBackgroundValue( 0 );
 
   const auto writer = TWriter::New();
   writer->SetFileName( OImage );
