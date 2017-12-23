@@ -120,3 +120,20 @@ target_link_libraries(${EXNAME} dv-lib
                                 ${Boost_PROGRAM_OPTIONS_LIBRARY}
                                 ${Boost_FILESYSTEM_LIBRARY}
                                 ${Boost_SYSTEM_LIBRARY})
+
+find_package(VTK)
+
+if(VTK_FOUND)
+  include(${VTK_USE_FILE})
+  find_package(Qt5 REQUIRED
+               Core
+               Gui
+               Widgets
+               X11Extras)
+
+  set(EXNAME "dv-mesh-quality")
+  add_executable(${EXNAME} ${EXNAME}.cxx)
+  target_link_libraries(${EXNAME} ${VTK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+
+endif()
+
