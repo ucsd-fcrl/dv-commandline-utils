@@ -21,6 +21,7 @@ main( int argc, char ** argv )
 {
  
   std::map<int, std::string> quality_map;
+  quality_map[VTK_QUALITY_AREA]                  = "TriangleArea";
   quality_map[VTK_QUALITY_RADIUS_RATIO]          = "TriangleRadiusRatio";
   quality_map[VTK_QUALITY_ASPECT_RATIO]          = "TriangleAspectRatio";
   quality_map[VTK_QUALITY_ASPECT_FROBENIUS]      = "TriangleAspectFrobenius";
