@@ -26,15 +26,12 @@ BinarizeMesh(const std::string &iMesh,
 
   using MeshReaderType = itk::MeshFileReader< MeshType >;
 
-  using InputImageType = itk::Image< ImagePixelType, Dimension >;
-  using ImageReaderType = itk::ImageFileReader< InputImageType >;
+  using ImageType = itk::Image< ImagePixelType, Dimension >;
+  using ImageReaderType = itk::ImageFileReader< ImageType >;
 
-  using OutputPixelType = unsigned char;
-  using OutputImageType = itk::Image< OutputPixelType, Dimension >;
+  using FilterType = itk::TriangleMeshToBinaryImageFilter< MeshType, ImageType >;
 
-  using FilterType = itk::TriangleMeshToBinaryImageFilter< MeshType, OutputImageType >;
-
-  using WriterType = itk::ImageFileWriter< OutputImageType >;
+  using WriterType = itk::ImageFileWriter< ImageType >;
 
   const auto meshReader = MeshReaderType::New();
   meshReader->SetFileName( iMesh );

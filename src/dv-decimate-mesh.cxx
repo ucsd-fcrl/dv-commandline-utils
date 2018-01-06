@@ -16,7 +16,8 @@ using TCoordinate = float;
 using TMesh       = itk::QuadEdgeMesh< TCoordinate, Dimension >;
 using TReader     = itk::MeshFileReader< TMesh >;
 using TWriter     = itk::MeshFileWriter< TMesh >;
-using TCriterion  = itk::NumberOfPointsCriterion< TMesh >;
+//using TCriterion  = itk::NumberOfPointsCriterion< TMesh >;
+using TCriterion  = itk::NumberOfFacesCriterion< TMesh >;
 using TDecimation = itk::QuadricDecimationQuadEdgeMeshFilter< TMesh,
                                                               TMesh,
                                                               TCriterion >;

@@ -2,13 +2,16 @@ cmake_minimum_required(VERSION 2.8.12)
 
 project(dv-image-information)
 
-set(CMAKE_CXX_FLAGS "-std=c++14" CACHE STRING "cxx compiler flags" FORCE)
+set(CMAKE_CXX_FLAGS "-std=c++14 -fopenmp" CACHE STRING "cxx compiler flags" FORCE)
 set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pg" CACHE STRING "cxx debug compiler flags" FORCE)
 #set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "build type" FORCE)
+
+find_package(OpenMP REQUIRED)
 
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
 
+find_package(Fgt REQUIRED)
 find_package(Cpd REQUIRED)
 find_package(ITK REQUIRED)
 
@@ -108,6 +111,10 @@ set(EXNAME "dv-subdivide-mesh-loop")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
+set(EXNAME "dv-add-mesh-noise")
+add_executable(${EXNAME} ${EXNAME}.cxx)
+target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+
 set(EXNAME "dv-mesh-similarity-vertex-distance")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
@@ -116,10 +123,12 @@ set(EXNAME "dv-nonrigid-cpd")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME} dv-lib
                                 Cpd::Library-C++
+                                Fgt::Library-C++
                                 ${ITK_LIBRARIES}
                                 ${Boost_PROGRAM_OPTIONS_LIBRARY}
                                 ${Boost_FILESYSTEM_LIBRARY}
-                                ${Boost_SYSTEM_LIBRARY})
+                                ${Boost_SYSTEM_LIBRARY}
+                                ${OpenMP_LIBRARIES})
 
 find_package(VTK)
 
