@@ -9,6 +9,8 @@ namespace po = boost::program_options;
 #include <vtkMeshQuality.h>
 #include <vtkSmartPointer.h>
 #include <vtkFieldData.h>
+#include <vtkDoubleArray.h>
+#include <vtkCellData.h>
  
 const unsigned int Dimension = 3;
 using TCoordinate = float;
@@ -47,6 +49,7 @@ main( int argc, char ** argv )
     ("help", "Print usage information.")
     ("input-mesh", po::value<std::string>()->required(), "Filename of the input mesh.")
     ("metric", po::value<int>()->default_value(VTK_QUALITY_RADIUS_RATIO), metric_description.c_str())
+    ("cellwise", po::value<bool>()->default_value(false), "Calculate cellwise quality.")
   ;
 
   po::variables_map vm;
@@ -62,13 +65,21 @@ main( int argc, char ** argv )
 
   const std::string IMesh(vm["input-mesh"].as<std::string>());
   const int metric = vm["metric"].as<int>();
+  const bool cellwise = vm["cellwise"].as<bool>();
 
   const auto reader = TReader::New();
   reader->SetFileName( IMesh.c_str() );
 
   const auto quality = TQuality::New();
   quality->SetInputConnection( reader->GetOutputPort() );
-  quality->SaveCellQualityOff();
+  if (cellwise)
+    {
+    quality->SaveCellQualityOn();
+    }
+  else
+    {
+    quality->SaveCellQualityOff();
+    }
   quality->SetTriangleQualityMeasure(metric);
   quality->Update();
   const auto fd = quality->GetOutput()->GetFieldData()->GetArray( "Mesh Triangle Quality" );
@@ -83,6 +94,20 @@ main( int argc, char ** argv )
   std::cout << "Max: " << mx << std::endl;
   std::cout << "SD: " << sd << std::endl;
 
+  if (cellwise)
+    {
+    const auto qualityArray =
+      vtkDoubleArray::SafeDownCast(quality->GetOutput()->GetCellData()->GetArray("Quality"));
+ 
+  std::cout << "# Number of cells: " << qualityArray->GetNumberOfTuples() << std::endl;
+  std::cout << "CellID,Area\n";
+ 
+  for (vtkIdType i = 0; i < qualityArray->GetNumberOfTuples(); ++i)
+    {
+    double val = qualityArray->GetValue(i);
+    std::cout << i << ',' << val << '\n';
+    }
+    }
   return EXIT_SUCCESS;
  
 }
