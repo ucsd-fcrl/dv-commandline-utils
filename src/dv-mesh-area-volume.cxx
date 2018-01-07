@@ -1,21 +1,47 @@
+
+// Boost
+#include <boost/program_options.hpp>
+
+namespace po = boost::program_options;
+
+// ITK
 #include <itkMesh.h>
 #include <itkSimplexMesh.h>
 #include <itkMeshFileReader.h>
 #include <itkTriangleMeshToSimplexMeshFilter.h>
 #include <itkSimplexMeshVolumeCalculator.h>
- 
-typedef itk::Mesh< float, 3 >        TMesh;
-typedef itk::SimplexMesh< float, 3 > TSimplex;
-typedef itk::MeshFileReader< TMesh > TReader;
-typedef itk::TriangleMeshToSimplexMeshFilter< TMesh, TSimplex > TConvert;
-typedef itk::SimplexMeshVolumeCalculator< TSimplex >            TVolume;
+
+// Typedefs
+using TMesh = itk::Mesh< float, 3 >;
+using TSimplex = itk::SimplexMesh< float, 3 >;
+using TReader = itk::MeshFileReader< TMesh >;
+using TConvert = itk::TriangleMeshToSimplexMeshFilter< TMesh, TSimplex >;
+using TVolume = itk::SimplexMeshVolumeCalculator< TSimplex >;
  
 int main(int argc, char **argv)
 {
 
+  // Declare the supported options.
+  po::options_description description("Allowed options");
+  description.add_options()
+    ("help", "Print usage information.")
+    ("input-mesh", po::value<std::string>()->required(), "Filename of input mesh.")
+  ;
+
+  po::variables_map vm;
+  po::store(po::parse_command_line(argc, argv, description), vm);
+
+  if (vm.count("help"))
+    {
+    std::cout << description << '\n';
+    return EXIT_SUCCESS;
+    }
+
+  po::notify(vm);
+
   // Create a spherical mesh with known radius and resolution.
   const auto reader = TReader::New();
-  reader->SetFileName( argv[1] );
+  reader->SetFileName( vm["input-mesh"].as<std::string>() );
   reader->Update();
  
   std::cout << "Points: " << reader->GetOutput()->GetNumberOfPoints()       << std::endl;
