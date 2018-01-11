@@ -18,8 +18,8 @@ main( int argc, char* argv[] )
   po::options_description description("Allowed options");
   description.add_options()
     ("help", "Print usage information.")
-    ("input-image", po::value<std::string>()->required(),           "Filename of the input mesh.")
-    ("output-mesh", po::value<std::string>()->required(),           "Filename of the output image.")
+    ("input-image", po::value<std::string>()->required(),          "Filename of the input mesh.")
+    ("output-mesh", po::value<std::string>()->required(),          "Filename of the output image.")
     ("labels",      po::value<std::vector<short>>()->multitoken(), "Labels to extract from input image.")
   ;
 
