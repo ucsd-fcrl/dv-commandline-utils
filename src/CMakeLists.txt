@@ -11,7 +11,6 @@ find_package(OpenMP REQUIRED)
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
 
-find_package(Fgt REQUIRED)
 find_package(Cpd REQUIRED)
 find_package(ITK REQUIRED)
 
@@ -131,7 +130,6 @@ set(EXNAME "dv-nonrigid-cpd")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME} dv-lib
                                 Cpd::Library-C++
-                                Fgt::Library-C++
                                 ${ITK_LIBRARIES}
                                 ${Boost_PROGRAM_OPTIONS_LIBRARY}
                                 ${Boost_FILESYSTEM_LIBRARY}

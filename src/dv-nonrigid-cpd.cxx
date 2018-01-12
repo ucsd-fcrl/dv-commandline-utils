@@ -14,14 +14,13 @@ namespace po = boost::program_options;
 
 // CPD
 #include <cpd/nonrigid.hpp>
-#include <fgt.hpp>
 
 // Custom
 #include <dvITKPointSetToCPDMatrix.h>
 #include <dvUpdateITKPointSetWithCPDMatrix.h>
 #include <dvGetLowercaseFileExtension.h>
 
-#include <omp.h>
+//#include <omp.h>
 
 const unsigned int Dimension = 3;
 using TCoordinate = float;
@@ -37,13 +36,6 @@ void callback(const cpd::NonrigidResult &)
 
 int main(int argc, char** argv)
 {
-
-  #pragma omp parallel
-  {
-  std::cout << omp_get_num_threads() << std::endl; // prints 8, 8 times
-  }
-
-  std::cout << fgt::with_openmp() << std::endl;
 
   // Declare the supported options.
   po::options_description description("Allowed options");
