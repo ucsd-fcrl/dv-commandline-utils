@@ -6,9 +6,6 @@
 #include <itkChangeInformationImageFilter.h>
 #include <itkImageFileWriter.h>
 
-const unsigned int Dimension = 3;
-using TPixel = unsigned short;
- 
 namespace dv
 {
 

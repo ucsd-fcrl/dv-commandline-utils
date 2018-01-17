@@ -7,10 +7,11 @@ namespace po = boost::program_options;
 #include <itkFixedArray.h>
 
 // Custom
+#include <dvReadImageIOBase.h>
 #include <dvFlipAlongAxes3D.h>
 
 const unsigned int Dimension = 3;
-using TPixel = short;
+//using TPixel = short;
 using TArray = itk::FixedArray<unsigned int, Dimension>;
 
 int
@@ -47,7 +48,43 @@ main(int argc, char ** argv)
     order[i] = orderVec.at(i);
     }
 
-  dv::FlipAlongAxes3D<Dimension, TPixel>(IImage, OImage, order);
+  switch (dv::ReadImageIOBase(IImage)->GetComponentType())
+    {
+    case itk::ImageIOBase::UCHAR:
+      dv::FlipAlongAxes3D<3, unsigned char>(IImage, OImage, order);
+      break;
+    case itk::ImageIOBase::CHAR:
+      dv::FlipAlongAxes3D<3, char>(IImage, OImage, order);
+      break;
+    case itk::ImageIOBase::USHORT:
+      dv::FlipAlongAxes3D<3, unsigned short>(IImage, OImage, order);
+      break;
+    case itk::ImageIOBase::SHORT:
+      dv::FlipAlongAxes3D<3, short>(IImage, OImage, order);
+      break;
+    case itk::ImageIOBase::UINT:
+      dv::FlipAlongAxes3D<3, unsigned int>(IImage, OImage, order);
+      break;
+    case itk::ImageIOBase::INT:
+      dv::FlipAlongAxes3D<3, int>(IImage, OImage, order);
+      break;
+    case itk::ImageIOBase::ULONG:
+      dv::FlipAlongAxes3D<3, unsigned long>(IImage, OImage, order);
+      break;
+    case itk::ImageIOBase::LONG:
+      dv::FlipAlongAxes3D<3, long>(IImage, OImage, order);
+      break;
+    case itk::ImageIOBase::FLOAT:
+      dv::FlipAlongAxes3D<3, float>(IImage, OImage, order);
+      break;
+    case itk::ImageIOBase::DOUBLE:
+      dv::FlipAlongAxes3D<3, double>(IImage, OImage, order);
+      break;
+    default:
+      std::cerr << "ERROR: Unrecognized pixel type." << std::endl;
+      return EXIT_FAILURE;
+      break;
+    }
 
   return EXIT_SUCCESS;
 }
