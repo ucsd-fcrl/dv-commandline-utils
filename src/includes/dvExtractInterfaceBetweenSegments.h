@@ -6,6 +6,7 @@
 #include <itkImageFileReader.h>
 #include <itkMeshFileWriter.h>
 #include <itkSTLMeshIO.h>
+#include <itkCuberilleImageToMeshFilter.h>
 #include <itkBinaryMask3DMeshSource.h>
 #include <itkStatisticsImageFilter.h>
 #include <itkMacro.h>
@@ -30,6 +31,7 @@ ExtractInterfaceBetweenSegments(const std::string &IImage, const std::string &OM
   using ReaderType = itk::ImageFileReader< TImage >;
   using FilterType = itk::ExtractLabelsImageFilter<TImage>;
   using TMeshSource = itk::BinaryMask3DMeshSource< TImage, TMesh >;
+  using TCuberille = itk::CuberilleImageToMeshFilter< TImage, TMesh >;
   using TStats = itk::StatisticsImageFilter< TImage >;
   using TBall = itk::BinaryBallStructuringElement< TPixel, Dimension>;
   using TDilate = itk::BinaryDilateImageFilter< TImage, TImage, TBall >;
@@ -113,10 +115,20 @@ ExtractInterfaceBetweenSegments(const std::string &IImage, const std::string &OM
   //
   // Meshing
   //
-  const auto meshSource = TMeshSource::New();
-  const TPixel objectValue = static_cast<TPixel>( 1 );
-  meshSource->SetObjectValue( objectValue );
-  meshSource->SetInput( intersection->GetOutput() );
+//  if (USE_CUBERILLE)
+//    {
+//  const auto meshSource = TMeshSource::New();
+//  const TPixel objectValue = static_cast<TPixel>( 1 );
+//  meshSource->SetObjectValue( objectValue );
+//  meshSource->SetInput( intersection->GetOutput() );
+//    }
+//  else
+//    {
+    const auto meshSource = TCuberille::New();
+    meshSource->SetInput( intersection->GetOutput() );
+    meshSource->SetIsoSurfaceValue( 0.5 );
+    meshSource->SetProjectVertexSurfaceDistanceThreshold( 0.1 );
+//    }
 
   //
   // Writer
