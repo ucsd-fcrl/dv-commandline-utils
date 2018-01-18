@@ -8,6 +8,9 @@ namespace po = boost::program_options;
 #include <itkMeshFileReader.h>
 #include <itkPointsLocator.h>
 #include <itkMeshFileWriter.h>
+
+// STD
+#include <numeric>
  
 const unsigned int Dimension = 3;
 using TCoordinate = float;

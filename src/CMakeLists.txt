@@ -2,11 +2,12 @@ cmake_minimum_required(VERSION 2.8.12)
 
 project(dv-image-information)
 
-set(CMAKE_CXX_FLAGS "-std=c++14 -fopenmp" CACHE STRING "cxx compiler flags" FORCE)
+#set(CMAKE_CXX_FLAGS "-std=c++14 -fopenmp" CACHE STRING "cxx compiler flags" FORCE)
+set(CMAKE_CXX_FLAGS "-std=c++14" CACHE STRING "cxx compiler flags" FORCE)
 set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pg" CACHE STRING "cxx debug compiler flags" FORCE)
 #set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "build type" FORCE)
 
-find_package(OpenMP REQUIRED)
+#find_package(OpenMP REQUIRED)
 
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
@@ -22,9 +23,9 @@ file(GLOB SRC src/*.cxx)
 include_directories("includes/")
 add_library(dv-lib ${SRC})
 
-set(EXNAME "dv-convert-dicom-series-to-volume")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+#set(EXNAME "dv-convert-dicom-series-to-volume")
+#add_executable(${EXNAME} ${EXNAME}.cxx)
+#target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 set(EXNAME "dv-convert-mesh")
 add_executable(${EXNAME} ${EXNAME}.cxx)
@@ -138,7 +139,8 @@ target_link_libraries(${EXNAME} dv-lib
                                 ${Boost_PROGRAM_OPTIONS_LIBRARY}
                                 ${Boost_FILESYSTEM_LIBRARY}
                                 ${Boost_SYSTEM_LIBRARY}
-                                ${OpenMP_LIBRARIES})
+#                                ${OpenMP_LIBRARIES}
+                     )
 
 find_package(VTK)
 
@@ -147,8 +149,8 @@ if(VTK_FOUND)
   find_package(Qt5 REQUIRED
                Core
                Gui
-               Widgets
-               X11Extras)
+               Widgets)
+#               X11Extras)
 
   set(EXNAME "dv-mesh-quality")
   add_executable(${EXNAME} ${EXNAME}.cxx)
