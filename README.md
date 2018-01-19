@@ -11,6 +11,7 @@ Currently, only volumetric data are supported; 2D support is forthcoming.
 These instructions assume that you have MacPorts installed.
 
 ```
+NPROC=$(sysctl -n hw.ncpu)
 # Install prerequisits using MacPorts:
 $ sudo port install tiff boost cmake eigen3
 
@@ -20,7 +21,7 @@ $ git clone https://github.com/gadomski/fgt.git src
 $ mkdir ./bin && cd ./bin
 $ ccmake ../src -DCMAKE_CXX_FLAGS=-std=c++14 -DWITH_TESTS=OFF
 # Follow the instructions (c..c..g..)
-$ make -j$(nproc) && sudo make install
+$ make -j${NPROC} && sudo make install
 
 # Install CPD:
 $ mkdir ~/Developer/cpd/ && cd ~/Developer/cpd/
@@ -28,7 +29,7 @@ $ git clone https://github.com/gadomski/cpd.git src
 $ mkdir ./bin && cd ./bin
 $ ccmake ../src -DCMAKE_CXX_FLAGS=-std=c++14 -DWITH_TESTS=OFF -DWITH_FGT=ON
 # Follow the instructions (c..c..g..)
-$ make -j$(nproc) && sudo make install
+$ make -j${NPROC} && sudo make install
 
 # Build ITK:
 $ mkdir ~/Developer/ITK && cd ~/Developer/ITK/
@@ -36,13 +37,15 @@ $ git clone https://github.com/InsightSoftwareConsortium/ITK.git src
 $ mkdir ./bin && cd ./bin
 $ ccmake ../src -DCMAKE_CXX_FLAGS=-std=c++14 -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DITK_USE_SYSTEM_TIFF=ON -DModule_IOSTL=ON -DModule_SubdivisionQuadEdgeMesh=ON
 # Follow the instructions (c..c..g..)
-$ make -j$(nproc)
+$ make -j${NPROC}
 
 # Build this repo:
 $ cd ~/Developer/
 $ git clone https://github.com/DVigneault/dv-commandline-utils.git
 $ mkdir -p ./dv-commandline-utils/bin && cd ./dv-commandline-utils/bin
 $ ccmake ../src -DCAMKE_CXX_FLAGS=-std=c++14
+# Follow the instructions (c..c..g..)
+$ make -j${NPROC}
 ```
 
 # Instructions for Building
