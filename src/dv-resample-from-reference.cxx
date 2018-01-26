@@ -3,65 +3,77 @@
 
 namespace po = boost::program_options;
 
-// ITK
-#include <itkImage.h>
-#include <itkIdentityTransform.h>
-#include <itkResampleImageFilter.h>
-#include <itkImageFileReader.h>
-#include <itkImageFileWriter.h>
-
-template<unsigned int Dimension, typename PixelType>
-void
-resample( const std::string iImageFileName,
-          const std::string rImageFileName,
-          const std::string oImageFileName,
-          const double outsideValue)
-{
-
-  using ImageType     = itk::Image< PixelType, Dimension >;
-  using ReaderType    = itk::ImageFileReader< ImageType >;
-  using WriterType    = itk::ImageFileWriter< ImageType >;
-  using TransformType = itk::IdentityTransform< double, Dimension >;
-  using ResampleType  = itk::ResampleImageFilter< ImageType, ImageType >;
-
-  const auto iReader = ReaderType::New();
-  const auto rReader = ReaderType::New();
-  const auto resample = ResampleType::New();
-  const auto writer = WriterType::New();
-
-  iReader->SetFileName( iImageFileName );
-  rReader->SetFileName( rImageFileName );
-
-  resample->SetInput( iReader->GetOutput() );
-  resample->SetReferenceImage( rReader->GetOutput() );
-  resample->UseReferenceImageOn();
-  resample->SetTransform( TransformType::New() );
-  resample->SetDefaultPixelValue( outsideValue );
-
-  writer->SetInput( resample->GetOutput() );
-  writer->SetFileName( oImageFileName );
-  writer->Update();
-
-}
+// Custom
+#include <dvReadImageIOBase.h>
+#include <dvResampleFromReference.h>
 
 int
 main( int argc, char* argv[] )
 {
 
-  // Deal with commandline arguments
-  if (4 > argc)
+  // Declare the supported options.
+  po::options_description description("Allowed options");
+  description.add_options()
+    ("help",           "Print usage information.")
+    ("input-image",     po::value<std::string>()->required(), "Filename of the input image.")
+    ("reference-image", po::value<std::string>()->required(), "Filename of the reference image.")
+    ("output-image",    po::value<std::string>()->required(), "Filename of the output image.")
+  ;
+
+  po::variables_map vm;
+  po::store(po::parse_command_line(argc, argv, description), vm);
+
+  if (vm.count("help"))
     {
-    std::cerr << "Usage:\n"
-              << argv[0] << " <inputImage> <referenceImage> <outputImage>" << std::endl;
-    return EXIT_FAILURE;
+    std::cout << description << '\n';
+    return EXIT_SUCCESS;
     }
 
-  const std::string iImageFileName = argv[1];
-  const std::string rImageFileName = argv[2];
-  const std::string oImageFileName = argv[3];
-  const double outsideValue = (argc > 4) ? std::atof(argv[4]) : 0.0;
+  po::notify(vm);
 
-  resample< 3, signed short>(iImageFileName, rImageFileName, oImageFileName, outsideValue);
+  const std::string IImage(vm["input-image"].as<std::string>());
+  const std::string RImage(vm["reference-image"].as<std::string>());
+  const std::string OImage(vm["output-image"].as<std::string>());
+
+  const double OutsideValue = 0.0;
+
+  switch (dv::ReadImageIOBase(IImage)->GetComponentType())
+    {
+    case itk::ImageIOBase::UCHAR:
+      dv::ResampleFromReference<3, unsigned char>(IImage, RImage, OImage, OutsideValue);
+      break;
+    case itk::ImageIOBase::CHAR:
+      dv::ResampleFromReference<3, char>(IImage, RImage, OImage, OutsideValue);
+      break;
+    case itk::ImageIOBase::USHORT:
+      dv::ResampleFromReference<3, unsigned short>(IImage, RImage, OImage, OutsideValue);
+      break;
+    case itk::ImageIOBase::SHORT:
+      dv::ResampleFromReference<3, short>(IImage, RImage, OImage, OutsideValue);
+      break;
+    case itk::ImageIOBase::UINT:
+      dv::ResampleFromReference<3, unsigned int>(IImage, RImage, OImage, OutsideValue);
+      break;
+    case itk::ImageIOBase::INT:
+      dv::ResampleFromReference<3, int>(IImage, RImage, OImage, OutsideValue);
+      break;
+    case itk::ImageIOBase::ULONG:
+      dv::ResampleFromReference<3, unsigned long>(IImage, RImage, OImage, OutsideValue);
+      break;
+    case itk::ImageIOBase::LONG:
+      dv::ResampleFromReference<3, long>(IImage, RImage, OImage, OutsideValue);
+      break;
+    case itk::ImageIOBase::FLOAT:
+      dv::ResampleFromReference<3, float>(IImage, RImage, OImage, OutsideValue);
+      break;
+    case itk::ImageIOBase::DOUBLE:
+      dv::ResampleFromReference<3, double>(IImage, RImage, OImage, OutsideValue);
+      break;
+    default:
+      std::cerr << "ERROR: Unrecognized pixel type." << std::endl;
+      return EXIT_FAILURE;
+      break;
+    }
 
   return EXIT_SUCCESS;
 
