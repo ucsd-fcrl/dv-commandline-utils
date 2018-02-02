@@ -12,10 +12,11 @@ namespace dv
 
 template<unsigned int Dimension, typename PixelType>
 void
-ResampleFromReference( const std::string iImageFileName,
-          const std::string rImageFileName,
-          const std::string oImageFileName,
-          const double outsideValue)
+ResampleFromReference(
+  const std::string iImageFileName,
+  const std::string rImageFileName,
+  const std::string oImageFileName,
+  const double outsideValue)
 {
 
   using ImageType     = itk::Image< PixelType, Dimension >;

@@ -166,5 +166,13 @@ if(VTK_FOUND)
   add_executable(${EXNAME} ${EXNAME}.cxx)
   target_link_libraries(${EXNAME} ${VTK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
+  set(EXNAME "dv-plot-vectors")
+  add_executable(${EXNAME} ${EXNAME}.cxx)
+  target_link_libraries(${EXNAME} ${VTK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+
+  set(EXNAME "dv-visualize-meshes")
+  add_executable(${EXNAME} ${EXNAME}.cxx)
+  target_link_libraries(${EXNAME} ${VTK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+
 endif()
 
