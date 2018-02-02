@@ -9,9 +9,14 @@ namespace po = boost::program_options;
 #include "itkMetaDataObject.h"
 #include "gdcmGlobal.h"
 
+// Custom
+#include <dvReadImageIOBase.h>
+
+namespace dv
+{
 template<unsigned int Dimension, typename TPixel>
 void
-read(po::variables_map vm, itk::GDCMImageIO::Pointer dicomIO)
+ReadGDCMImage(const std::string& IImage, itk::GDCMImageIO::Pointer dicomIO)
 {
 
   using TImage = itk::Image< TPixel, Dimension >;
@@ -19,10 +24,11 @@ read(po::variables_map vm, itk::GDCMImageIO::Pointer dicomIO)
 
   const auto reader = TReader::New();
 
-  reader->SetFileName( vm["input-image"].as<std::string>() );
+  reader->SetFileName( IImage );
   reader->SetImageIO( dicomIO );
   reader->Update();
 
+}
 }
 
 int
@@ -34,8 +40,7 @@ main(int argc, char**argv)
   description.add_options()
     ("help", "Print usage information.")
     ("input-image", po::value<std::string>()->required(), "Filename of input image.")
-    ("dicom-tag", po::value<std::string>()->required(), "DICOM tag in the format: 0028|0030")
-    ("image-dimension", po::value<unsigned int>()->required(), "The dimension of the image (2, 3, or 4 supported)");
+    ("dicom-tag", po::value<std::string>()->required(), "DICOM tag in the format: 0028|0030");
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, description), vm);
@@ -48,32 +53,32 @@ main(int argc, char**argv)
 
   po::notify(vm);
 
+  const auto IImage = vm["input-image"].as<std::string>();
+  const auto Tag = vm["dicom-tag"].as<std::string>();
+
   const auto dicomIO = itk::GDCMImageIO::New();
 
-  const unsigned int Dimension = vm["image-dimension"].as<unsigned int>();
-
-  switch (Dimension)
+  switch (dv::ReadImageIOBase(IImage)->GetNumberOfDimensions())
     {
     case 2:
-      read<2, signed short>(vm, dicomIO);
+      dv::ReadGDCMImage<2, signed short>(IImage, dicomIO);
       break;
     case 3:
-      read<3, signed short>(vm, dicomIO);
+      dv::ReadGDCMImage<3, signed short>(IImage, dicomIO);
       break;
     case 4:
-      read<4, signed short>(vm, dicomIO);
+      dv::ReadGDCMImage<4, signed short>(IImage, dicomIO);
       break;
     default:
       std::cerr << "Image dimension not supported." << std::endl;
       return EXIT_FAILURE;
     }
 
-  using DictionaryType = itk::MetaDataDictionary;
-  const  DictionaryType & dictionary = dicomIO->GetMetaDataDictionary();
+  const auto dictionary = dicomIO->GetMetaDataDictionary();
 
-  using MetaDataStringType = itk::MetaDataObject< std::string >;
+  using TMetaDataString = itk::MetaDataObject< std::string >;
 
-  DictionaryType::ConstIterator tagItr = dictionary.Find( vm["dicom-tag"].as<std::string>() );
+  const auto tagItr = dictionary.Find( Tag );
 
   if (tagItr == dictionary.End())
     {
@@ -81,8 +86,8 @@ main(int argc, char**argv)
     return EXIT_FAILURE;
     }
 
-  MetaDataStringType::ConstPointer entryvalue =
-    dynamic_cast<const MetaDataStringType *>( tagItr->second.GetPointer() );
+  const auto entryvalue =
+    dynamic_cast<const TMetaDataString *>( tagItr->second.GetPointer() );
 
   if (!entryvalue)
     {
@@ -91,7 +96,7 @@ main(int argc, char**argv)
     }
 
   const std::string tagvalue = entryvalue->GetMetaDataObjectValue();
-  std::cout << tagvalue.c_str() << std::endl;
+  std::cout << tagvalue << std::endl;
 
   return EXIT_SUCCESS;
 
