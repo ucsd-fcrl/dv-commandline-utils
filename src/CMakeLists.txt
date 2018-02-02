@@ -4,18 +4,11 @@ cmake_policy(SET CMP0028 NEW)
 
 project(dv-image-information)
 
-#set(CMAKE_CXX_FLAGS "-std=c++14 -fopenmp" CACHE STRING "cxx compiler flags" FORCE)
 set(CMAKE_CXX_FLAGS "-std=c++14" CACHE STRING "cxx compiler flags" FORCE)
 set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pg" CACHE STRING "cxx debug compiler flags" FORCE)
-#set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "build type" FORCE)
-
-#find_package(OpenMP REQUIRED)
 
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
-
-find_package(Cpd REQUIRED)
-find_package(ITK REQUIRED)
 
 find_package(Boost COMPONENTS program_options filesystem system REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
@@ -141,26 +134,51 @@ set(EXNAME "dv-extract-orthogonal-slice")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
-set(EXNAME "dv-nonrigid-cpd")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} dv-lib
-                                Cpd::Library-C++
-                                ${ITK_LIBRARIES}
-                                ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                                ${Boost_FILESYSTEM_LIBRARY}
-                                ${Boost_SYSTEM_LIBRARY}
-#                                ${OpenMP_LIBRARIES}
-                     )
+##
+## Utilities depending upon CPD
+##
 
-find_package(VTK)
+option(BUILD_CPD_UTILS "Build utilities depending upon CPD." OFF)
 
-if(VTK_FOUND)
+if(${BUILD_CPD_UTILS})
+
+  find_package(Cpd REQUIRED)
+
+  set(EXNAME "dv-nonrigid-cpd")
+  add_executable(${EXNAME} ${EXNAME}.cxx)
+  target_link_libraries(${EXNAME} dv-lib
+                                  Cpd::Library-C++
+                                  ${ITK_LIBRARIES}
+                                  ${Boost_PROGRAM_OPTIONS_LIBRARY}
+                                  ${Boost_FILESYSTEM_LIBRARY}
+                                  ${Boost_SYSTEM_LIBRARY}
+                       )
+
+endif()
+
+##
+## Utilities depending upon VTK
+##
+
+option(BUILD_VTK_UTILS "Build utilities depending upon VTK." OFF)
+
+if(${BUILD_VTK_UTILS})
+
+  find_package(VTK REQUIRED)
   include(${VTK_USE_FILE})
-  find_package(Qt5 COMPONENTS
-               Core
-               Gui
-               Widgets
-               X11Extras)
+
+  if(${APPLE})
+    find_package(Qt5 COMPONENTS
+                 Core
+                 Gui
+                 Widgets)
+  else()
+    find_package(Qt5 COMPONENTS
+                 Core
+                 Gui
+                 Widgets
+                 X11Extras)
+  endif()
 
   set(EXNAME "dv-mesh-quality")
   add_executable(${EXNAME} ${EXNAME}.cxx)
