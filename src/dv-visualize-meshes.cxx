@@ -80,6 +80,8 @@ main( int argc, char ** argv )
     ("help", "Print usage information.")
     ("input-directory", po::value<std::string>()->required(), "Directory containing segmentation images named *.nii.gz.")
     ("labels", po::value<std::vector<unsigned int>>()->multitoken()->required(), "Directory containing segmentation images named *.nii.gz.")
+    ("downsampling-factor", po::value<double>()->default_value(1.0), "Downsampling factor.")
+    ("window-size", po::value<unsigned int>()->default_value(512), "Window size.")
   ;
 
   po::variables_map vm;
@@ -95,7 +97,8 @@ main( int argc, char ** argv )
 
   const std::string dn = vm["input-directory"].as<std::string>();
   const std::vector<unsigned int> labels = vm["labels"].as<std::vector<unsigned int>>();
-  const double SampleRate = 4.0;
+  const double SampleRate = vm["downsampling-factor"].as<double>();
+  const unsigned int WindowSize = vm["window-size"].as<unsigned int>();
 
   const auto renderer = vtkSmartPointer<vtkRenderer>::New();
 
@@ -113,7 +116,7 @@ main( int argc, char ** argv )
   renderer->SetBackground( 1.0, 1.0, 1.0 );
   const auto window = vtkSmartPointer<vtkRenderWindow>::New();
   window->AddRenderer( renderer );
-  window->SetSize( 512, 512 );
+  window->SetSize( WindowSize, WindowSize );
   const auto interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
   interactor->EnableRenderOn();
 
