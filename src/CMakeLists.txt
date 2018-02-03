@@ -14,20 +14,43 @@ set(dv-commandline-utils_VERSION_PATCH "1")
 set(dv-commandline-utils_VERSION
     "${dv-commandline-utils_VERSION_MAJOR}.${DVCppUtils_VERSION_MINOR}.${DVCppUtils_VERSION_PATCH}")
 
+###################
+## CMake Modules ##
+###################
+
+set(dv-commandline-utils_CMAKE_DIR ${dv-commandline-utils_SOURCE_DIR}/CMake)
+set(CMAKE_MODULE_PATH ${dv-commandline-utils_CMAKE_DIR} ${CMAKE_MODULE_PATH})
+
+include(DVInitializeBuildType)
+include(DVPreventInSourceBuilds)
+include(DVPreventInBuildInstalls)
+
+#############
+## Options ##
+#############
+
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pg" CACHE STRING "cxx debug compiler flags" FORCE)
+
+##############################
+## dv-commandline-utils-lib ##
+##############################
+
+file(GLOB SRC src/*.cxx)
+
+include_directories("includes/")
+add_library(dv-commandline-utils-lib ${SRC})
+
+################################
+## Utilities Depending on ITK ##
+################################
 
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
 
 find_package(Boost COMPONENTS program_options filesystem system REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
-
-file(GLOB SRC src/*.cxx)
-
-include_directories("includes/")
-add_library(dv-commandline-utils-lib ${SRC})
 
 #set(EXNAME "dv-convert-dicom-series-to-volume")
 #add_executable(${EXNAME} ${EXNAME}.cxx)
