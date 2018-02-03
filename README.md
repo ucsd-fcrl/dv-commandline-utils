@@ -10,7 +10,7 @@ Currently, only volumetric data are supported; 2D support is forthcoming.
 
 These instructions assume that you have MacPorts installed.
 
-```
+```bash
 NPROC=$(sysctl -n hw.ncpu)
 # Install prerequisits using MacPorts:
 $ sudo port install tiff boost cmake eigen3
@@ -68,7 +68,7 @@ These instructions assume that you are on a unix system and that the CMake Curse
 
 First, make sure that ITK is built on your system.
 
-```
+```bash
 # Make and move into a directory where source and build files for ITK will live
 $ mkdir ~/Developer/ITK/ && cd ~/Developer/ITK/
 
@@ -88,7 +88,7 @@ $ make -j$(nproc)
 
 If ITK has been installed in `~/Developer/ITK/bin`, the following instructions will work; otherwise, modify the `ITK_DIR` variable in `./src/CMakeLists.txt` to match the appropriate directory.
 
-```
+```bash
 $ cd ~/Developer
 $ git clone https://github.com/DVigneault/dv-commandline-utils.git
 $ mkdir ./dv-commandline-utils/bin
