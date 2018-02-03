@@ -3,10 +3,11 @@
 
 namespace po = boost::program_options;
 
+// Custom
+#include <dvReadImageIOBase.h>
 #include <dvConvertImage.h>
 
 const unsigned int Dimension = 3;
-using TPixel = short;
 
 int
 main(int argc, char **argv)
@@ -34,7 +35,43 @@ main(int argc, char **argv)
   const std::string IImage = vm["input-image"].as<std::string>();
   const std::string OImage = vm["output-image"].as<std::string>();
 
-  dv::ConvertImage<Dimension, TPixel>(IImage, OImage);
+  switch (dv::ReadImageIOBase(IImage)->GetComponentType())
+    {
+    case itk::ImageIOBase::UCHAR:
+      dv::ConvertImage<3, unsigned char>(IImage, OImage);
+      break;
+    case itk::ImageIOBase::CHAR:
+      dv::ConvertImage<3, char>(IImage, OImage);
+      break;
+    case itk::ImageIOBase::USHORT:
+      dv::ConvertImage<3, unsigned short>(IImage, OImage);
+      break;
+    case itk::ImageIOBase::SHORT:
+      dv::ConvertImage<3, short>(IImage, OImage);
+      break;
+    case itk::ImageIOBase::UINT:
+      dv::ConvertImage<3, unsigned int>(IImage, OImage);
+      break;
+    case itk::ImageIOBase::INT:
+      dv::ConvertImage<3, int>(IImage, OImage);
+      break;
+    case itk::ImageIOBase::ULONG:
+      dv::ConvertImage<3, unsigned long>(IImage, OImage);
+      break;
+    case itk::ImageIOBase::LONG:
+      dv::ConvertImage<3, long>(IImage, OImage);
+      break;
+    case itk::ImageIOBase::FLOAT:
+      dv::ConvertImage<3, float>(IImage, OImage);
+      break;
+    case itk::ImageIOBase::DOUBLE:
+      dv::ConvertImage<3, double>(IImage, OImage);
+      break;
+    default:
+      std::cerr << "ERROR: Unrecognized pixel type." << std::endl;
+      return EXIT_FAILURE;
+      break;
+    }
 
   return EXIT_SUCCESS;
 }

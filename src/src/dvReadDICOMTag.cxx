@@ -1,16 +1,4 @@
-// Boost
-#include <boost/program_options.hpp>
-
-namespace po = boost::program_options;
-
-// ITK
-#include "itkImageFileReader.h"
-#include "itkGDCMImageIO.h"
-#include "itkMetaDataObject.h"
-#include "gdcmGlobal.h"
-
-// Custom
-#include <dvReadImageIOBase.h>
+#include <dvReadDICOMTag.h>
 
 namespace dv
 {
@@ -29,33 +17,11 @@ ReadGDCMImage(const std::string& IImage, itk::GDCMImageIO::Pointer dicomIO)
   reader->Update();
 
 }
-}
 
-int
-main(int argc, char**argv)
+
+std::tuple<bool, std::string, std::string>
+ReadDICOMTag(const std::string& IImage, const std::string& Tag)
 {
-
-  // Declare the supported options.
-  po::options_description description("Allowed options");
-  description.add_options()
-    ("help", "Print usage information.")
-    ("input-image", po::value<std::string>()->required(), "Filename of input image.")
-    ("dicom-tag", po::value<std::string>()->required(), "DICOM tag in the format: 0028|0030");
-
-  po::variables_map vm;
-  po::store(po::parse_command_line(argc, argv, description), vm);
-
-  if (vm.count("help"))
-    {
-    std::cout << description << '\n';
-    return EXIT_SUCCESS;
-    }
-
-  po::notify(vm);
-
-  const auto IImage = vm["input-image"].as<std::string>();
-  const auto Tag = vm["dicom-tag"].as<std::string>();
-
   const auto dicomIO = itk::GDCMImageIO::New();
 
   switch (dv::ReadImageIOBase(IImage)->GetNumberOfDimensions())
@@ -71,7 +37,7 @@ main(int argc, char**argv)
       break;
     default:
       std::cerr << "Image dimension not supported." << std::endl;
-      return EXIT_FAILURE;
+      return TReturn{false, "Image dimension not supported.", ""};
     }
 
   const auto dictionary = dicomIO->GetMetaDataDictionary();
@@ -82,8 +48,7 @@ main(int argc, char**argv)
 
   if (tagItr == dictionary.End())
     {
-    std::cerr << "The tag could not be found." << std::endl;
-    return EXIT_FAILURE;
+    return TReturn{false, "The tag could not be found.", ""};
     }
 
   const auto entryvalue =
@@ -91,13 +56,12 @@ main(int argc, char**argv)
 
   if (!entryvalue)
     {
-    std::cerr << "The tag value cound not be converted to a string." << std::endl;
-    return EXIT_FAILURE;
+    return TReturn{false, "The tag could not be converted.", ""};
     }
 
   const std::string tagvalue = entryvalue->GetMetaDataObjectValue();
-  std::cout << tagvalue << std::endl;
+  return TReturn{true, "", tagvalue};
 
-  return EXIT_SUCCESS;
+}
 
 }
