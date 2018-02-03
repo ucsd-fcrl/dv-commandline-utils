@@ -19,7 +19,7 @@ $ sudo port install tiff boost cmake eigen3
 $ mkdir ~/Developer/fgt/ && cd ~/Developer/fgt/
 $ git clone https://github.com/gadomski/fgt.git src
 $ mkdir ./bin && cd ./bin
-$ ccmake ../src -DCMAKE_CXX_FLAGS=-std=c++14 -DWITH_TESTS=OFF
+$ ccmake ../src -DCMAKE_CXX_STANDARD=14 -DWITH_TESTS=OFF
 # Follow the instructions (c..c..g..)
 $ make -j${NPROC} && sudo make install
 
@@ -27,7 +27,7 @@ $ make -j${NPROC} && sudo make install
 $ mkdir ~/Developer/cpd/ && cd ~/Developer/cpd/
 $ git clone https://github.com/gadomski/cpd.git src
 $ mkdir ./bin && cd ./bin
-$ ccmake ../src -DCMAKE_CXX_FLAGS=-std=c++14 -DWITH_TESTS=OFF -DWITH_FGT=ON
+$ ccmake ../src -DCMAKE_CXX_STANDARD=14 -DWITH_TESTS=OFF -DWITH_FGT=ON
 # Follow the instructions (c..c..g..)
 $ make -j${NPROC} && sudo make install
 
@@ -35,13 +35,21 @@ $ make -j${NPROC} && sudo make install
 $ mkdir ~/Developer/VTK && cd ~/Developer/VTK
 $ git clone https://github.com/Kitware/VTK.git src
 $ mkdir ./bin && cd ./bin
-$ ccmake ../src -DCMAKE_CXX_FLAGS=-std=c++14 -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DVTK_USE_SYSTEM_TIFF=ON
+$ ccmake ../src -DCMAKE_CXX_STANDARD=14 -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DVTK_USE_SYSTEM_TIFF=ON
 
 # Build ITK:
 $ mkdir ~/Developer/ITK && cd ~/Developer/ITK/
 $ git clone https://github.com/InsightSoftwareConsortium/ITK.git src
 $ mkdir ./bin && cd ./bin
-$ ccmake ../src -DCMAKE_CXX_FLAGS=-std=c++14 -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DITK_USE_SYSTEM_TIFF=ON -DModule_IOSTL=ON -DModule_SubdivisionQuadEdgeMesh=ON
+$ ccmake ../src \
+  -DCMAKE_CXX_STANDARD=14 \
+  -DBUILD_TESTING=OFF \
+  -DBUILD_EXAMPLES=OFF \
+  -DITK_USE_SYSTEM_TIFF=ON \
+  -DModule_DVMeshNoise=ON \
+  -DModule_IOSTL=ON \
+  -DModule_SubdivisionQuadEdgeMesh=ON
+
 # Follow the instructions (c..c..g..)
 $ make -j${NPROC}
 
@@ -49,7 +57,7 @@ $ make -j${NPROC}
 $ cd ~/Developer/
 $ git clone https://github.com/DVigneault/dv-commandline-utils.git
 $ mkdir -p ./dv-commandline-utils/bin && cd ./dv-commandline-utils/bin
-$ ccmake ../src -DCAMKE_CXX_FLAGS=-std=c++14
+$ ccmake ../src -DCAMKE_CXX_STANDARD=14
 # Follow the instructions (c..c..g..)
 $ make -j${NPROC}
 ```
@@ -71,7 +79,7 @@ $ git clone https://github.com/InsightSoftwareConsortium/ITK.git ./src
 $ mkdir ./bin && cd ./bin
 
 # Configure and generate
-$ ccmake ../src -DModule_IOSTL=ON -DCMAKE_CXX_FLAGS=-std=c++14
+$ ccmake ../src -DModule_IOSTL=ON -DCMAKE_CXX_STANDARD=14
 # Follow the instructions (c..c..g..)
 
 # Build ITK
