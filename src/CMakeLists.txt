@@ -1,10 +1,21 @@
 cmake_minimum_required(VERSION 3.9.5 FATAL_ERROR)
 
+######################
+## Project Settings ##
+######################
+
 cmake_policy(SET CMP0028 NEW)
 
-project(dv-commandline-utils)
+project(dv-commandline-utils CXX C)
+
+set(dv-commandline-utils_VERSION_MAJOR "0")
+set(dv-commandline-utils_VERSION_MINOR "0")
+set(dv-commandline-utils_VERSION_PATCH "1")
+set(dv-commandline-utils_VERSION
+    "${dv-commandline-utils_VERSION_MAJOR}.${DVCppUtils_VERSION_MINOR}.${DVCppUtils_VERSION_PATCH}")
 
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pg" CACHE STRING "cxx debug compiler flags" FORCE)
 
 find_package(ITK REQUIRED)
@@ -282,5 +293,17 @@ if(${BUILD_VTK_UTILS})
   add_executable(${EXNAME} ${EXNAME}.cxx)
   target_link_libraries(${EXNAME} ${VTK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
+endif()
+
+#############
+## Testing ##
+#############
+
+option(BUILD_TESTING "Build the testing tree." OFF)
+
+include(CTest)
+
+if(BUILD_TESTING)
+  add_subdirectory(tests)
 endif()
 
