@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <algorithm>
+#include <cmath>
+#include <numeric>
 
 namespace dv
 {

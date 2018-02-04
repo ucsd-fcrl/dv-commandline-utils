@@ -2,6 +2,7 @@
 #include <dvReverseFindIf.h>
 #include <vector>
 #include <iostream>
+#include <numeric>
 
 int main()
 {
