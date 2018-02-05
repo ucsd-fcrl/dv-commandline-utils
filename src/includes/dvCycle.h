@@ -48,8 +48,8 @@ return this->Current;
 
 private:
 
-const T Start;
-const T Range;
+T Start;
+T Range;
 T Current;
 
 };

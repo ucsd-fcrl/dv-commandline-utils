@@ -19,6 +19,10 @@ namespace po = boost::program_options;
 #include <vtkCallbackCommand.h>
 #include <vtkExtractVOI.h>
 
+// Custom
+#include <dvNumberOfSequentialFiles.h>
+#include <dvCycle.h>
+
 // Define interaction style
 namespace dv
 {
@@ -36,14 +40,14 @@ class KeyPressInteractorStyle : public vtkInteractorStyleTrackballCamera
       // Handle an arrow key
       if (this->IncrementKeys.find(key) != this->IncrementKeys.cend())
         {
-        this->index += 1;
+        this->index.Increment();
         this->UpdateReader();
         }
  
       // Handle an arrow key
       if (this->DecrementKeys.find(key) != this->DecrementKeys.cend())
         {
-        this->index -= 1;
+        this->index.Decrement();
         this->UpdateReader();
         }
  
@@ -53,14 +57,14 @@ class KeyPressInteractorStyle : public vtkInteractorStyleTrackballCamera
 
   void UpdateReader()
     {
-    std::cout << "Frame: " << this->index << std::endl;
-    const auto fn = this->directory + std::to_string(this->index) + ".nii.gz";
+    std::cout << "Frame: " << this->index.GetCurrent() << std::endl;
+    const auto fn = this->directory + std::to_string(this->index.GetCurrent()) + ".nii.gz";
     this->reader->SetFileName( fn.c_str() );
     this->reader->Update();
     for (const auto &c : cubes) c->Update();
     this->GetCurrentRenderer()->GetRenderWindow()->Render();
     }
-  unsigned int index = 0;
+  dv::Cycle<unsigned int> index{1};
   std::string directory;
   vtkSmartPointer<vtkNIFTIImageReader> reader;
   std::vector<vtkSmartPointer<vtkDiscreteMarchingCubes>> cubes;
@@ -99,6 +103,7 @@ main( int argc, char ** argv )
   const std::vector<unsigned int> labels = vm["labels"].as<std::vector<unsigned int>>();
   const double SampleRate = vm["downsampling-factor"].as<double>();
   const unsigned int WindowSize = vm["window-size"].as<unsigned int>();
+  const unsigned int NumberOfFiles = dv::NumberOfSequentialFiles([dn](size_t n){ return dn + std::to_string(n) + ".nii.gz"; });
 
   const auto renderer = vtkSmartPointer<vtkRenderer>::New();
 
@@ -123,6 +128,7 @@ main( int argc, char ** argv )
   const auto style = vtkSmartPointer<dv::KeyPressInteractorStyle>::New();
   style->reader = reader;
   style->directory = dn;
+  style->index = dv::Cycle<unsigned int>{NumberOfFiles};
   interactor->SetInteractorStyle( style );
   style->SetCurrentRenderer( renderer );
 

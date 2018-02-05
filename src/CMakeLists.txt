@@ -270,12 +270,13 @@ if(${BUILD_CPD_UTILS})
 
   set(EXNAME "dv-nonrigid-cpd")
   add_executable(${EXNAME} ${EXNAME}.cxx)
-  target_link_libraries(${EXNAME} dv-commandline-utils-lib
-                                  Cpd::Library-C++
-                                  ${ITK_LIBRARIES}
-                                  ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                                  ${Boost_FILESYSTEM_LIBRARY}
-                                  ${Boost_SYSTEM_LIBRARY}
+  target_link_libraries(${EXNAME}
+                        dv-commandline-utils-lib
+                        Cpd::Library-C++
+                        ${ITK_LIBRARIES}
+                        ${Boost_PROGRAM_OPTIONS_LIBRARY}
+                        ${Boost_FILESYSTEM_LIBRARY}
+                        ${Boost_SYSTEM_LIBRARY}
                        )
 
 endif()
@@ -314,7 +315,13 @@ if(${BUILD_VTK_UTILS})
 
   set(EXNAME "dv-visualize-meshes")
   add_executable(${EXNAME} ${EXNAME}.cxx)
-  target_link_libraries(${EXNAME} ${VTK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+  target_link_libraries(${EXNAME}
+                        dv-commandline-utils-lib
+                        ${VTK_LIBRARIES}
+                        ${Boost_PROGRAM_OPTIONS_LIBRARY}
+                        ${Boost_FILESYSTEM_LIBRARY}
+                        ${Boost_SYSTEM_LIBRARY}
+                       )
 
 endif()
 
