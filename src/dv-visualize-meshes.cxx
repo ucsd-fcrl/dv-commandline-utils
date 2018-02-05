@@ -22,6 +22,7 @@ namespace po = boost::program_options;
 // Custom
 #include <dvNumberOfSequentialFiles.h>
 #include <dvCycle.h>
+#include <dvStringOperations.h>
 
 // Define interaction style
 namespace dv
@@ -99,7 +100,7 @@ main( int argc, char ** argv )
 
   po::notify(vm);
 
-  const std::string dn = vm["input-directory"].as<std::string>();
+  const std::string dn = dv::AppendCharacterIfAbsent(vm["input-directory"].as<std::string>(), '/');
   const std::vector<unsigned int> labels = vm["labels"].as<std::vector<unsigned int>>();
   const double SampleRate = vm["downsampling-factor"].as<double>();
   const unsigned int WindowSize = vm["window-size"].as<unsigned int>();
