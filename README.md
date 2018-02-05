@@ -6,22 +6,41 @@ This repository contains a collection of commandline utilities for simple image 
 
 Currently, only volumetric data are supported; 2D support is forthcoming.
 
-# Instructions for Building (Mac Os X)
+# Prerequisites
+
+## Mac OsX
 
 These instructions assume that you have MacPorts installed.
 
 ```bash
-NPROC=$(sysctl -n hw.ncpu)
 # Install prerequisits using MacPorts:
 $ sudo port install tiff boost cmake eigen3
+```
 
+## Ubuntu
+
+```bash
+# Install prerequisites using aptitude:
+$ sudo apt install libtiff5-dev libboost-all-dev libeigen3-dev cmake cmake-curses-gui
+# CMake must be installed separately, because the aptitude version is out of date.
+$ mkdir ~/Developer/cmake && cd ~/Developer/cmake/
+$ git clone https://github.com/Kitware/CMake.git src
+$ mkdir ./bin && cd ./bin
+$ ccmake ../src
+# Follow the instructions (c..c..g..)
+$ sudo make install
+```
+
+# Instructions for Building
+
+```bash
 # Install FGT:
 $ mkdir ~/Developer/fgt/ && cd ~/Developer/fgt/
 $ git clone https://github.com/gadomski/fgt.git src
 $ mkdir ./bin && cd ./bin
 $ ccmake ../src -DCMAKE_CXX_STANDARD=14 -DWITH_TESTS=OFF
 # Follow the instructions (c..c..g..)
-$ make -j${NPROC} && sudo make install
+$ make && sudo make install
 
 # Install CPD:
 $ mkdir ~/Developer/cpd/ && cd ~/Developer/cpd/
@@ -29,13 +48,19 @@ $ git clone https://github.com/gadomski/cpd.git src
 $ mkdir ./bin && cd ./bin
 $ ccmake ../src -DCMAKE_CXX_STANDARD=14 -DWITH_TESTS=OFF -DWITH_FGT=ON
 # Follow the instructions (c..c..g..)
-$ make -j${NPROC} && sudo make install
+$ make && sudo make install
 
 # Build VTK:
 $ mkdir ~/Developer/VTK && cd ~/Developer/VTK
 $ git clone https://github.com/Kitware/VTK.git src
 $ mkdir ./bin && cd ./bin
-$ ccmake ../src -DCMAKE_CXX_STANDARD=14 -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DVTK_USE_SYSTEM_TIFF=ON
+$ ccmake ../src \
+  -DCMAKE_CXX_STANDARD=14 \
+  -DBUILD_TESTING=OFF \
+  -DBUILD_EXAMPLES=OFF \
+  -DVTK_USE_SYSTEM_TIFF=ON
+# Follow the instructions (c..c..g..)
+$ make
 
 # Build ITK:
 $ mkdir ~/Developer/ITK && cd ~/Developer/ITK/
@@ -49,51 +74,17 @@ $ ccmake ../src \
   -DModule_DVMeshNoise=ON \
   -DModule_IOSTL=ON \
   -DModule_SubdivisionQuadEdgeMesh=ON
-
 # Follow the instructions (c..c..g..)
-$ make -j${NPROC}
+$ make
 
 # Build this repo:
 $ cd ~/Developer/
 $ git clone https://github.com/DVigneault/dv-commandline-utils.git
 $ mkdir -p ./dv-commandline-utils/bin && cd ./dv-commandline-utils/bin
-$ ccmake ../src -DCAMKE_CXX_STANDARD=14
+$ ccmake ../src \
+  -DCAMKE_CXX_STANDARD=14 \
+  -DBUILD_CPD_UTILS=ON \
+  -DBUILD_VTK_UTILS=ON
 # Follow the instructions (c..c..g..)
-$ make -j${NPROC}
-```
-
-# Instructions for Building
-
-These instructions assume that you are on a unix system and that the CMake Curses Gui is installed.
-
-First, make sure that ITK is built on your system.
-
-```bash
-# Make and move into a directory where source and build files for ITK will live
-$ mkdir ~/Developer/ITK/ && cd ~/Developer/ITK/
-
-# Clone the ITK git repo
-$ git clone https://github.com/InsightSoftwareConsortium/ITK.git ./src
-
-# Make and move into the binary directory
-$ mkdir ./bin && cd ./bin
-
-# Configure and generate
-$ ccmake ../src -DModule_IOSTL=ON -DCMAKE_CXX_STANDARD=14
-# Follow the instructions (c..c..g..)
-
-# Build ITK
-$ make -j$(nproc)
-```
-
-If ITK has been installed in `~/Developer/ITK/bin`, the following instructions will work; otherwise, modify the `ITK_DIR` variable in `./src/CMakeLists.txt` to match the appropriate directory.
-
-```bash
-$ cd ~/Developer
-$ git clone https://github.com/DVigneault/dv-commandline-utils.git
-$ mkdir ./dv-commandline-utils/bin
-$ cd ./dv-commandline-utils/bin
-$ ccmake ../src
-# Configure, configure, build...
-$ make -j$(nproc)
+$ make
 ```
