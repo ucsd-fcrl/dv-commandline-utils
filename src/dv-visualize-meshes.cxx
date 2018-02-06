@@ -1,5 +1,6 @@
 // Boost
 #include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
 
 namespace po = boost::program_options;
 
@@ -18,11 +19,14 @@ namespace po = boost::program_options;
 #include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkCallbackCommand.h>
 #include <vtkExtractVOI.h>
+#include <vtkWindowToImageFilter.h>
+#include <vtkPNGWriter.h>
 
 // Custom
 #include <dvNumberOfSequentialFiles.h>
 #include <dvCycle.h>
 #include <dvStringOperations.h>
+#include <dvProgress.h>
 
 // Define interaction style
 namespace dv
@@ -38,44 +42,94 @@ class KeyPressInteractorStyle : public vtkInteractorStyleTrackballCamera
       vtkRenderWindowInteractor *rwi = this->Interactor;
       const std::string key = rwi->GetKeySym();
  
-      // Handle an arrow key
+      // Increment
       if (this->IncrementKeys.find(key) != this->IncrementKeys.cend())
         {
-        this->index.Increment();
-        this->UpdateReader();
+        this->Increment();
         }
  
-      // Handle an arrow key
+      // Decrement
       if (this->DecrementKeys.find(key) != this->DecrementKeys.cend())
         {
-        this->index.Decrement();
-        this->UpdateReader();
+        this->Decrement();
+        }
+ 
+      // Take Screenshots
+      if (this->ScreenshotKeys.find(key) != this->ScreenshotKeys.cend())
+        {
+        this->CaptureScreenshots();
         }
  
       // Forward events
       vtkInteractorStyleTrackballCamera::OnKeyPress();
       }
 
+  void Increment()
+    {
+    this->index.Increment();
+    this->UpdateReader();
+    }
+
+  void Decrement()
+    {
+    this->index.Decrement();
+    this->UpdateReader();
+    }
+
   void UpdateReader()
     {
-    std::cout << "Frame: " << this->index.GetCurrent() << std::endl;
     const auto fn = this->directory + std::to_string(this->index.GetCurrent()) + ".nii.gz";
     this->reader->SetFileName( fn.c_str() );
     this->reader->Update();
     for (const auto &c : cubes) c->Update();
     this->GetCurrentRenderer()->GetRenderWindow()->Render();
     }
+  void CaptureScreenshots()
+    {
+    if (!this->screenshot_dir_exists)
+      {
+      std::cerr << "No screenshot directory was set." << std::endl;
+      return;
+      }
+    const std::string folder = this->screenshot_dir + std::to_string(std::time(nullptr));
+    if (!boost::filesystem::create_directory(boost::filesystem::path(folder)))
+      {
+      std::cerr << "The directory " << folder << " could not be created." << std::endl;
+      return;
+      }
+    std::cout << "Saving screenshots to " << folder << "..." << std::endl;
+    auto progress = dv::Progress( this->index.GetRange() - this->index.GetStart() );
+    const auto current = this->index.GetCurrent();
+    do
+      {
+      const auto screenshot = vtkSmartPointer<vtkWindowToImageFilter>::New();
+      screenshot->SetInput( this->GetCurrentRenderer()->GetRenderWindow() );
+      screenshot->SetInputBufferTypeToRGBA();
+      screenshot->SetFixBoundary(true);
+      screenshot->Update();
+
+      const auto writer = vtkSmartPointer<vtkPNGWriter>::New();
+      const auto path = folder + "/" + std::to_string(this->index.GetCurrent()) + ".png";
+      writer->SetFileName( path.c_str() );
+      writer->SetInputConnection( screenshot->GetOutputPort() );
+      writer->Write();
+
+      progress.UnitCompleted();
+      this->Increment();
+      }
+    while (current != this->index.GetCurrent());
+    }
+
   dv::Cycle<unsigned int> index{1};
   std::string directory;
+  bool screenshot_dir_exists;
+  std::string screenshot_dir;
   vtkSmartPointer<vtkNIFTIImageReader> reader;
   std::vector<vtkSmartPointer<vtkDiscreteMarchingCubes>> cubes;
   std::set<std::string> IncrementKeys{"Down", "Right", "j", "l"};
   std::set<std::string> DecrementKeys{"Up", "Left", "h", "k"};
   std::set<std::string> ScreenshotKeys{"s", "p"};
 
-  void CaptureScreenshots()
-    {
-    }
 };
 }
 vtkStandardNewMacro(dv::KeyPressInteractorStyle);
@@ -137,6 +191,8 @@ main( int argc, char ** argv )
   const auto style = vtkSmartPointer<dv::KeyPressInteractorStyle>::New();
   style->reader = reader;
   style->directory = dn;
+  style->screenshot_dir_exists = screenshot_dir_exists;
+  style->screenshot_dir = screenshot_dir;
   style->index = dv::Cycle<unsigned int>{NumberOfFiles};
   interactor->SetInteractorStyle( style );
   style->SetCurrentRenderer( renderer );
