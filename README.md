@@ -58,6 +58,7 @@ $ ccmake ../src \
   -DCMAKE_CXX_STANDARD=14 \
   -DBUILD_TESTING=OFF \
   -DBUILD_EXAMPLES=OFF \
+  -DBUILD_SHARED_LIBS=OFF \
   -DVTK_USE_SYSTEM_TIFF=ON
 # Follow the instructions (c..c..g..)
 $ make
@@ -70,6 +71,7 @@ $ ccmake ../src \
   -DCMAKE_CXX_STANDARD=14 \
   -DBUILD_TESTING=OFF \
   -DBUILD_EXAMPLES=OFF \
+  -DBUILD_SHARED_LIBS=OFF \
   -DITK_USE_SYSTEM_TIFF=ON \
   -DModule_DVMeshNoise=ON \
   -DModule_IOSTL=ON \
