@@ -71,6 +71,11 @@ class KeyPressInteractorStyle : public vtkInteractorStyleTrackballCamera
   std::vector<vtkSmartPointer<vtkDiscreteMarchingCubes>> cubes;
   std::set<std::string> IncrementKeys{"Down", "Right", "j", "l"};
   std::set<std::string> DecrementKeys{"Up", "Left", "h", "k"};
+  std::set<std::string> ScreenshotKeys{"s", "p"};
+
+  void CaptureScreenshots()
+    {
+    }
 };
 }
 vtkStandardNewMacro(dv::KeyPressInteractorStyle);
@@ -85,6 +90,7 @@ main( int argc, char ** argv )
     ("help", "Print usage information.")
     ("input-directory", po::value<std::string>()->required(), "Directory containing segmentation images named *.nii.gz.")
     ("labels", po::value<std::vector<unsigned int>>()->multitoken()->required(), "Directory containing segmentation images named *.nii.gz.")
+    ("screenshot-directory", po::value<std::string>(), "Directory in which to save screenshots.")
     ("downsampling-factor", po::value<double>()->default_value(1.0), "Downsampling factor.")
     ("window-size", po::value<unsigned int>()->default_value(512), "Window size.")
   ;
@@ -105,6 +111,8 @@ main( int argc, char ** argv )
   const double SampleRate = vm["downsampling-factor"].as<double>();
   const unsigned int WindowSize = vm["window-size"].as<unsigned int>();
   const unsigned int NumberOfFiles = dv::NumberOfSequentialFiles([dn](size_t n){ return dn + std::to_string(n) + ".nii.gz"; });
+  const bool screenshot_dir_exists = vm.count("screenshot-directory");
+  const std::string screenshot_dir = screenshot_dir_exists ? vm["screenshot-directory"].as<std::string>() : "";
 
   const auto renderer = vtkSmartPointer<vtkRenderer>::New();
 
