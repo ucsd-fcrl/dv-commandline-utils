@@ -92,7 +92,7 @@ class KeyPressInteractorStyle : public vtkInteractorStyleTrackballCamera
       return;
       }
     const std::string folder = this->screenshot_dir + std::to_string(std::time(nullptr));
-    if (!boost::filesystem::create_directory(boost::filesystem::path(folder)))
+    if (!boost::filesystem::create_directories(boost::filesystem::path(folder)))
       {
       std::cerr << "The directory " << folder << " could not be created." << std::endl;
       return;
@@ -166,7 +166,7 @@ main( int argc, char ** argv )
   const unsigned int WindowSize = vm["window-size"].as<unsigned int>();
   const unsigned int NumberOfFiles = dv::NumberOfSequentialFiles([dn](size_t n){ return dn + std::to_string(n) + ".nii.gz"; });
   const bool screenshot_dir_exists = vm.count("screenshot-directory");
-  const std::string screenshot_dir = screenshot_dir_exists ? vm["screenshot-directory"].as<std::string>() : "";
+  const std::string screenshot_dir = screenshot_dir_exists ? dv::AppendCharacterIfAbsent(vm["screenshot-directory"].as<std::string>(), '/') : "";
 
   const auto renderer = vtkSmartPointer<vtkRenderer>::New();
 
