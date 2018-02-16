@@ -31,7 +31,7 @@ void Collapse4D(const std::string &IImage,
   const auto extract = TExtract::New();
   extract->SetInput( reader->GetOutput() );
   extract->SetExtractionRegion( region );
-  extract->SetDirectionCollapseToSubmatrix();
+  extract->SetDirectionCollapseToGuess();
 
   const auto writer = TWriter::New();
   writer->SetInput( extract->GetOutput() );

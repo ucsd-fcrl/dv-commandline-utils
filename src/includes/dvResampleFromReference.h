@@ -69,10 +69,10 @@ ResampleFromReference(
     Nspac2 = static_cast<double>( outputSpacing );
   }
 
-  //std::cout << "Dim:" << RefDimension << std::endl;
-  //std::cout << "Dir:" << RefDirection << std::endl;
-  //std::cout << "Spac:" << RefSpacing << std::endl;
-  //std::cout << "Orig:" << RefOrigin << std::endl;
+  //std::cout << "Ref Dim:" << RefDimension << std::endl;
+  //std::cout << "Ref Dir:" << RefDirection << std::endl;
+  //std::cout << "Ref Spac:" << RefSpacing << std::endl;
+  //std::cout << "Ref Orig:" << RefOrigin << std::endl;
 
   // Normalize Dir Vector (just in case)
 
@@ -97,9 +97,34 @@ ResampleFromReference(
   //std::cout << "OriginShift: [" << OriginShift[0] << " , " << OriginShift[1] << " , " <<OriginShift[2] << " ] " <<std::endl;
 
   auto NewOrigin = RefOrigin + OriginShift;
-  //std::cout << "NewOrig:" << NewOrigin << std::endl;
+  std::cout << "NewOrig:" << NewOrigin << std::endl;
   resample->SetOutputOrigin( NewOrigin );
 
+  auto CentShift = RefDirection * CenterVect;
+  auto CentPoint = RefOrigin + CentShift;
+
+  iReader->Update();
+  auto inOrigin = iReader->GetOutput()->GetOrigin();
+  auto inDimension = iReader->GetOutput()->GetLargestPossibleRegion().GetSize();
+  auto inSpacing = iReader->GetOutput()->GetSpacing();
+  auto inDirection = iReader->GetOutput()->GetDirection();
+
+  //std::cout << "In Dim:" << inDimension << std::endl;
+  //std::cout << "In Dir:" << inDirection << std::endl;
+  //std::cout << "In Spac:" << inSpacing << std::endl;
+  //std::cout << "In Orig:" << inOrigin << std::endl;
+
+  itk::Vector<double,3> EndVect;
+  EndVect[0] = ( static_cast<double> (inDimension[0]) / 1.0 ) * static_cast<double> ( inSpacing[0]);
+  EndVect[1] = ( static_cast<double> (inDimension[1]) / 1.0 ) * static_cast<double> ( inSpacing[1]);
+  EndVect[2] = ( static_cast<double> (inDimension[2]) / 1.0 ) * static_cast<double> ( inSpacing[2]);
+
+  auto EndShift = inDirection * EndVect;
+  auto EndPoint = inOrigin + EndShift;
+
+  //std::cout << "X ranges from: " << inOrigin[0] << " to " << EndPoint[0] << " Img Center: " << CentPoint[0] << std::endl;
+  //std::cout << "Y ranges from: " << inOrigin[1] << " to " << EndPoint[1] << " Img Center: " << CentPoint[1] << std::endl;
+  //std::cout << "Z ranges from: " << inOrigin[2] << " to " << EndPoint[2] << " Img Center: " << CentPoint[2] << std::endl;
 
   resample->SetOutputDirection( rReader->GetOutput()->GetDirection() );
 
