@@ -31,7 +31,7 @@ struct GetPixelTypeFunction
   GetPixelTypeFunction():GetInfoFunction("--pixel-type"){};
   std::string
   GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {  
+    {
     const auto pixelType = imageIO->GetPixelType();
     return itk::ImageIOBase::GetPixelTypeAsString( pixelType );
     }
@@ -43,7 +43,7 @@ struct GetComponentTypeFunction
   GetComponentTypeFunction():GetInfoFunction("--component-type"){};
   std::string
   GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {  
+    {
     const auto componentType = imageIO->GetComponentType();
     return imageIO->GetComponentTypeAsString( componentType );
     }
@@ -55,7 +55,7 @@ struct GetFileTypeFunction
   GetFileTypeFunction():GetInfoFunction("--file-type"){};
   std::string
   GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {  
+    {
     const auto fileType = imageIO->GetFileType();
     return imageIO->GetFileTypeAsString( fileType );
     }
@@ -68,7 +68,7 @@ struct GetDimensionFunction
   GetDimensionFunction():GetInfoFunction("--dimension"){};
   std::string
   GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {  
+    {
     return std::to_string(imageIO->GetNumberOfDimensions());
     }
 };
@@ -79,7 +79,7 @@ struct GetDimensionsFunction
   GetDimensionsFunction():GetInfoFunction("--dimensions"){};
   std::string
   GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {  
+    {
     const auto N = imageIO->GetNumberOfDimensions();
     std::string dim;
     for (std::size_t i = 0; i < N; ++i) dim += std::to_string(imageIO->GetDimensions(i)) + ' ';
@@ -131,6 +131,7 @@ struct GetDirectionFunction
         {
         direction += std::to_string(v) + ' ';
         }
+      direction += '\n';
       }
     return direction;
     }
