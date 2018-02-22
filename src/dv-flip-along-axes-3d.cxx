@@ -23,8 +23,8 @@ main(int argc, char ** argv)
   description.add_options()
     ("help", "Print usage information.")
     ("input-image",  po::value<std::string>()->required(),                             "Filename of the input mesh.")
-    ("output-image", po::value<std::string>()->required(),                             "Filename of the reference image.")
-    ("order",        po::value<std::vector<unsigned int>>()->multitoken()->required(), "Filename of the output image.")
+    ("output-image", po::value<std::string>()->required(),                             "Filename of the output image.")
+    ("order",        po::value<std::vector<unsigned int>>()->multitoken()->required(), "e.g., 1 0 0 to flip the first axis.")
   ;
 
   po::variables_map vm;
