@@ -1,27 +1,27 @@
-#ifndef dv_ChangeLabels_h
-#define dv_ChangeLabels_h
+#ifndef dv_AnisotropicSmoothing_h
+#define dv_AnisotropicSmoothing_h
 
 // ITK
 #include <itkImageFileReader.h>
+#include <itkGradientAnisotropicDiffusionImageFilter.h>
 #include <itkImageFileWriter.h>
-
-// Custom
-#include <itkChangeLabelsImageFilter.h>
-
-// STD
-#include <map>
 
 namespace dv
 {
 
 template<unsigned int Dimension, typename TPixel>
 void
-ChangeLabels(const std::string &IImage, const std::map<TPixel, TPixel> &LabelMap, const std::string &OImage)
+AnisotropicSmoothing(
+  const std::string &IImage,
+  const std::string &OImage,
+  const unsigned int Iterations,
+  const double TimeStep,
+  const double Conductance)
 {
 
   using TImage  = itk::Image< TPixel, Dimension >;
   using TReader = itk::ImageFileReader< TImage >;
-  using TFilter = itk::ChangeLabelsImageFilter< TImage >;
+  using TFilter = itk::GradientAnisotropicDiffusionImageFilter< TImage, TImage >;
   using TWriter = itk::ImageFileWriter< TImage >;
 
   //
@@ -36,8 +36,11 @@ ChangeLabels(const std::string &IImage, const std::map<TPixel, TPixel> &LabelMap
   //
 
   const auto filter = TFilter::New();
-  filter->SetLabelMap( LabelMap );
   filter->SetInput( reader->GetOutput() );
+  filter->SetNumberOfIterations( Iterations );
+  filter->SetTimeStep( TimeStep );
+  filter->SetConductanceParameter( Conductance );
+  filter->UseImageSpacingOn();
 
   //
   // Writer

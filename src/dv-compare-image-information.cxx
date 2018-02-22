@@ -36,23 +36,23 @@ main(int argc, char ** argv)
     return EXIT_FAILURE;
     }
 
-  if (Image1->GetComponentSize() != Image2->GetComponentSize())
-    {
-    std::cerr << "Component sizes do not match." << std::endl;
-    return EXIT_FAILURE;
-    }
-
-  if (Image1->GetComponentType() != Image2->GetComponentType())
-    {
-    std::cerr << "Component types do not match." << std::endl;
-    return EXIT_FAILURE;
-    }
+//  if (Image1->GetComponentSize() != Image2->GetComponentSize())
+//    {
+//    std::cerr << "Component sizes do not match." << std::endl;
+//    return EXIT_FAILURE;
+//    }
+//
+//  if (Image1->GetComponentType() != Image2->GetComponentType())
+//    {
+//    std::cerr << "Component types do not match." << std::endl;
+//    return EXIT_FAILURE;
+//    }
 
   for (size_t i = 0; i < Image1->GetNumberOfDimensions(); ++i)
     {
     if (Image1->GetDimensions(i) != Image2->GetDimensions(i))
       {
-      std::cerr << "Dimensions do not match." << std::endl;
+      std::cerr << "Matrix size does not match." << std::endl;
       return EXIT_FAILURE;
       }
     }
