@@ -80,10 +80,10 @@ ResampleFromReference(
     {
     resample->SetOutputOrigin( ReferenceOrigin );
     resample->SetOutputSpacing( ReferenceSpacing );
-    resample->SetOutputDirection( ReferenceDirection );
     resample->SetSize( ReferenceSize );
     }
 
+  resample->SetOutputDirection( ReferenceDirection );
 
   const auto writer = TWriter::New();
   writer->SetInput( resample->GetOutput() );
