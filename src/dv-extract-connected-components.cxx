@@ -17,7 +17,7 @@ main( int argc, char **argv)
     ("help", "Print usage information.")
     ("input-image", po::value<std::string>()->required(),  "Filename of input image.")
     ("output-image", po::value<std::string>()->required(), "Filename of output image.")
-    ("N", po::value<unsigned int>(),                       "Number of connected components.")
+    ("N", po::value<unsigned int>()->default_value( 1 ),   "Number of connected components.")
   ;
 
   po::variables_map vm;
