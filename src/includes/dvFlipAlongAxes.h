@@ -1,5 +1,5 @@
-#ifndef dv_FlipAlongAxes3D_h
-#define dv_FlipAlongAxes3D_h
+#ifndef dv_FlipAlongAxes_h
+#define dv_FlipAlongAxes_h
 
 // ITK
 #include <itkImageFileReader.h>
@@ -11,7 +11,7 @@ namespace dv
 
 template<unsigned int Dimension, typename TPixel>
 void
-FlipAlongAxes3D(const std::string &IImage,
+FlipAlongAxes(const std::string &IImage,
                 const std::string &OImage,
                 const itk::FixedArray<unsigned int, Dimension> &order)
 {

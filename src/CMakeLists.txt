@@ -188,7 +188,7 @@ target_link_libraries(${EXNAME}
                       ${Boost_SYSTEM_LIBRARY}
                      )
 
-set(EXNAME "dv-flip-along-axes-3d")
+set(EXNAME "dv-flip-along-axes")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME}
                       ${ITK_LIBRARIES}
