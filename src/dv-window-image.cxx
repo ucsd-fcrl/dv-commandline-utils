@@ -25,8 +25,8 @@ main(int argc, char ** argv)
   ("help", "Print usage information.")
   ("input-image",  po::value<std::string>()->required(),                             "Filename of the input mesh.")
   ("output-image", po::value<std::string>()->required(),                             "Filename of the output image.")
-  ("scale",        po::value<std::vector<unsigned int>>()->multitoken()->required(), "Min and max values for window scaling")
-  ("output-range", po::value<std::vector<unsigned int>>(), "Min and max values for output image")
+  ("scale",        po::value<std::vector<double>>()->multitoken()->required(), "Min and max values for window scaling")
+  ("output-range", po::value<std::vector<double>>()->multitoken(), "Min and max values for output image")
 ;
 
   po::variables_map vm;
@@ -40,29 +40,28 @@ main(int argc, char ** argv)
 
   po::notify(vm);
 
-  const std::string IImage = vm["input-image"].as<std::string>();
-  const std::string OImage = vm["output-image"].as<std::string>();
-  const std::vector<signed int> scaleVec = vm["scale"].as<std::vector<signed int>>();
-  const std::vector<signed int> outputVec = vm["output-range"].as<std::vector<signed int>>();
-
+  const auto IImage = vm["input-image"].as<std::string>();
+  const auto OImage = vm["output-image"].as<std::string>();
+  const auto scaleVec = vm["scale"].as<std::vector<double>>();
 
   constexpr signed int DIM = 2;
 
-  TArray scale;
-  for (unsigned int i = 0; i < 2; ++i)
-  {
+  using TArray = itk::FixedArray<double, DIM>;
+  TArray scale, o_range;
+  for (size_t i = 0; i < 2; ++i)
+    {
     scale[i] = scaleVec.at(i);
-  }
+    }
 
   const bool output_range_exists = vm.count("output-range");
-  if(output_range_exists)
-  {
-    TArray o_range;
-    for (unsigned int i = 0; i < 2; ++i)
+  if  (output_range_exists)
     {
+    const auto outputVec = vm["output-range"].as<std::vector<double>>();
+    for (size_t i = 0; i < 2; ++i)
+      {
       o_range[i] = outputVec.at(i);
+      }
     }
-  }
 
   switch (dv::ReadImageIOBase(IImage)->GetComponentType())
   {
@@ -180,9 +179,7 @@ main(int argc, char ** argv)
     return EXIT_FAILURE;
     break;
   }
-  break;
-}
 
+  return EXIT_SUCCESS;
 
-return EXIT_SUCCESS;
 }

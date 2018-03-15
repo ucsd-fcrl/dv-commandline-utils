@@ -15,8 +15,8 @@ namespace dv
   void
   WindowImage(const std::string &IImage,
     const std::string &OImage,
-    const itk::FixedArray<signed int, 2> &scale,
-    const itk::FixedArray<signed int, 2> &o_range)
+    const itk::FixedArray<double, 2> &scale,
+    const itk::FixedArray<double, 2> &o_range)
     {
 
       using TImage = itk::Image<TPixel, Dimension>;
@@ -64,8 +64,6 @@ namespace dv
         writer->Update();
       }
 
-
-      return EXIT_SUCCESS;
     }
   }
   #endif
