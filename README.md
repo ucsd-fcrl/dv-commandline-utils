@@ -84,6 +84,7 @@ $ cd ~/Developer/
 $ git clone https://github.com/DVigneault/dv-commandline-utils.git
 $ mkdir -p ./dv-commandline-utils/bin && cd ./dv-commandline-utils/bin
 $ ccmake ../src \
+  -DBUILD_TESTING=OFF \
   -DCAMKE_CXX_STANDARD=14 \
   -DBUILD_CPD_UTILS=ON \
   -DBUILD_VTK_UTILS=ON
