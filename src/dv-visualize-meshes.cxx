@@ -201,19 +201,19 @@ main( int argc, char ** argv )
   std::vector<std::array<double, 3>> colors;
   colors.emplace_back(std::array<double, 3>{  0.0/255,    0.0/255,    0.0/255});
   colors.emplace_back(std::array<double, 3>{255.0/255,    0.0/255,    0.0/255});
-  colors.emplace_back(std::array<double, 3>{  0.0/255,  255.0/255,    0.0/255});
-  colors.emplace_back(std::array<double, 3>{  0.0/255,    0.0/255,  255.0/255});
   colors.emplace_back(std::array<double, 3>{255.0/255,  255.0/255,    0.0/255});
-  colors.emplace_back(std::array<double, 3>{  0.0/255,  255.0/255,  255.0/255});
+  colors.emplace_back(std::array<double, 3>{127.0/255,  255.0/255,    0.0/255});
   colors.emplace_back(std::array<double, 3>{255.0/255,    0.0/255,  255.0/255});
   colors.emplace_back(std::array<double, 3>{255.0/255,  127.0/255,    0.0/255});
-  colors.emplace_back(std::array<double, 3>{  0.0/255,  255.0/255,  127.0/255});
-  colors.emplace_back(std::array<double, 3>{127.0/255,    0.0/255,  255.0/255});
-  colors.emplace_back(std::array<double, 3>{127.0/255,  255.0/255,    0.0/255});
   colors.emplace_back(std::array<double, 3>{  0.0/255,  127.0/255,  255.0/255});
   colors.emplace_back(std::array<double, 3>{255.0/255,    0.0/255,  127.0/255});
   colors.emplace_back(std::array<double, 3>{  0.0/255,   27.0/255,  155.0/255});
   colors.emplace_back(std::array<double, 3>{155.0/255,    0.0/255,   27.0/255});
+  colors.emplace_back(std::array<double, 3>{  0.0/255,  255.0/255,    0.0/255});
+  colors.emplace_back(std::array<double, 3>{  0.0/255,  255.0/255,  255.0/255});
+  colors.emplace_back(std::array<double, 3>{  0.0/255,  255.0/255,  127.0/255});
+  colors.emplace_back(std::array<double, 3>{127.0/255,    0.0/255,  255.0/255});
+  colors.emplace_back(std::array<double, 3>{  0.0/255,    0.0/255,  255.0/255});
   colors.emplace_back(std::array<double, 3>{127.0/255,  127.0/255,  127.0/255});
 
   for (const auto &l : labels)
