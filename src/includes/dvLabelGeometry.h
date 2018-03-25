@@ -43,12 +43,12 @@ LabelGeometry(const std::string &IImage)
 
   for (const auto &l : labels)
     {
-    std::cout << "Volume,"       << l << ',' << filter->GetVolume( l ) << std::endl;
-    std::cout << "CentroidX,"    << l << ',' << filter->GetCentroid( l )[0] << std::endl;
-    std::cout << "CentroidY,"    << l << ',' << filter->GetCentroid( l )[1] << std::endl;
-    std::cout << "CentroidZ,"    << l << ',' << filter->GetCentroid( l )[2] << std::endl;
-    std::cout << "Eccentricity," << l << ',' << filter->GetEccentricity( l ) << std::endl;
-    std::cout << "Elongation,"   << l << ',' << filter->GetElongation( l ) << std::endl;
+    std::cout << "Volume,"       << static_cast<int>(l) << ',' << filter->GetVolume( l ) << std::endl;
+    std::cout << "CentroidX,"    << static_cast<int>(l) << ',' << filter->GetCentroid( l )[0] << std::endl;
+    std::cout << "CentroidY,"    << static_cast<int>(l) << ',' << filter->GetCentroid( l )[1] << std::endl;
+    std::cout << "CentroidZ,"    << static_cast<int>(l) << ',' << filter->GetCentroid( l )[2] << std::endl;
+    std::cout << "Eccentricity," << static_cast<int>(l) << ',' << filter->GetEccentricity( l ) << std::endl;
+    std::cout << "Elongation,"   << static_cast<int>(l) << ',' << filter->GetElongation( l ) << std::endl;
     }
 
 }
