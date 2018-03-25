@@ -43,12 +43,21 @@ LabelGeometry(const std::string &IImage)
 
   for (const auto &l : labels)
     {
-    std::cout << "Volume,"       << static_cast<int>(l) << ',' << filter->GetVolume( l ) << std::endl;
-    std::cout << "CentroidX,"    << static_cast<int>(l) << ',' << filter->GetCentroid( l )[0] << std::endl;
-    std::cout << "CentroidY,"    << static_cast<int>(l) << ',' << filter->GetCentroid( l )[1] << std::endl;
-    std::cout << "CentroidZ,"    << static_cast<int>(l) << ',' << filter->GetCentroid( l )[2] << std::endl;
+    itk::ContinuousIndex< double, 3 > index;
+    const auto indexCentroid = filter->GetCentroid( l );
+    index[0] = indexCentroid[0];
+    index[1] = indexCentroid[1];
+    index[2] = indexCentroid[2];
+
+    typename TImage::PointType centroid;
+    reader->GetOutput()->TransformContinuousIndexToPhysicalPoint( index, centroid );
+
+    std::cout << "Volume,"       << static_cast<int>(l) << ',' << filter->GetVolume( l )       << std::endl;
+    std::cout << "CentroidX,"    << static_cast<int>(l) << ',' << centroid[0] << std::endl;
+    std::cout << "CentroidY,"    << static_cast<int>(l) << ',' << centroid[1] << std::endl;
+    std::cout << "CentroidZ,"    << static_cast<int>(l) << ',' << centroid[2] << std::endl;
     std::cout << "Eccentricity," << static_cast<int>(l) << ',' << filter->GetEccentricity( l ) << std::endl;
-    std::cout << "Elongation,"   << static_cast<int>(l) << ',' << filter->GetElongation( l ) << std::endl;
+    std::cout << "Elongation,"   << static_cast<int>(l) << ',' << filter->GetElongation( l )   << std::endl;
     }
 
 }
