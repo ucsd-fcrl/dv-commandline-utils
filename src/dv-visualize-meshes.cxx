@@ -214,6 +214,8 @@ main( int argc, char ** argv )
   colors.emplace_back(std::array<double, 3>{  0.0/255,  255.0/255,  127.0/255});
   colors.emplace_back(std::array<double, 3>{127.0/255,    0.0/255,  255.0/255});
   colors.emplace_back(std::array<double, 3>{  0.0/255,    0.0/255,  255.0/255});
+  colors.emplace_back(std::array<double, 3>{255.0/255,  127.0/255,  255.0/255});
+  colors.emplace_back(std::array<double, 3>{127.0/255,  127.0/255,  255.0/255});
   colors.emplace_back(std::array<double, 3>{127.0/255,  127.0/255,  127.0/255});
 
   for (const auto &l : labels)
