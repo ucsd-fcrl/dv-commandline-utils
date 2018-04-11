@@ -73,6 +73,7 @@ $ ccmake ../src \
   -DBUILD_EXAMPLES=OFF \
   -DBUILD_SHARED_LIBS=OFF \
   -DITK_USE_SYSTEM_TIFF=ON \
+  -DModule_ITKReview=ON \
   -DModule_DVMeshNoise=ON \
   -DModule_IOSTL=ON \
   -DModule_SubdivisionQuadEdgeMesh=ON
