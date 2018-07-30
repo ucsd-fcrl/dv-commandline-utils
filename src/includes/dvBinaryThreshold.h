@@ -18,31 +18,30 @@ BinaryThreshold(po::variables_map vm)
   using TReader = itk::ImageFileReader<TImage>;
   using TFilter = itk::BinaryThresholdImageFilter<TImage, TImage>;
   using TWriter = itk::ImageFileWriter<TImage>;
- 
   const auto reader = TReader::New();
   reader->SetFileName( vm["input-image"].as<std::string>() );
- 
+
   const auto filter = TFilter::New();
   filter->SetInput(reader->GetOutput());
 
   if (vm.count("interior-value"))
     {
-    filter->SetInsideValue(vm["interior-value"].as<TPixel>());
+    filter->SetInsideValue(vm["interior-value"].as<double>());
     }
 
   if (vm.count("exterior-value"))
     {
-    filter->SetOutsideValue(vm["exterior-value"].as<TPixel>());
+    filter->SetOutsideValue(vm["exterior-value"].as<double>());
     }
 
   if (vm.count("lower-threshold"))
     {
-    filter->SetLowerThreshold(vm["lower-threshold"].as<TPixel>());
+    filter->SetLowerThreshold(vm["lower-threshold"].as<double>());
     }
 
   if (vm.count("upper-threshold"))
     {
-    filter->SetUpperThreshold(vm["upper-threshold"].as<TPixel>());
+    filter->SetUpperThreshold(vm["upper-threshold"].as<double>());
     }
 
   const auto writer = TWriter::New();

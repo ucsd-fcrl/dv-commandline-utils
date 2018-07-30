@@ -20,10 +20,10 @@ main(int argc, char **argv)
     ("help", "Print usage information.")
     ("input-image", po::value<std::string>()->required(), "Filename of input image.")
     ("output-image", po::value<std::string>()->required(), "Filename of output image.")
-    ("interior-value", po::value<signed short>(), "Value to set interior pixels.")
-    ("exterior-value", po::value<signed short>(), "Value to set exterior pixels.")
-    ("lower-threshold", po::value<signed short>(), "Lower threshold.")
-    ("upper-threshold", po::value<signed short>(), "Upper threshold.")
+    ("interior-value", po::value<double>(), "Value to set interior pixels.")
+    ("exterior-value", po::value<double>(), "Value to set exterior pixels.")
+    ("lower-threshold", po::value<double>(), "Lower threshold.")
+    ("upper-threshold", po::value<double>(), "Upper threshold.")
   ;
 
   po::variables_map vm;
@@ -38,7 +38,6 @@ main(int argc, char **argv)
   po::notify(vm);
 
   const auto IImage = vm["input-image"].as<std::string>();
-
 
   switch (dv::ReadImageIOBase(IImage)->GetComponentType())
     {
