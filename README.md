@@ -22,6 +22,7 @@ $ sudo port install tiff boost cmake eigen3
 ```bash
 # Install prerequisites using aptitude:
 $ sudo apt install libtiff5-dev libboost-all-dev libeigen3-dev cmake cmake-curses-gui
+$ sudo apt install qt5-default qt5-qmake libqt5x11extras5 freeglut3-dev mesa-common-dev
 # CMake must be installed separately, because the aptitude version is out of date.
 $ mkdir ~/Developer/cmake && cd ~/Developer/cmake/
 $ git clone https://github.com/Kitware/CMake.git src
@@ -86,7 +87,7 @@ $ git clone https://github.com/DVigneault/dv-commandline-utils.git
 $ mkdir -p ./dv-commandline-utils/bin && cd ./dv-commandline-utils/bin
 $ ccmake ../src \
   -DBUILD_TESTING=OFF \
-  -DCAMKE_CXX_STANDARD=14 \
+  -DCMAKE_CXX_STANDARD=14 \
   -DBUILD_CPD_UTILS=ON \
   -DBUILD_VTK_UTILS=ON
 # Follow the instructions (c..c..g..)
