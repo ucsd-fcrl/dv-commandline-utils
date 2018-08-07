@@ -4,6 +4,10 @@
 
 namespace po = boost::program_options;
 
+// RapidJSON
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/stringbuffer.h>
+
 // VTK
 #include <vtkSmartPointer.h>
 #include <vtkImageData.h>
@@ -27,6 +31,7 @@ namespace po = boost::program_options;
 #include <dvCycle.h>
 #include <dvStringOperations.h>
 #include <dvProgress.h>
+#include <dvCameraState.h>
 
 // Define interaction style
 namespace dv
@@ -91,13 +96,52 @@ class KeyPressInteractorStyle : public vtkInteractorStyleTrackballCamera
       std::cerr << "No screenshot directory was set." << std::endl;
       return;
       }
-    const std::string folder = this->screenshot_dir + std::to_string(std::time(nullptr));
+    const std::string time = std::to_string(std::time(nullptr));
+    const std::string folder = this->screenshot_dir + time;
     if (!boost::filesystem::create_directories(boost::filesystem::path(folder)))
       {
       std::cerr << "The directory " << folder << " could not be created." << std::endl;
       return;
       }
     std::cout << "Saving screenshots to " << folder << "..." << std::endl;
+
+    dv::CameraState camera;
+    camera.CaptureState(this->GetCurrentRenderer()->GetActiveCamera());
+
+    rapidjson::StringBuffer sb;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+    writer.StartObject();
+
+    writer.Key("camera.ViewAngle");
+    writer.Double(camera.ViewAngle);
+    writer.Key("camera.ParallelScale");
+    writer.Double(camera.ParallelScale);
+    writer.Key("camera.ParallelProjection");
+    writer.Double(camera.ParallelProjection);
+
+    writer.Key("camera.Position");
+    writer.StartArray();
+    for (size_t i = 0; i < 3; ++i) writer.Double(camera.Position[i]);
+    writer.EndArray();
+
+    writer.Key("camera.FocalPoint");
+    writer.StartArray();
+    for (size_t i = 0; i < 3; ++i) writer.Double(camera.FocalPoint[i]);
+    writer.EndArray();
+
+    writer.Key("camera.ViewUp");
+    writer.StartArray();
+    for (size_t i = 0; i < 3; ++i) writer.Double(camera.ViewUp[i]);
+    writer.EndArray();
+
+    writer.EndObject();
+
+    std::string cameraStateFileName = this->screenshot_dir + time + "/camera-state.json";
+    std::ofstream fileStream;
+    fileStream.open(cameraStateFileName);
+    fileStream << sb.GetString();
+    fileStream.close();
+
     auto progress = dv::Progress( this->index.GetRange() - this->index.GetStart() );
     const auto current = this->index.GetCurrent();
     do

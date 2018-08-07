@@ -39,7 +39,6 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pg" CACHE STRING "cxx debug compile
 
 file(GLOB SRC src/*.cxx)
 
-include_directories("includes/")
 add_library(dv-commandline-utils-lib ${SRC})
 
 ################################
@@ -50,7 +49,14 @@ find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
 
 find_package(Boost COMPONENTS program_options filesystem system REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
+
+find_package(RapidJSON REQUIRED)
+
+include_directories(
+    "includes/"
+    ${Boost_INCLUDE_DIRS}
+    "$ENV{HOME}/Developer/RapidJSON/src/include"
+    )
 
 #set(EXNAME "dv-convert-dicom-series-to-volume")
 #add_executable(${EXNAME} ${EXNAME}.cxx)
