@@ -1,8 +1,11 @@
-#ifndef vtkCameraState_h
-#define vtkCameraState_h
+#ifndef dv_CameraState_h
+#define dv_CameraState_h
 
 #include <vtkSmartPointer.h>
 #include <vtkCamera.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/document.h>
 
 namespace dv
 {
@@ -20,6 +23,8 @@ public:
 
   void CaptureState(vtkCamera* const camera);
   void RestoreState(vtkCamera* const camera) const;
+  void SerializeJSON(rapidjson::PrettyWriter<rapidjson::StringBuffer> &writer);
+  void DeserializeJSON(const rapidjson::Document &d);
 
 }; // end class
 } // end namespace vtk
