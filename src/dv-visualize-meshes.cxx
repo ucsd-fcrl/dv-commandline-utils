@@ -36,9 +36,12 @@ namespace po = boost::program_options;
 // Define interaction style
 namespace dv
 {
-class KeyPressInteractorStyle : public vtkInteractorStyleTrackballCamera
+class KeyPressInteractorStyle
+: public vtkInteractorStyleTrackballCamera
 {
+
   public:
+
     static KeyPressInteractorStyle* New();
     vtkTypeMacro(KeyPressInteractorStyle, vtkInteractorStyleTrackballCamera);
  
@@ -52,17 +55,20 @@ class KeyPressInteractorStyle : public vtkInteractorStyleTrackballCamera
         {
         this->Increment();
         }
- 
       // Decrement
-      if (this->DecrementKeys.find(key) != this->DecrementKeys.cend())
+      else if (this->DecrementKeys.find(key) != this->DecrementKeys.cend())
         {
         this->Decrement();
         }
- 
       // Take Screenshots
-      if (this->ScreenshotKeys.find(key) != this->ScreenshotKeys.cend())
+      else if (this->ScreenshotKeys.find(key) != this->ScreenshotKeys.cend())
         {
         this->CaptureScreenshots();
+        }
+      // Restore Camera State
+      else if (this->RestoreCameraStateKeys.find(key) != this->ScreenshotKeys.cend())
+        {
+        this->RestoreCameraState();
         }
  
       // Forward events
@@ -89,6 +95,7 @@ class KeyPressInteractorStyle : public vtkInteractorStyleTrackballCamera
     for (const auto &c : cubes) c->Update();
     this->GetCurrentRenderer()->GetRenderWindow()->Render();
     }
+
   void CaptureScreenshots()
     {
     if (!this->screenshot_dir_exists)
@@ -105,34 +112,13 @@ class KeyPressInteractorStyle : public vtkInteractorStyleTrackballCamera
       }
     std::cout << "Saving screenshots to " << folder << "..." << std::endl;
 
-    dv::CameraState camera;
-    camera.CaptureState(this->GetCurrentRenderer()->GetActiveCamera());
+    this->camera.CaptureState(this->GetCurrentRenderer()->GetActiveCamera());
 
     rapidjson::StringBuffer sb;
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
     writer.StartObject();
 
-    writer.Key("camera.ViewAngle");
-    writer.Double(camera.ViewAngle);
-    writer.Key("camera.ParallelScale");
-    writer.Double(camera.ParallelScale);
-    writer.Key("camera.ParallelProjection");
-    writer.Double(camera.ParallelProjection);
-
-    writer.Key("camera.Position");
-    writer.StartArray();
-    for (size_t i = 0; i < 3; ++i) writer.Double(camera.Position[i]);
-    writer.EndArray();
-
-    writer.Key("camera.FocalPoint");
-    writer.StartArray();
-    for (size_t i = 0; i < 3; ++i) writer.Double(camera.FocalPoint[i]);
-    writer.EndArray();
-
-    writer.Key("camera.ViewUp");
-    writer.StartArray();
-    for (size_t i = 0; i < 3; ++i) writer.Double(camera.ViewUp[i]);
-    writer.EndArray();
+    camera.SerializeJSON(writer);
 
     writer.EndObject();
 
@@ -143,7 +129,9 @@ class KeyPressInteractorStyle : public vtkInteractorStyleTrackballCamera
     fileStream.close();
 
     auto progress = dv::Progress( this->index.GetRange() - this->index.GetStart() );
+
     const auto current = this->index.GetCurrent();
+
     do
       {
       const auto screenshot = vtkSmartPointer<vtkWindowToImageFilter>::New();
@@ -162,17 +150,54 @@ class KeyPressInteractorStyle : public vtkInteractorStyleTrackballCamera
       this->Increment();
       }
     while (current != this->index.GetCurrent());
+
+    }
+
+  void RestoreCameraState()
+    {
+
+    if (!this->camera_state_exists)
+      {
+      std::cerr << "No camera state was provided." << std::endl;
+      return;
+      }
+
+    if (!boost::filesystem::exists(this->camera_state))
+      {
+      std::cerr << "A camera state was provided, but the file does not exist." << std::endl;
+      }
+
+    std::ifstream file_stream;
+    file_stream.open(this->camera_state);
+    std::stringstream buffer;
+    buffer << file_stream.rdbuf();
+    file_stream.close();
+
+    rapidjson::Document d;
+    d.Parse(buffer.str().c_str());
+
+    this->camera.DeserializeJSON(d);
+    this->camera.RestoreState(this->GetCurrentRenderer()->GetActiveCamera());
+
     }
 
   dv::Cycle<unsigned int> index{1};
   std::string directory;
+
   bool screenshot_dir_exists;
   std::string screenshot_dir;
+
+  bool camera_state_exists;
+  std::string camera_state;
+
   vtkSmartPointer<vtkNIFTIImageReader> reader;
   std::vector<vtkSmartPointer<vtkDiscreteMarchingCubes>> cubes;
   std::set<std::string> IncrementKeys{"Down", "Right", "j", "l"};
   std::set<std::string> DecrementKeys{"Up", "Left", "h", "k"};
   std::set<std::string> ScreenshotKeys{"s", "p"};
+  std::set<std::string> RestoreCameraStateKeys{"r"};
+
+  dv::CameraState camera;
 
 };
 }
@@ -189,8 +214,10 @@ main( int argc, char ** argv )
     ("input-directory", po::value<std::string>()->required(), "Directory containing segmentation images named *.nii.gz.")
     ("labels", po::value<std::vector<unsigned int>>()->multitoken()->required(), "Space-separated list of lables to visualize, e.g.: 0 1 2 3")
     ("screenshot-directory", po::value<std::string>(), "Directory in which to save screenshots.")
+    ("camera-state", po::value<std::string>(), "JSON file containing the saved camera state.")
     ("downsampling-factor", po::value<double>()->default_value(1.0), "Downsampling factor.")
     ("window-size", po::value<unsigned int>()->default_value(512), "Window size.")
+    ("restore-capture-quit", "Restore camera state, capture screenshots, and quit.")
   ;
 
   po::variables_map vm;
@@ -209,8 +236,12 @@ main( int argc, char ** argv )
   const double SampleRate = vm["downsampling-factor"].as<double>();
   const unsigned int WindowSize = vm["window-size"].as<unsigned int>();
   const unsigned int NumberOfFiles = dv::NumberOfSequentialFiles([dn](size_t n){ return dn + std::to_string(n) + ".nii.gz"; });
+
   const bool screenshot_dir_exists = vm.count("screenshot-directory");
   const std::string screenshot_dir = screenshot_dir_exists ? dv::AppendCharacterIfAbsent(vm["screenshot-directory"].as<std::string>(), '/') : "";
+
+  const bool camera_state_exists = vm.count("camera-state");
+  const std::string camera_state = camera_state_exists ? vm["camera-state"].as<std::string>() : "";
 
   const auto renderer = vtkSmartPointer<vtkRenderer>::New();
 
@@ -235,8 +266,13 @@ main( int argc, char ** argv )
   const auto style = vtkSmartPointer<dv::KeyPressInteractorStyle>::New();
   style->reader = reader;
   style->directory = dn;
+
   style->screenshot_dir_exists = screenshot_dir_exists;
   style->screenshot_dir = screenshot_dir;
+
+  style->camera_state_exists = camera_state_exists;
+  style->camera_state = camera_state;
+
   style->index = dv::Cycle<unsigned int>{NumberOfFiles};
   interactor->SetInteractorStyle( style );
   style->SetCurrentRenderer( renderer );
@@ -282,8 +318,18 @@ main( int argc, char ** argv )
 
   window->Render();
 
-  interactor->Start();
+  if (vm.count("restore-capture-quit"))
+    {
+    style->RestoreCameraState();
+    style->CaptureScreenshots();
+    window->Finalize();
+    }
+  else
+    {
+    interactor->Start();
+    }
 
   return EXIT_SUCCESS;
  
+
 }
