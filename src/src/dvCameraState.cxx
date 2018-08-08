@@ -14,10 +14,10 @@ void
 CameraState
 ::CaptureState(vtkCamera* const camera)
 {
-  camera->GetPosition(   this->Position );
-  camera->GetFocalPoint( this->FocalPoint );
-  camera->GetViewUp(     this->ViewUp );
-  this->ViewAngle =          camera->GetViewAngle();
+  camera->GetPosition(       this->Position );
+  camera->GetFocalPoint(     this->FocalPoint );
+  camera->GetViewUp(         this->ViewUp );
+  this->ViewAngle =          camera->GetViewAngle(); // No effect when in parallel mode
   this->ParallelScale =      camera->GetParallelScale();
   this->ParallelProjection = camera->GetParallelProjection();
 }
@@ -29,7 +29,7 @@ CameraState
   camera->SetPosition(          this->Position);
   camera->SetFocalPoint(        this->FocalPoint);
   camera->SetViewUp(            this->ViewUp);
-  camera->SetViewAngle(         this->ViewAngle);
+  camera->SetViewAngle(         this->ViewAngle); // No effect when in parallel mode
   camera->SetParallelScale(     this->ParallelScale);
   camera->SetParallelProjection(this->ParallelProjection);
 }

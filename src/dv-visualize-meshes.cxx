@@ -66,7 +66,7 @@ class KeyPressInteractorStyle
         this->CaptureScreenshots();
         }
       // Restore Camera State
-      else if (this->RestoreCameraStateKeys.find(key) != this->ScreenshotKeys.cend())
+      else if (this->RestoreCameraStateKeys.find(key) != this->RestoreCameraStateKeys.cend())
         {
         this->RestoreCameraState();
         }
