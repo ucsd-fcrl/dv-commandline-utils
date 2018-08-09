@@ -178,6 +178,9 @@ class KeyPressInteractorStyle
 
     this->camera.DeserializeJSON(d);
     this->camera.RestoreState(this->GetCurrentRenderer()->GetActiveCamera());
+    this->GetCurrentRenderer()->GetRenderWindow()->Render();
+    this->GetInteractor()->InvokeEvent(vtkCommand::MouseWheelForwardEvent, NULL);
+    this->GetInteractor()->InvokeEvent(vtkCommand::MouseWheelBackwardEvent, NULL);
 
     }
 
@@ -194,8 +197,8 @@ class KeyPressInteractorStyle
   std::vector<vtkSmartPointer<vtkDiscreteMarchingCubes>> cubes;
   std::set<std::string> IncrementKeys{"Down", "Right", "j", "l"};
   std::set<std::string> DecrementKeys{"Up", "Left", "h", "k"};
-  std::set<std::string> ScreenshotKeys{"s", "p"};
-  std::set<std::string> RestoreCameraStateKeys{"r"};
+  std::set<std::string> ScreenshotKeys{"s"};
+  std::set<std::string> RestoreCameraStateKeys{"p"};
 
   dv::CameraState camera;
 
@@ -330,6 +333,5 @@ main( int argc, char ** argv )
     }
 
   return EXIT_SUCCESS;
- 
 
 }

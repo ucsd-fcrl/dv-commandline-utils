@@ -32,6 +32,7 @@ CameraState
   camera->SetViewAngle(         this->ViewAngle); // No effect when in parallel mode
   camera->SetParallelScale(     this->ParallelScale);
   camera->SetParallelProjection(this->ParallelProjection);
+
 }
 
 void
