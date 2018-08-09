@@ -211,7 +211,9 @@ main( int argc, char ** argv )
 {
  
   // Declare the supported options.
-  po::options_description description("Allowed options");
+
+
+  po::options_description description("s : Capture screenshots.\np : Load prior camera state.\ne,q : Exit.\nAllowed options");
   description.add_options()
     ("help", "Print usage information.")
     ("input-directory", po::value<std::string>()->required(), "Directory containing segmentation images named *.nii.gz.")
@@ -229,6 +231,7 @@ main( int argc, char ** argv )
   if (vm.count("help"))
     {
     std::cout << description << '\n';
+
     return EXIT_SUCCESS;
     }
 
