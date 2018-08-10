@@ -51,11 +51,10 @@ include(${ITK_USE_FILE})
 find_package(Boost COMPONENTS program_options filesystem system REQUIRED)
 
 find_package(RapidJSON REQUIRED)
-
 include_directories(
     "includes/"
     ${Boost_INCLUDE_DIRS}
-    "$ENV{HOME}/Developer/RapidJSON/src/include"
+    ${RapidJSON_INCLUDE_DIRS}
     )
 
 #set(EXNAME "dv-convert-dicom-series-to-volume")
