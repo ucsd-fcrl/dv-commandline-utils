@@ -44,13 +44,56 @@ main(int argc, char **argv)
   switch (dv::ReadImageIOBase(InputImages[0])->GetComponentType())
     {
     case itk::ImageIOBase::UCHAR:
-      dv::TileImages<2, unsigned char>(InputImages, OutputImage, NumRows, NumCols, static_cast<unsigned char>(Background));
+      switch (dv::ReadImageIOBase(InputImages[0])->GetPixelType())
+      {
+        case itk::ImageIOBase::RGB:   /* If RGB... */
+        {
+          typedef itk::RGBPixel< unsigned char > PixelType;
+          dv::TileImages<2, PixelType>(InputImages, OutputImage, NumRows, NumCols, static_cast<unsigned char>(Background));
+          break;
+        }
+
+        case itk::ImageIOBase::RGBA: /* If RGBA... */
+        {
+          typedef itk::RGBAPixel< unsigned char > PixelType;
+          dv::TileImages<2, PixelType>(InputImages, OutputImage, NumRows, NumCols, static_cast<unsigned char>(Background));
+          break;
+        }
+        case itk::ImageIOBase::SCALAR: /* regular */
+          dv::TileImages<2, unsigned char>(InputImages, OutputImage, NumRows, NumCols, static_cast<unsigned char>(Background));
+          break;
+        default:
+          std::cerr << "ERROR: Unrecognized pixel type." << std::endl;
+          return EXIT_FAILURE;
+          break;
+      }
       break;
     case itk::ImageIOBase::CHAR:
       dv::TileImages<2, char>(InputImages, OutputImage, NumRows, NumCols, static_cast<char>(Background));
       break;
     case itk::ImageIOBase::USHORT:
-      dv::TileImages<2, unsigned short>(InputImages, OutputImage, NumRows, NumCols, static_cast<unsigned short>(Background));
+      switch (dv::ReadImageIOBase(InputImages[0])->GetPixelType())
+      {
+        case itk::ImageIOBase::RGB:   /* If RGB... */
+        {
+          typedef itk::RGBPixel< unsigned short > PixelType;
+          dv::TileImages<2, PixelType>(InputImages, OutputImage, NumRows, NumCols, static_cast<unsigned char>(Background));
+          break;
+        }
+        case itk::ImageIOBase::RGBA: /* If RGBA... */
+        {
+          typedef itk::RGBAPixel< unsigned short > PixelType;
+          dv::TileImages<2, PixelType>(InputImages, OutputImage, NumRows, NumCols, static_cast<unsigned char>(Background));
+          break;
+        }
+        case itk::ImageIOBase::SCALAR: /* regular */
+          dv::TileImages<2, unsigned short>(InputImages, OutputImage, NumRows, NumCols, static_cast<unsigned short>(Background));
+          break;
+        default:
+          std::cerr << "ERROR: Unrecognized pixel type." << std::endl;
+          return EXIT_FAILURE;
+          break;
+      }
       break;
     case itk::ImageIOBase::SHORT:
       dv::TileImages<2, short>(InputImages, OutputImage, NumRows, NumCols, static_cast<short>(Background));
