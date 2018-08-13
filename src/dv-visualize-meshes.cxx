@@ -316,7 +316,7 @@ main( int argc, char ** argv )
     mapper->ScalarVisibilityOff();
     const auto actor = vtkSmartPointer<vtkActor>::New();
     actor->SetMapper( mapper );
-    actor->GetProperty()->SetColor( colors.at(l).data() );
+    actor->GetProperty()->SetColor( colors.at(l % colors.size() ).data() );
     renderer->AddActor( actor );
     style->cubes.push_back(cubes);
     }
