@@ -387,6 +387,10 @@ if(${BUILD_VTK_UTILS})
                  X11Extras)
   endif()
 
+  set(EXNAME "dv-write-arrow-from-start-and-end")
+  add_executable(${EXNAME} ${EXNAME}.cxx)
+  target_link_libraries(${EXNAME} ${VTK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+
   set(EXNAME "dv-mesh-quality")
   add_executable(${EXNAME} ${EXNAME}.cxx)
   target_link_libraries(${EXNAME} ${VTK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
