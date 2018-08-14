@@ -74,14 +74,36 @@ EnforceBoundaryBetweenLabels(
     const auto stats = TStats::New();
     stats->SetInput( binary_1 );
     stats->Update();
-    itkAssertOrThrowMacro(0 < stats->GetSum(), "Segmentation image 1 is empty.");
+
+    if (stats->GetSum() == 0)
+      {
+      std::cerr << "WARNING: No pixels corresponding to label set 1; output is unchanged." << std::endl;
+
+      const auto writer = TWriter::New();
+      writer->SetInput( reader->GetOutput() );
+      writer->SetFileName( OMesh );
+      writer->Update();
+
+      return;
+      }
     }
 
     {
     const auto stats = TStats::New();
     stats->SetInput( binary_2 );
     stats->Update();
-    itkAssertOrThrowMacro(0 < stats->GetSum(), "Segmentation image 2 is empty.");
+
+    if (stats->GetSum() == 0)
+      {
+      std::cerr << "WARNING: No pixels corresponding to label set 1; output is unchanged." << std::endl;
+
+      const auto writer = TWriter::New();
+      writer->SetInput( reader->GetOutput() );
+      writer->SetFileName( OMesh );
+      writer->Update();
+
+      return;
+      }
     }
 
   // Dilate
