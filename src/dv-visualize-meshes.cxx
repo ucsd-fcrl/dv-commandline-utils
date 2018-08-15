@@ -92,7 +92,7 @@ class KeyPressInteractorStyle
     const auto fn = this->directory + std::to_string(this->index.GetCurrent()) + ".nii.gz";
     this->reader->SetFileName( fn.c_str() );
     this->reader->Update();
-    for (const auto &c : cubes) c->Update();
+    for (const auto &c : this->cubes) c->Update();
     this->GetCurrentRenderer()->GetRenderWindow()->Render();
     }
 
@@ -250,6 +250,7 @@ main( int argc, char ** argv )
   const std::string camera_state = camera_state_exists ? vm["camera-state"].as<std::string>() : "";
 
   const auto renderer = vtkSmartPointer<vtkRenderer>::New();
+  renderer->SetBackground( 1.0, 1.0, 1.0 );
 
   unsigned int frameid = 0;
 
@@ -262,7 +263,6 @@ main( int argc, char ** argv )
   voi->SetSampleRate( SampleRate, SampleRate, SampleRate );
   voi->SetVOI( reader->GetOutput()->GetExtent() );
 
-  renderer->SetBackground( 1.0, 1.0, 1.0 );
   const auto window = vtkSmartPointer<vtkRenderWindow>::New();
   window->AddRenderer( renderer );
   window->SetSize( WindowSize, WindowSize );
@@ -314,6 +314,7 @@ main( int argc, char ** argv )
     const auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     mapper->SetInputConnection( cubes->GetOutputPort() );
     mapper->ScalarVisibilityOff();
+
     const auto actor = vtkSmartPointer<vtkActor>::New();
     actor->SetMapper( mapper );
     actor->GetProperty()->SetColor( colors.at(l % colors.size() ).data() );

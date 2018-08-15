@@ -1,21 +1,11 @@
-#include <vtkActor.h>
 #include <vtkArrowSource.h>
 #include <vtkMath.h>
 #include <vtkMinimalStandardRandomSequence.h>
-#include <vtkNamedColors.h>
 #include <vtkPolyData.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkProperty.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
 #include <vtkSmartPointer.h>
-#include <vtkSphereSource.h>
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkOBJWriter.h>
-#include <vtkOBJReader.h>
-#include <vtkAxesActor.h>
 
 #include <array>
 
