@@ -80,90 +80,9 @@ void ArrowWithStartAndEnd(const double startPoint[3],
   transformPD->SetInputConnection(arrowSource->GetOutputPort());
 
   const auto writer = vtkSmartPointer<vtkOBJWriter>::New();
-  writer->SetFileName("arrow.obj");
+  writer->SetFileName(fileName.c_str());
   writer->SetInputConnection(transformPD->GetOutputPort());
   writer->Update();
 
 }
 }
-
-//int main(int, char *[])
-//{
-//  std::array<double, 3> startPoint{{10.0, 10.0, 10.0}};
-//  std::array<double, 3> endPoint{{5.0, 5.0, 5.0}};
-//  const std::string fileName = "arrow.obj";
-//  const int tipResolution = 50;
-//  const int shaftResolution = 50;
-//
-//  dv::ArrowWithStartAndEnd(startPoint, endPoint, fileName, tipResolution, shaftResolution);
-//
-//  const auto reader = vtkSmartPointer<vtkOBJReader>::New();
-//  reader->SetFileName( fileName.c_str() );
-//
-//  const auto colors = vtkSmartPointer<vtkNamedColors>::New();
-//
-//  //Create a mapper and actor for the arrow
-//  vtkSmartPointer<vtkPolyDataMapper> mapper =
-//    vtkSmartPointer<vtkPolyDataMapper>::New();
-//  vtkSmartPointer<vtkActor> actor =
-//    vtkSmartPointer<vtkActor>::New();
-//#ifdef USER_MATRIX
-//  mapper->SetInputConnection(reader->GetOutputPort());
-////  actor->SetUserMatrix(transform->GetMatrix());
-//#else
-////  mapper->SetInputConnection(transformPD->GetOutputPort());
-//#endif
-//  actor->SetMapper(mapper);
-//  actor->GetProperty()->SetColor(colors->GetColor3d("Cyan").GetData());
-//
-//  // Create spheres for start and end point
-//  vtkSmartPointer<vtkSphereSource> sphereStartSource =
-//    vtkSmartPointer<vtkSphereSource>::New();
-//    sphereStartSource->SetCenter(startPoint);
-//    sphereStartSource->SetRadius(0.8);
-//  vtkSmartPointer<vtkPolyDataMapper> sphereStartMapper =
-//    vtkSmartPointer<vtkPolyDataMapper>::New();
-//  sphereStartMapper->SetInputConnection(sphereStartSource->GetOutputPort());
-//  vtkSmartPointer<vtkActor> sphereStart =
-//    vtkSmartPointer<vtkActor>::New();
-//  sphereStart->SetMapper(sphereStartMapper);
-//  sphereStart->GetProperty()->SetColor(colors->GetColor3d("Yellow").GetData());
-//
-//  vtkSmartPointer<vtkSphereSource> sphereEndSource =
-//    vtkSmartPointer<vtkSphereSource>::New();
-//    sphereEndSource->SetCenter(endPoint);
-//    sphereEndSource->SetRadius(0.8);
-//  vtkSmartPointer<vtkPolyDataMapper> sphereEndMapper =
-//    vtkSmartPointer<vtkPolyDataMapper>::New();
-//  sphereEndMapper->SetInputConnection(sphereEndSource->GetOutputPort());
-//  vtkSmartPointer<vtkActor> sphereEnd =
-//    vtkSmartPointer<vtkActor>::New();
-//  sphereEnd->SetMapper(sphereEndMapper);
-//  sphereEnd->GetProperty()->SetColor(colors->GetColor3d("Magenta").GetData());
-//
-//  //Create a renderer, render window, and interactor
-//  vtkSmartPointer<vtkRenderer> renderer =
-//    vtkSmartPointer<vtkRenderer>::New();
-//  vtkSmartPointer<vtkRenderWindow> renderWindow =
-//    vtkSmartPointer<vtkRenderWindow>::New();
-//  renderWindow->AddRenderer(renderer);
-//  renderWindow->SetWindowName("Oriented Arrow");
-//  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-//    vtkSmartPointer<vtkRenderWindowInteractor>::New();
-//  renderWindowInteractor->SetRenderWindow(renderWindow);
-//
-//  const auto axes = vtkSmartPointer<vtkAxesActor>::New();
-//
-//  //Add the actor to the scene
-//  renderer->AddActor(axes);
-//  renderer->AddActor(actor);
-//  renderer->AddActor(sphereStart);
-//  renderer->AddActor(sphereEnd);
-//  renderer->SetBackground(colors->GetColor3d("BkgColor").GetData());
-//
-//  //Render and interact
-//  renderWindow->Render();
-//  renderWindowInteractor->Start();
-//
-//  return EXIT_SUCCESS;
-//}
