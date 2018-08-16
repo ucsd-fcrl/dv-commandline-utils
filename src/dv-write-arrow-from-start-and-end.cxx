@@ -22,7 +22,15 @@ main( int argc, char** argv )
   ;
 
   po::variables_map vm;
-  po::store(po::parse_command_line(argc, argv, description), vm);
+  po::store(
+    po::parse_command_line(
+      argc,
+      argv,
+      description,
+      po::command_line_style::unix_style ^ po::command_line_style::allow_short
+      ),
+    vm
+  );
 
   if (vm.count("help"))
     {
