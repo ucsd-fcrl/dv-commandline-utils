@@ -8,6 +8,7 @@ namespace po = boost::program_options;
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
 
+// ITK
 #include <itkImage.h>
 #include <itkImageFileReader.h>
 #include <itkImageToVTKImageFilter.h>
@@ -71,6 +72,93 @@ GetListOfColors()
   return colors;
 }
 
+class SegmentationView
+{
+
+  using TImage = itk::Image<short,3>;
+  using TITKReader = itk::ImageFileReader<TImage>;
+  using TITK2VTK = itk::ImageToVTKImageFilter<TImage>;
+
+  TITKReader::Pointer m_SegmentationReader = nullptr;
+  TITK2VTK::Pointer itk2vtk = nullptr;
+  std::vector<vtkSmartPointer<vtkDiscreteMarchingCubes>> cubes;
+
+  public:
+
+  SegmentationView()
+    {
+    }
+
+  void Setup(
+    const double SampleRate,
+    const std::vector<unsigned int> labels,
+    std::vector<std::array<double, 3>> colors,
+    std::string file_name,
+    vtkRenderer* renderer
+    )
+    {
+
+    this->m_SegmentationReader = TITKReader::New();
+//    this->m_SegmentationReader->SetFileName( this->GetCurrentSegmentationFileName() );
+    this->m_SegmentationReader->SetFileName( file_name );
+    this->m_SegmentationReader->Update();
+
+    const auto fMat = vtkSmartPointer<vtkMatrix4x4>::New();
+    const auto bMat = vtkSmartPointer<vtkMatrix4x4>::New();
+
+    dv::GetVTKTransformationMatrixFromITKImage<TImage>( this->m_SegmentationReader->GetOutput(), fMat);
+
+    const auto fTrans = vtkSmartPointer<vtkTransform>::New();
+    const auto bTrans = vtkSmartPointer<vtkTransform>::New();
+
+    fTrans->SetMatrix(  fMat );
+    fTrans->GetInverse( bMat );
+    bTrans->SetMatrix(  bMat );
+
+    this->itk2vtk = TITK2VTK::New();
+    itk2vtk->SetInput( this->m_SegmentationReader->GetOutput() );
+    itk2vtk->Update();
+
+    const auto voi = vtkSmartPointer<vtkExtractVOI>::New();
+    voi->SetInputData( itk2vtk->GetOutput() );
+    voi->SetSampleRate( SampleRate, SampleRate, SampleRate );
+    voi->SetVOI( itk2vtk->GetOutput()->GetExtent() );
+ 
+    for (const auto &l : labels)
+      {
+      const auto cubes = vtkSmartPointer<vtkDiscreteMarchingCubes>::New();
+      cubes->SetInputConnection( voi->GetOutputPort() );
+ 
+      cubes->SetValue( 0, l );
+
+      const auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+      mapper->SetInputConnection( cubes->GetOutputPort() );
+      mapper->ScalarVisibilityOff();
+  
+      const auto actor = vtkSmartPointer<vtkActor>::New();
+      actor->SetUserMatrix( fTrans->GetMatrix() );
+      actor->SetPosition(-fTrans->GetMatrix()->GetElement(0,3),
+                         -fTrans->GetMatrix()->GetElement(1,3),
+                         -fTrans->GetMatrix()->GetElement(2,3));
+  
+      actor->SetMapper( mapper );
+      actor->GetProperty()->SetColor( colors.at(l % colors.size() ).data() );
+      renderer->AddActor( actor );
+//      this->GetCurrentRenderer()->AddActor( actor );
+      this->cubes.push_back(cubes);
+      }
+    }
+
+  void Update(std::string file_name)
+    {
+    this->m_SegmentationReader->SetFileName( file_name.c_str() );
+    this->m_SegmentationReader->Update();
+    this->itk2vtk->Update();
+    for (const auto &c : this->cubes) c->Update();
+    }
+
+};
+
 class KeyPressInteractorStyle
 : public vtkInteractorStyleTrackballCamera
 {
@@ -112,28 +200,30 @@ class KeyPressInteractorStyle
   void Increment()
     {
     this->index.Increment();
-    this->UpdateReader();
+    this->m_SegView.Update( this->GetCurrentSegmentationFileName() );
+    this->GetCurrentRenderer()->GetRenderWindow()->Render();
     }
 
   void Decrement()
     {
     this->index.Decrement();
-    this->UpdateReader();
-    }
-
-  std::string GetCurrentFileName()
-    {
-    return this->directory + std::to_string(this->index.GetCurrent()) + ".nii.gz";
-    }
-
-  void UpdateReader()
-    {
-    this->reader->SetFileName( this->GetCurrentFileName().c_str() );
-    this->reader->Update();
-    this->itk2vtk->Update();
-    for (const auto &c : this->cubes) c->Update();
+    this->m_SegView.Update( this->GetCurrentSegmentationFileName() );
     this->GetCurrentRenderer()->GetRenderWindow()->Render();
     }
+
+  std::string GetCurrentSegmentationFileName()
+    {
+    return this->m_SegmentationDirectory + std::to_string(this->index.GetCurrent()) + ".nii.gz";
+    }
+
+//  void UpdateSegmentationReader()
+//    {
+//    this->m_SegmentationReader->SetFileName( this->GetCurrentSegmentationFileName().c_str() );
+//    this->m_SegmentationReader->Update();
+//    this->itk2vtk->Update();
+//    for (const auto &c : this->cubes) c->Update();
+//    this->GetCurrentRenderer()->GetRenderWindow()->Render();
+//    }
 
   void CaptureScreenshots()
     {
@@ -223,61 +313,61 @@ class KeyPressInteractorStyle
 
     }
 
-  void SetupSegmentations(
-    const double SampleRate,
-    const std::vector<unsigned int> labels,
-    std::vector<std::array<double, 3>> colors
-    )
-    {
-
-    this->reader = TITKReader::New();
-    this->reader->SetFileName( this->GetCurrentFileName() );
-    this->reader->Update();
-
-    const auto fMat = vtkSmartPointer<vtkMatrix4x4>::New();
-    const auto bMat = vtkSmartPointer<vtkMatrix4x4>::New();
-
-    dv::GetVTKTransformationMatrixFromITKImage<TImage>( this->reader->GetOutput(), fMat);
-
-    const auto fTrans = vtkSmartPointer<vtkTransform>::New();
-    const auto bTrans = vtkSmartPointer<vtkTransform>::New();
-
-    fTrans->SetMatrix(  fMat );
-    fTrans->GetInverse( bMat );
-    bTrans->SetMatrix(  bMat );
-
-    this->itk2vtk = TITK2VTK::New();
-    itk2vtk->SetInput( this->reader->GetOutput() );
-    itk2vtk->Update();
-  
-    const auto voi = vtkSmartPointer<vtkExtractVOI>::New();
-    voi->SetInputData( itk2vtk->GetOutput() );
-    voi->SetSampleRate( SampleRate, SampleRate, SampleRate );
-    voi->SetVOI( itk2vtk->GetOutput()->GetExtent() );
-  
-    for (const auto &l : labels)
-      {
-      const auto cubes = vtkSmartPointer<vtkDiscreteMarchingCubes>::New();
-      cubes->SetInputConnection( voi->GetOutputPort() );
-  
-      cubes->SetValue( 0, l );
-
-      const auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-      mapper->SetInputConnection( cubes->GetOutputPort() );
-      mapper->ScalarVisibilityOff();
-  
-      const auto actor = vtkSmartPointer<vtkActor>::New();
-      actor->SetUserMatrix( fTrans->GetMatrix() );
-      actor->SetPosition(-fTrans->GetMatrix()->GetElement(0,3),
-                         -fTrans->GetMatrix()->GetElement(1,3),
-                         -fTrans->GetMatrix()->GetElement(2,3));
-  
-      actor->SetMapper( mapper );
-      actor->GetProperty()->SetColor( colors.at(l % colors.size() ).data() );
-      this->GetCurrentRenderer()->AddActor( actor );
-      this->cubes.push_back(cubes);
-      }
-    }
+//  void SetupSegmentations(
+//    const double SampleRate,
+//    const std::vector<unsigned int> labels,
+//    std::vector<std::array<double, 3>> colors
+//    )
+//    {
+//
+//    this->m_SegmentationReader = TITKReader::New();
+//    this->m_SegmentationReader->SetFileName( this->GetCurrentSegmentationFileName() );
+//    this->m_SegmentationReader->Update();
+//
+//    const auto fMat = vtkSmartPointer<vtkMatrix4x4>::New();
+//    const auto bMat = vtkSmartPointer<vtkMatrix4x4>::New();
+//
+//    dv::GetVTKTransformationMatrixFromITKImage<TImage>( this->m_SegmentationReader->GetOutput(), fMat);
+//
+//    const auto fTrans = vtkSmartPointer<vtkTransform>::New();
+//    const auto bTrans = vtkSmartPointer<vtkTransform>::New();
+//
+//    fTrans->SetMatrix(  fMat );
+//    fTrans->GetInverse( bMat );
+//    bTrans->SetMatrix(  bMat );
+//
+//    this->itk2vtk = TITK2VTK::New();
+//    itk2vtk->SetInput( this->m_SegmentationReader->GetOutput() );
+//    itk2vtk->Update();
+//  
+//    const auto voi = vtkSmartPointer<vtkExtractVOI>::New();
+//    voi->SetInputData( itk2vtk->GetOutput() );
+//    voi->SetSampleRate( SampleRate, SampleRate, SampleRate );
+//    voi->SetVOI( itk2vtk->GetOutput()->GetExtent() );
+//  
+//    for (const auto &l : labels)
+//      {
+//      const auto cubes = vtkSmartPointer<vtkDiscreteMarchingCubes>::New();
+//      cubes->SetInputConnection( voi->GetOutputPort() );
+//  
+//      cubes->SetValue( 0, l );
+//
+//      const auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+//      mapper->SetInputConnection( cubes->GetOutputPort() );
+//      mapper->ScalarVisibilityOff();
+//  
+//      const auto actor = vtkSmartPointer<vtkActor>::New();
+//      actor->SetUserMatrix( fTrans->GetMatrix() );
+//      actor->SetPosition(-fTrans->GetMatrix()->GetElement(0,3),
+//                         -fTrans->GetMatrix()->GetElement(1,3),
+//                         -fTrans->GetMatrix()->GetElement(2,3));
+//  
+//      actor->SetMapper( mapper );
+//      actor->GetProperty()->SetColor( colors.at(l % colors.size() ).data() );
+//      this->GetCurrentRenderer()->AddActor( actor );
+//      this->cubes.push_back(cubes);
+//      }
+//    }
 
 //  void SetupMeshes()
 //    {
@@ -296,7 +386,7 @@ class KeyPressInteractorStyle
 //    }
 
   dv::Cycle<unsigned int> index{1};
-  std::string directory;
+  std::string m_SegmentationDirectory;
 
   bool screenshot_dir_exists;
   std::string screenshot_dir;
@@ -304,14 +394,15 @@ class KeyPressInteractorStyle
   bool camera_state_exists;
   std::string camera_state;
 
-  using TImage = itk::Image<short,3>;
-  using TITKReader = itk::ImageFileReader<TImage>;
-  using TITK2VTK = itk::ImageToVTKImageFilter<TImage>;
+  SegmentationView m_SegView;
 
-  TITKReader::Pointer reader = nullptr;
-  TITK2VTK::Pointer itk2vtk = nullptr;
-//  vtkSmartPointer<vtkNIFTIImageReader> reader;
-  std::vector<vtkSmartPointer<vtkDiscreteMarchingCubes>> cubes;
+//  using TImage = itk::Image<short,3>;
+//  using TITKReader = itk::ImageFileReader<TImage>;
+//  using TITK2VTK = itk::ImageToVTKImageFilter<TImage>;
+//
+//  TITKReader::Pointer m_SegmentationReader = nullptr;
+//  TITK2VTK::Pointer itk2vtk = nullptr;
+//  std::vector<vtkSmartPointer<vtkDiscreteMarchingCubes>> cubes;
   std::set<std::string> IncrementKeys{"Down", "Right", "j", "l"};
   std::set<std::string> DecrementKeys{"Up", "Left", "h", "k"};
   std::set<std::string> ScreenshotKeys{"s"};
@@ -376,7 +467,7 @@ main( int argc, char ** argv )
   interactor->EnableRenderOn();
 
   const auto style = vtkSmartPointer<dv::KeyPressInteractorStyle>::New();
-  style->directory = dn;
+  style->m_SegmentationDirectory = dn;
 
   style->screenshot_dir_exists = screenshot_dir_exists;
   style->screenshot_dir = screenshot_dir;
@@ -391,7 +482,7 @@ main( int argc, char ** argv )
   interactor->SetRenderWindow( window );
   auto colors = dv::GetListOfColors();
 
-  style->SetupSegmentations( SampleRate, labels, colors );
+  style->m_SegView.Setup( SampleRate, labels, colors, style->GetCurrentSegmentationFileName(), style->GetCurrentRenderer() );
 //  style->SetupMeshes();
 
   window->Render();
