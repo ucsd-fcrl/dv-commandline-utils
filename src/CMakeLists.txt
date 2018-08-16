@@ -404,6 +404,7 @@ if(${BUILD_VTK_UTILS})
   target_link_libraries(${EXNAME}
                         dv-commandline-utils-lib
                         ${VTK_LIBRARIES}
+                        ${ITK_LIBRARIES}
                         ${Boost_PROGRAM_OPTIONS_LIBRARY}
                         ${Boost_FILESYSTEM_LIBRARY}
                         ${Boost_SYSTEM_LIBRARY}

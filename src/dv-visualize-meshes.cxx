@@ -8,10 +8,13 @@ namespace po = boost::program_options;
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
 
+#include <itkImage.h>
+#include <itkImageFileReader.h>
+#include <itkImageToVTKImageFilter.h>
+
 // VTK
 #include <vtkSmartPointer.h>
 #include <vtkImageData.h>
-#include <vtkNIFTIImageReader.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkRenderer.h>
@@ -25,6 +28,9 @@ namespace po = boost::program_options;
 #include <vtkExtractVOI.h>
 #include <vtkWindowToImageFilter.h>
 #include <vtkPNGWriter.h>
+#include <vtkOBJReader.h>
+#include <vtkMatrix4x4.h>
+#include <vtkTransform.h>
 
 // Custom
 #include <dvNumberOfSequentialFiles.h>
@@ -32,10 +38,39 @@ namespace po = boost::program_options;
 #include <dvStringOperations.h>
 #include <dvProgress.h>
 #include <dvCameraState.h>
+#include <dvGetVTKTransformationMatrixFromITKImage.h>
 
 // Define interaction style
 namespace dv
 {
+
+std::vector<std::array<double, 3>>
+GetListOfColors()
+{
+
+  std::vector<std::array<double, 3>> colors;
+  colors.emplace_back(std::array<double, 3>{  0.0/255,    0.0/255,    0.0/255});
+  colors.emplace_back(std::array<double, 3>{255.0/255,    0.0/255,    0.0/255});
+  colors.emplace_back(std::array<double, 3>{255.0/255,  255.0/255,    0.0/255});
+  colors.emplace_back(std::array<double, 3>{127.0/255,  255.0/255,    0.0/255});
+  colors.emplace_back(std::array<double, 3>{255.0/255,    0.0/255,  255.0/255});
+  colors.emplace_back(std::array<double, 3>{255.0/255,  127.0/255,    0.0/255});
+  colors.emplace_back(std::array<double, 3>{  0.0/255,  127.0/255,  255.0/255});
+  colors.emplace_back(std::array<double, 3>{255.0/255,    0.0/255,  127.0/255});
+  colors.emplace_back(std::array<double, 3>{  0.0/255,   27.0/255,  155.0/255});
+  colors.emplace_back(std::array<double, 3>{155.0/255,    0.0/255,   27.0/255});
+  colors.emplace_back(std::array<double, 3>{  0.0/255,  255.0/255,    0.0/255});
+  colors.emplace_back(std::array<double, 3>{  0.0/255,  255.0/255,  255.0/255});
+  colors.emplace_back(std::array<double, 3>{  0.0/255,  255.0/255,  127.0/255});
+  colors.emplace_back(std::array<double, 3>{127.0/255,    0.0/255,  255.0/255});
+  colors.emplace_back(std::array<double, 3>{  0.0/255,    0.0/255,  255.0/255});
+  colors.emplace_back(std::array<double, 3>{255.0/255,  127.0/255,  255.0/255});
+  colors.emplace_back(std::array<double, 3>{127.0/255,  127.0/255,  255.0/255});
+  colors.emplace_back(std::array<double, 3>{127.0/255,  127.0/255,  127.0/255});
+
+  return colors;
+}
+
 class KeyPressInteractorStyle
 : public vtkInteractorStyleTrackballCamera
 {
@@ -47,8 +82,7 @@ class KeyPressInteractorStyle
  
     void OnKeyPress() override
       {
-      vtkRenderWindowInteractor *rwi = this->Interactor;
-      const std::string key = rwi->GetKeySym();
+      const std::string key = this->Interactor->GetKeySym();
  
       // Increment
       if (this->IncrementKeys.find(key) != this->IncrementKeys.cend())
@@ -87,11 +121,16 @@ class KeyPressInteractorStyle
     this->UpdateReader();
     }
 
+  std::string GetCurrentFileName()
+    {
+    return this->directory + std::to_string(this->index.GetCurrent()) + ".nii.gz";
+    }
+
   void UpdateReader()
     {
-    const auto fn = this->directory + std::to_string(this->index.GetCurrent()) + ".nii.gz";
-    this->reader->SetFileName( fn.c_str() );
+    this->reader->SetFileName( this->GetCurrentFileName().c_str() );
     this->reader->Update();
+    this->itk2vtk->Update();
     for (const auto &c : this->cubes) c->Update();
     this->GetCurrentRenderer()->GetRenderWindow()->Render();
     }
@@ -184,6 +223,78 @@ class KeyPressInteractorStyle
 
     }
 
+  void SetupSegmentations(
+    const double SampleRate,
+    const std::vector<unsigned int> labels,
+    std::vector<std::array<double, 3>> colors
+    )
+    {
+
+    this->reader = TITKReader::New();
+    this->reader->SetFileName( this->GetCurrentFileName() );
+    this->reader->Update();
+
+    const auto fMat = vtkSmartPointer<vtkMatrix4x4>::New();
+    const auto bMat = vtkSmartPointer<vtkMatrix4x4>::New();
+
+    dv::GetVTKTransformationMatrixFromITKImage<TImage>( this->reader->GetOutput(), fMat);
+
+    const auto fTrans = vtkSmartPointer<vtkTransform>::New();
+    const auto bTrans = vtkSmartPointer<vtkTransform>::New();
+
+    fTrans->SetMatrix(  fMat );
+    fTrans->GetInverse( bMat );
+    bTrans->SetMatrix(  bMat );
+
+    this->itk2vtk = TITK2VTK::New();
+    itk2vtk->SetInput( this->reader->GetOutput() );
+    itk2vtk->Update();
+  
+    const auto voi = vtkSmartPointer<vtkExtractVOI>::New();
+    voi->SetInputData( itk2vtk->GetOutput() );
+    voi->SetSampleRate( SampleRate, SampleRate, SampleRate );
+    voi->SetVOI( itk2vtk->GetOutput()->GetExtent() );
+  
+    for (const auto &l : labels)
+      {
+      const auto cubes = vtkSmartPointer<vtkDiscreteMarchingCubes>::New();
+      cubes->SetInputConnection( voi->GetOutputPort() );
+  
+      cubes->SetValue( 0, l );
+
+      const auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+      mapper->SetInputConnection( cubes->GetOutputPort() );
+      mapper->ScalarVisibilityOff();
+  
+      const auto actor = vtkSmartPointer<vtkActor>::New();
+      actor->SetUserMatrix( fTrans->GetMatrix() );
+      actor->SetPosition(-fTrans->GetMatrix()->GetElement(0,3),
+                         -fTrans->GetMatrix()->GetElement(1,3),
+                         -fTrans->GetMatrix()->GetElement(2,3));
+  
+      actor->SetMapper( mapper );
+      actor->GetProperty()->SetColor( colors.at(l % colors.size() ).data() );
+      this->GetCurrentRenderer()->AddActor( actor );
+      this->cubes.push_back(cubes);
+      }
+    }
+
+//  void SetupMeshes()
+//    {
+//    const auto meshReader = vtkSmartPointer<vtkOBJReader>::New();
+//    meshReader->SetFileName( "/home/davis/Desktop/file.obj" );
+//    meshReader->Update();
+//
+//      const auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+//      mapper->SetInputConnection( meshReader->GetOutputPort() );
+//      mapper->ScalarVisibilityOff();
+//  
+//      const auto actor = vtkSmartPointer<vtkActor>::New();
+//      actor->SetMapper( mapper );
+//      actor->GetProperty()->SetColor( 1.0, 0.0, 0.0 );
+//      this->GetCurrentRenderer()->AddActor( actor );
+//    }
+
   dv::Cycle<unsigned int> index{1};
   std::string directory;
 
@@ -193,7 +304,13 @@ class KeyPressInteractorStyle
   bool camera_state_exists;
   std::string camera_state;
 
-  vtkSmartPointer<vtkNIFTIImageReader> reader;
+  using TImage = itk::Image<short,3>;
+  using TITKReader = itk::ImageFileReader<TImage>;
+  using TITK2VTK = itk::ImageToVTKImageFilter<TImage>;
+
+  TITKReader::Pointer reader = nullptr;
+  TITK2VTK::Pointer itk2vtk = nullptr;
+//  vtkSmartPointer<vtkNIFTIImageReader> reader;
   std::vector<vtkSmartPointer<vtkDiscreteMarchingCubes>> cubes;
   std::set<std::string> IncrementKeys{"Down", "Right", "j", "l"};
   std::set<std::string> DecrementKeys{"Up", "Left", "h", "k"};
@@ -252,17 +369,6 @@ main( int argc, char ** argv )
   const auto renderer = vtkSmartPointer<vtkRenderer>::New();
   renderer->SetBackground( 1.0, 1.0, 1.0 );
 
-  unsigned int frameid = 0;
-
-  const auto reader = vtkSmartPointer<vtkNIFTIImageReader>::New();
-  reader->SetFileName( (dn + std::to_string(frameid) + ".nii.gz").c_str() );
-  reader->Update();
-
-  const auto voi = vtkSmartPointer<vtkExtractVOI>::New();
-  voi->SetInputConnection( reader->GetOutputPort() );
-  voi->SetSampleRate( SampleRate, SampleRate, SampleRate );
-  voi->SetVOI( reader->GetOutput()->GetExtent() );
-
   const auto window = vtkSmartPointer<vtkRenderWindow>::New();
   window->AddRenderer( renderer );
   window->SetSize( WindowSize, WindowSize );
@@ -270,7 +376,6 @@ main( int argc, char ** argv )
   interactor->EnableRenderOn();
 
   const auto style = vtkSmartPointer<dv::KeyPressInteractorStyle>::New();
-  style->reader = reader;
   style->directory = dn;
 
   style->screenshot_dir_exists = screenshot_dir_exists;
@@ -284,44 +389,10 @@ main( int argc, char ** argv )
   style->SetCurrentRenderer( renderer );
 
   interactor->SetRenderWindow( window );
-  std::vector<std::array<double, 3>> colors;
-  colors.emplace_back(std::array<double, 3>{  0.0/255,    0.0/255,    0.0/255});
-  colors.emplace_back(std::array<double, 3>{255.0/255,    0.0/255,    0.0/255});
-  colors.emplace_back(std::array<double, 3>{255.0/255,  255.0/255,    0.0/255});
-  colors.emplace_back(std::array<double, 3>{127.0/255,  255.0/255,    0.0/255});
-  colors.emplace_back(std::array<double, 3>{255.0/255,    0.0/255,  255.0/255});
-  colors.emplace_back(std::array<double, 3>{255.0/255,  127.0/255,    0.0/255});
-  colors.emplace_back(std::array<double, 3>{  0.0/255,  127.0/255,  255.0/255});
-  colors.emplace_back(std::array<double, 3>{255.0/255,    0.0/255,  127.0/255});
-  colors.emplace_back(std::array<double, 3>{  0.0/255,   27.0/255,  155.0/255});
-  colors.emplace_back(std::array<double, 3>{155.0/255,    0.0/255,   27.0/255});
-  colors.emplace_back(std::array<double, 3>{  0.0/255,  255.0/255,    0.0/255});
-  colors.emplace_back(std::array<double, 3>{  0.0/255,  255.0/255,  255.0/255});
-  colors.emplace_back(std::array<double, 3>{  0.0/255,  255.0/255,  127.0/255});
-  colors.emplace_back(std::array<double, 3>{127.0/255,    0.0/255,  255.0/255});
-  colors.emplace_back(std::array<double, 3>{  0.0/255,    0.0/255,  255.0/255});
-  colors.emplace_back(std::array<double, 3>{255.0/255,  127.0/255,  255.0/255});
-  colors.emplace_back(std::array<double, 3>{127.0/255,  127.0/255,  255.0/255});
-  colors.emplace_back(std::array<double, 3>{127.0/255,  127.0/255,  127.0/255});
+  auto colors = dv::GetListOfColors();
 
-  for (const auto &l : labels)
-    {
-    const auto cubes = vtkSmartPointer<vtkDiscreteMarchingCubes>::New();
-    cubes->SetInputConnection( voi->GetOutputPort() );
-
-    cubes->SetValue( 0, l );
-
-    const auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInputConnection( cubes->GetOutputPort() );
-    mapper->ScalarVisibilityOff();
-
-    const auto actor = vtkSmartPointer<vtkActor>::New();
-    actor->SetMapper( mapper );
-    actor->GetProperty()->SetColor( colors.at(l % colors.size() ).data() );
-    renderer->AddActor( actor );
-    style->cubes.push_back(cubes);
-    }
-
+  style->SetupSegmentations( SampleRate, labels, colors );
+//  style->SetupMeshes();
 
   window->Render();
 
