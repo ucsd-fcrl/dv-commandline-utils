@@ -19,7 +19,6 @@ namespace po = boost::program_options;
 #include <vtkCallbackCommand.h>
 #include <vtkWindowToImageFilter.h>
 #include <vtkPNGWriter.h>
-#include <vtkOBJReader.h>
 
 // Custom
 #include <dvNumberOfSequentialFiles.h>
@@ -29,6 +28,7 @@ namespace po = boost::program_options;
 #include <dvCameraState.h>
 
 #include <dvSegmentationView.h>
+#include <dvMeshView.h>
 
 // Define interaction style
 namespace dv
@@ -103,6 +103,10 @@ class KeyPressInteractorStyle
     {
     this->index.Increment();
     this->m_SegView.Update( this->GetCurrentSegmentationFileName() );
+    if (this->m_MeshDirectoryExists)
+      {
+      this->m_MeshView.Update( this->GetCurrentMeshFileName() );
+      }
     this->GetCurrentRenderer()->GetRenderWindow()->Render();
     }
 
@@ -110,7 +114,16 @@ class KeyPressInteractorStyle
     {
     this->index.Decrement();
     this->m_SegView.Update( this->GetCurrentSegmentationFileName() );
+    if (this->m_MeshDirectoryExists)
+      {
+      this->m_MeshView.Update( this->GetCurrentMeshFileName() );
+      }
     this->GetCurrentRenderer()->GetRenderWindow()->Render();
+    }
+
+  std::string GetCurrentMeshFileName()
+    {
+    return this->m_MeshDirectory + std::to_string(this->index.GetCurrent()) + ".obj";
     }
 
   std::string GetCurrentSegmentationFileName()
@@ -206,24 +219,11 @@ class KeyPressInteractorStyle
 
     }
 
-  void SetupMeshes()
-    {
-    const auto meshReader = vtkSmartPointer<vtkOBJReader>::New();
-    meshReader->SetFileName( "/home/davis/Desktop/file.obj" );
-    meshReader->Update();
-
-      const auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-      mapper->SetInputConnection( meshReader->GetOutputPort() );
-      mapper->ScalarVisibilityOff();
-  
-      const auto actor = vtkSmartPointer<vtkActor>::New();
-      actor->SetMapper( mapper );
-      actor->GetProperty()->SetColor( 1.0, 0.0, 0.0 );
-      this->GetCurrentRenderer()->AddActor( actor );
-    }
-
   dv::Cycle<unsigned int> index{1};
   std::string m_SegmentationDirectory;
+
+  bool m_MeshDirectoryExists;
+  std::string m_MeshDirectory;
 
   bool screenshot_dir_exists;
   std::string screenshot_dir;
@@ -232,6 +232,7 @@ class KeyPressInteractorStyle
   std::string camera_state;
 
   SegmentationView m_SegView;
+  MeshView m_MeshView;
 
   std::set<std::string> IncrementKeys{"Down", "Right", "j", "l"};
   std::set<std::string> DecrementKeys{"Up", "Left", "h", "k"};
@@ -301,6 +302,8 @@ main( int argc, char ** argv )
 
   const auto style = vtkSmartPointer<dv::KeyPressInteractorStyle>::New();
   style->m_SegmentationDirectory = sd;
+  style->m_MeshDirectory = mesh_dir;
+  style->m_MeshDirectoryExists = mesh_dir_exists;
 
   style->screenshot_dir_exists = screenshot_dir_exists;
   style->screenshot_dir = screenshot_dir;
@@ -323,7 +326,13 @@ main( int argc, char ** argv )
     style->GetCurrentRenderer()
     );
 
-  style->SetupMeshes();
+  if (mesh_dir_exists)
+    {
+    style->m_MeshView.Setup(
+      style->GetCurrentMeshFileName(),
+      style->GetCurrentRenderer()
+      );
+    }
 
   window->Render();
 

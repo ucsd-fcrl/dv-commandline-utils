@@ -60,7 +60,7 @@ class SegmentationView
     const double SampleRate,
     const std::vector<unsigned int> labels,
     std::vector<std::array<double, 3>> colors,
-    std::string file_name,
+    const std::string file_name,
     vtkRenderer* renderer
     )
     {
