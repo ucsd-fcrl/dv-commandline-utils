@@ -17,6 +17,7 @@ main( int argc, char* argv[] )
     ("help", "Print usage information.")
     ("source-image", po::value<std::string>()->required(), "Filename of source image.")
     ("target-image", po::value<std::string>()->required(), "Filename of target image.")
+    ("label", po::value<long>()->default_value(1),         "Label.")
   ;
 
   po::variables_map vm;
@@ -30,34 +31,35 @@ main( int argc, char* argv[] )
 
   po::notify(vm);
 
-  const std::string IImage = vm["source-image"].as<std::string>();
-  const std::string OImage = vm["target-image"].as<std::string>();
+  const std::string SImage = vm["source-image"].as<std::string>();
+  const std::string TImage = vm["target-image"].as<std::string>();
+  const long Label = vm["label"].as<long>();
 
-  switch (dv::ReadImageIOBase(IImage)->GetComponentType())
+  switch (dv::ReadImageIOBase(SImage)->GetComponentType())
     {
     case itk::ImageIOBase::UCHAR:
-      dv::SegmentationError<3, unsigned char>(IImage, OImage);
+      dv::SegmentationError<3, unsigned char>(SImage, TImage, Label);
       break;
     case itk::ImageIOBase::CHAR:
-      dv::SegmentationError<3, char>(IImage, OImage);
+      dv::SegmentationError<3, char>(SImage, TImage, Label);
       break;
     case itk::ImageIOBase::USHORT:
-      dv::SegmentationError<3, unsigned short>(IImage, OImage);
+      dv::SegmentationError<3, unsigned short>(SImage, TImage, Label);
       break;
     case itk::ImageIOBase::SHORT:
-      dv::SegmentationError<3, short>(IImage, OImage);
+      dv::SegmentationError<3, short>(SImage, TImage, Label);
       break;
     case itk::ImageIOBase::UINT:
-      dv::SegmentationError<3, unsigned int>(IImage, OImage);
+      dv::SegmentationError<3, unsigned int>(SImage, TImage, Label);
       break;
     case itk::ImageIOBase::INT:
-      dv::SegmentationError<3, int>(IImage, OImage);
+      dv::SegmentationError<3, int>(SImage, TImage, Label);
       break;
     case itk::ImageIOBase::ULONG:
-      dv::SegmentationError<3, unsigned long>(IImage, OImage);
+      dv::SegmentationError<3, unsigned long>(SImage, TImage, Label);
       break;
     case itk::ImageIOBase::LONG:
-      dv::SegmentationError<3, long>(IImage, OImage);
+      dv::SegmentationError<3, long>(SImage, TImage, Label);
       break;
     default:
       std::cerr << "ERROR: Unrecognized pixel type." << std::endl;

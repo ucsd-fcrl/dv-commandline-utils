@@ -12,7 +12,8 @@ namespace dv
 template<unsigned int Dimension, typename TPixel>
 void
 SegmentationError(const std::string &IImage,
-                  const std::string &OImage)
+                  const std::string &OImage,
+                  const TPixel label)
 {
   using TImage = itk::Image< TPixel, Dimension >;
   using TReader = itk::ImageFileReader< TImage >;
@@ -32,13 +33,13 @@ SegmentationError(const std::string &IImage,
   error->SetTargetImage( targetReader->GetOutput() );
   error->Update();
 
-  std::cout << "False Negative Error: " << error->GetFalseNegativeError( 1 ) << std::endl;
-  std::cout << "False Positive Error: " << error->GetFalsePositiveError( 1 ) << std::endl;
-  std::cout << "Target Overlap: "       << error->GetTargetOverlap( 1 )      << std::endl;
-  std::cout << "Volume Similarity: "    << error->GetVolumeSimilarity( 1 )   << std::endl;
-  std::cout << "UnionOverlap: "         << error->GetUnionOverlap( 1 )       << std::endl;
-  std::cout << "Dice: "                 << error->GetDiceCoefficient( 1 ) << std::endl;
-  std::cout << "Jaccard: "              << error->GetJaccardCoefficient( 1 ) << std::endl;
+  std::cout << "False Negative Error: " << error->GetFalseNegativeError( label ) << std::endl;
+  std::cout << "False Positive Error: " << error->GetFalsePositiveError( label ) << std::endl;
+  std::cout << "Target Overlap: "       << error->GetTargetOverlap(      label ) << std::endl;
+  std::cout << "Volume Similarity: "    << error->GetVolumeSimilarity(   label ) << std::endl;
+  std::cout << "UnionOverlap: "         << error->GetUnionOverlap(       label ) << std::endl;
+  std::cout << "Dice: "                 << error->GetDiceCoefficient(    label ) << std::endl;
+  std::cout << "Jaccard: "              << error->GetJaccardCoefficient( label ) << std::endl;
 
 }
 
