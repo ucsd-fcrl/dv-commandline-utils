@@ -103,10 +103,10 @@ class KeyPressInteractorStyle
     {
     this->index.Increment();
     this->m_SegView.Update( this->GetCurrentSegmentationFileName() );
-    if (this->m_MeshDirectoryExists)
-      {
-      this->m_MeshView.Update( this->GetCurrentMeshFileName() );
-      }
+    for (unsigned int i = 0; i < this->m_MeshDirectories.size(); ++i)
+        {
+        this->m_MeshViews.at(i).Update( this->GetCurrentMeshFileName(this->m_MeshDirectories.at(i)) );
+        }
     this->GetCurrentRenderer()->GetRenderWindow()->Render();
     }
 
@@ -114,16 +114,17 @@ class KeyPressInteractorStyle
     {
     this->index.Decrement();
     this->m_SegView.Update( this->GetCurrentSegmentationFileName() );
-    if (this->m_MeshDirectoryExists)
+    for (unsigned int i = 0; i < this->m_MeshDirectories.size(); ++i)
       {
-      this->m_MeshView.Update( this->GetCurrentMeshFileName() );
+      this->m_MeshViews.at(i).Update( this->GetCurrentMeshFileName(this->m_MeshDirectories.at(i)) );
       }
     this->GetCurrentRenderer()->GetRenderWindow()->Render();
     }
 
-  std::string GetCurrentMeshFileName()
+  std::string GetCurrentMeshFileName(const std::string dir)
     {
-    return this->m_MeshDirectory + std::to_string(this->index.GetCurrent()) + ".obj";
+    const auto fn = dir + std::to_string(this->index.GetCurrent()) + ".obj";
+    return fn;
     }
 
   std::string GetCurrentSegmentationFileName()
@@ -222,8 +223,7 @@ class KeyPressInteractorStyle
   dv::Cycle<unsigned int> index{1};
   std::string m_SegmentationDirectory;
 
-  bool m_MeshDirectoryExists;
-  std::string m_MeshDirectory;
+  std::vector<std::string> m_MeshDirectories;
 
   bool screenshot_dir_exists;
   std::string screenshot_dir;
@@ -232,7 +232,7 @@ class KeyPressInteractorStyle
   std::string camera_state;
 
   SegmentationView m_SegView;
-  MeshView m_MeshView;
+  std::vector<MeshView> m_MeshViews;
 
   std::set<std::string> IncrementKeys{"Down", "Right", "j", "l"};
   std::set<std::string> DecrementKeys{"Up", "Left", "h", "k"};
@@ -257,7 +257,7 @@ main( int argc, char ** argv )
     ("help", "Print usage information.")
     ("segmentation-directory", po::value<std::string>()->required(), "Directory containing segmentation images named *.nii.gz.")
     ("labels", po::value<std::vector<unsigned int>>()->multitoken()->required(), "Space-separated list of lables to visualize, e.g.: 0 1 2 3")
-    ("mesh-directory", po::value<std::string>(), "Directory containing meshes named *.obj.")
+    ("mesh-directories", po::value<std::vector<std::string>>()->multitoken(), "Directory containing meshes named *.obj.")
     ("screenshot-directory", po::value<std::string>(), "Directory in which to save screenshots.")
     ("camera-state", po::value<std::string>(), "JSON file containing the saved camera state.")
     ("downsampling-factor", po::value<double>()->default_value(1.0), "Downsampling factor.")
@@ -283,8 +283,12 @@ main( int argc, char ** argv )
   const unsigned int WindowSize = vm["window-size"].as<unsigned int>();
   const unsigned int NumberOfFiles = dv::NumberOfSequentialFiles([sd](size_t n){ return sd + std::to_string(n) + ".nii.gz"; });
 
-  const bool mesh_dir_exists = vm.count("mesh-directory");
-  const std::string mesh_dir = mesh_dir_exists ? dv::AppendCharacterIfAbsent(vm["mesh-directory"].as<std::string>(), '/') : "";
+  std::vector<std::string> MeshDirectories;
+  if (vm.count("mesh-directories"))
+    {
+    MeshDirectories = vm["mesh-directories"].as<std::vector<std::string>>();
+    }
+
   const bool screenshot_dir_exists = vm.count("screenshot-directory");
   const std::string screenshot_dir = screenshot_dir_exists ? dv::AppendCharacterIfAbsent(vm["screenshot-directory"].as<std::string>(), '/') : "";
 
@@ -302,8 +306,8 @@ main( int argc, char ** argv )
 
   const auto style = vtkSmartPointer<dv::KeyPressInteractorStyle>::New();
   style->m_SegmentationDirectory = sd;
-  style->m_MeshDirectory = mesh_dir;
-  style->m_MeshDirectoryExists = mesh_dir_exists;
+  style->m_MeshDirectories = MeshDirectories;
+
 
   style->screenshot_dir_exists = screenshot_dir_exists;
   style->screenshot_dir = screenshot_dir;
@@ -326,10 +330,11 @@ main( int argc, char ** argv )
     style->GetCurrentRenderer()
     );
 
-  if (mesh_dir_exists)
+  for (unsigned int i = 0; i < style->m_MeshDirectories.size(); ++i)
     {
-    style->m_MeshView.Setup(
-      style->GetCurrentMeshFileName(),
+    style->m_MeshViews.emplace_back(dv::MeshView());
+    style->m_MeshViews.at(i).Setup(
+      style->GetCurrentMeshFileName(style->m_MeshDirectories.at(i)),
       style->GetCurrentRenderer()
       );
     }
