@@ -101,8 +101,11 @@ class KeyPressInteractorStyle
 
   void Increment()
     {
+
+    this->m_SegViews.at(this->GetCurrentSegmentationFileName()).RemoveAllActors();
     this->index.Increment();
-    this->m_SegView.Update( this->GetCurrentSegmentationFileName() );
+    this->m_SegViews.at(this->GetCurrentSegmentationFileName()).AddAllActors();
+
     for (unsigned int i = 0; i < this->m_MeshDirectories.size(); ++i)
         {
         this->m_MeshViews.at(i).Update( this->GetCurrentMeshFileName(this->m_MeshDirectories.at(i)) );
@@ -112,8 +115,10 @@ class KeyPressInteractorStyle
 
   void Decrement()
     {
+    this->m_SegViews.at(this->GetCurrentSegmentationFileName()).RemoveAllActors();
     this->index.Decrement();
-    this->m_SegView.Update( this->GetCurrentSegmentationFileName() );
+    this->m_SegViews.at(this->GetCurrentSegmentationFileName()).AddAllActors();
+
     for (unsigned int i = 0; i < this->m_MeshDirectories.size(); ++i)
       {
       this->m_MeshViews.at(i).Update( this->GetCurrentMeshFileName(this->m_MeshDirectories.at(i)) );
@@ -168,8 +173,7 @@ class KeyPressInteractorStyle
 
     const auto current = this->index.GetCurrent();
 
-    do
-      {
+    do {
       const auto screenshot = vtkSmartPointer<vtkWindowToImageFilter>::New();
       screenshot->SetInput( this->GetCurrentRenderer()->GetRenderWindow() );
       screenshot->SetInputBufferTypeToRGBA();
@@ -231,7 +235,7 @@ class KeyPressInteractorStyle
   bool camera_state_exists;
   std::string camera_state;
 
-  SegmentationView m_SegView;
+  std::map<std::string, SegmentationView> m_SegViews;
   std::vector<MeshView> m_MeshViews;
 
   std::set<std::string> IncrementKeys{"Down", "Right", "j", "l"};
@@ -240,6 +244,31 @@ class KeyPressInteractorStyle
   std::set<std::string> RestoreCameraStateKeys{"p"};
 
   dv::CameraState camera;
+
+  void SetupSegmentations(
+    std::vector<unsigned int> Labels,
+    std::vector<std::array<double, 3>> Colors,
+    vtkRenderer* Renderer
+    )
+    {
+
+    auto progress = dv::Progress( this->index.GetRange() - this->index.GetStart() );
+
+    const auto current = this->index.GetCurrent();
+
+    do {
+      const auto fn = this->GetCurrentSegmentationFileName();
+      const auto sv = dv::SegmentationView( fn, Labels, Colors, Renderer );
+      this->m_SegViews.emplace(std::make_pair(fn, sv));
+
+      progress.UnitCompleted();
+      this->index.Increment();
+      }
+
+    while (current != this->index.GetCurrent());
+
+    m_SegViews.at(this->GetCurrentSegmentationFileName()).AddAllActors();
+    }
 
 };
 }
@@ -320,13 +349,10 @@ main( int argc, char ** argv )
   style->SetCurrentRenderer( renderer );
 
   interactor->SetRenderWindow( window );
-  auto colors = dv::GetListOfColors();
 
-  style->m_SegView.Setup(
-    SampleRate,
+  style->SetupSegmentations(
     labels,
-    colors,
-    style->GetCurrentSegmentationFileName(),
+    dv::GetListOfColors(),
     style->GetCurrentRenderer()
     );
 
