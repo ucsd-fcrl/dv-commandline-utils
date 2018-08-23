@@ -28,9 +28,9 @@ SegmentationView(
   const std::vector<unsigned int> Labels,
   const std::vector<std::array<double, 3>> Colors,
   vtkRenderer* Renderer
-  ) : m_FileName(FileName), m_Labels(Labels), m_Colors(Colors), m_Renderer(Renderer)
+  ) : m_Labels(Labels), m_Colors(Colors), m_Renderer(Renderer)
   {
-  this->Setup(this->m_FileName);
+  this->Setup(FileName);
   }
 
 void
@@ -100,7 +100,7 @@ Setup(const std::string file_name)
     actor->SetMapper( mapper );
     actor->GetProperty()->SetColor( this->m_Colors.at(l % this->m_Colors.size() ).data() );
 
-    this->m_Actors[l] = actor;
+    this->m_Actors.emplace(std::make_pair(l, actor));
     }
 
 }

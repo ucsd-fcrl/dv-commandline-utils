@@ -8,7 +8,7 @@
 #include <map>
 
 // VTK
-#include <vtkSmartPointer>
+#include <vtkSmartPointer.h>
 #include <vtkActor.h>
 #include <vtkRenderer.h>
 
@@ -18,7 +18,6 @@ namespace dv
 class SegmentationView
 {
 
-  std::string m_FileName;
   std::vector<unsigned int> m_Labels;
   std::vector<std::array<double, 3>> m_Colors;
   vtkSmartPointer<vtkRenderer> m_Renderer = nullptr;

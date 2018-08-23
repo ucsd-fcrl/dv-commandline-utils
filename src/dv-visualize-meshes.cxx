@@ -107,9 +107,9 @@ class KeyPressInteractorStyle
     this->m_SegViews.at(this->GetCurrentSegmentationFileName()).AddAllActors();
 
     for (unsigned int i = 0; i < this->m_MeshDirectories.size(); ++i)
-        {
-        this->m_MeshViews.at(i).Update( this->GetCurrentMeshFileName(this->m_MeshDirectories.at(i)) );
-        }
+      {
+      this->m_MeshViews.at(i).Update( this->GetCurrentMeshFileName(this->m_MeshDirectories.at(i)) );
+      }
     this->GetCurrentRenderer()->GetRenderWindow()->Render();
     }
 

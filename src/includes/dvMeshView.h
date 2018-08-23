@@ -4,6 +4,7 @@
 #include <vtkOBJReader.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
+#include <vtkProperty.h>
 
 namespace dv
 {
