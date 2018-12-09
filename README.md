@@ -14,7 +14,7 @@ These instructions assume that you have MacPorts installed.
 
 ```bash
 # Install prerequisits using MacPorts:
-$ sudo port install tiff boost cmake eigen3
+$ sudo port install tiff boost cmake eigen3 rapidjson-devel
 ```
 
 ## Ubuntu
@@ -77,7 +77,8 @@ $ ccmake ../src \
   -DModule_ITKReview=ON \
   -DModule_DVMeshNoise=ON \
   -DModule_IOSTL=ON \
-  -DModule_SubdivisionQuadEdgeMesh=ON
+  -DModule_SubdivisionQuadEdgeMesh=ON \
+  -DModule_ITKVTKGlue=ON
 # Follow the instructions (c..c..g..)
 $ make
 
