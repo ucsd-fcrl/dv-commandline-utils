@@ -33,17 +33,24 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pg" CACHE STRING "cxx debug compiler flags" FORCE)
 
-##############################
-## dv-commandline-utils-lib ##
-##############################
-
-file(GLOB SRC src/*.cxx)
-
-add_library(dv-commandline-utils-lib ${SRC})
-
 ################################
 ## Utilities Depending on ITK ##
 ################################
+
+find_package(VTK REQUIRED)
+
+if(${APPLE})
+  find_package(Qt5 COMPONENTS
+               Core
+               Gui
+               Widgets)
+else()
+  find_package(Qt5 COMPONENTS
+               Core
+               Gui
+               Widgets
+               X11Extras)
+endif()
 
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
@@ -57,63 +64,64 @@ include_directories(
     ${RapidJSON_INCLUDE_DIRS}
     )
 
-#set(EXNAME "dv-convert-dicom-series-to-volume")
-#add_executable(${EXNAME} ${EXNAME}.cxx)
-#target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+##############################
+## dv-commandline-utils-lib ##
+##############################
 
-set(EXNAME "dv-convert-mesh")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+file(GLOB SRC src/*.cxx)
+add_library(dv-commandline-utils-lib ${SRC})
+target_link_libraries(dv-commandline-utils-lib ${VTK_LIBRARIES})
 
-set(EXNAME "dv-scale-mesh")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+set(EXNAMES "dv-convert-dicom-series-to-volume"
+            "dv-convert-mesh"
+            "dv-scale-mesh"
+            "dv-translate-mesh"
+            "dv-binarize-mesh"
+            "dv-permute-axes-3d"
+            "dv-convert-labels-to-mesh"
+            "dv-decimate-mesh"
+            "dv-subdivide-mesh-loop"
+            "dv-add-mesh-noise"
+            "dv-mesh-similarity-vertex-distance"
+            "dv-mesh-area-volume"
+            "dv-extract-interface-between-segments"
+            "dv-smooth-mesh"
+   )
 
-set(EXNAME "dv-translate-mesh")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+foreach(EXNAME ${EXNAMES})
 
-set(EXNAME "dv-binarize-mesh")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+  add_executable(${EXNAME} ${EXNAME}.cxx)
+  target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
-set(EXNAME "dv-permute-axes-3d")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+endforeach()
 
-set(EXNAME "dv-convert-labels-to-mesh")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+set(EXNAMES "dv-label-geometry"
+            "dv-enforce-boundary-between-labels"
+            "dv-anisotropic-smoothing"
+            "dv-compare-image-information"
+            "dv-convert-image"
+            "dv-image-information"
+            "dv-resample-volume"
+            "dv-resample-from-reference"
+            "dv-collapse-4d"
+            "dv-flip-along-axes"
+            "dv-change-information-3d"
+            "dv-binary-threshold"
+            "dv-extract-connected-components"
+            "dv-fill-holes-in-binary-image"
+            "dv-fill-holes-in-segmentation"
+            "dv-binary-opening"
+            "dv-segmentation-error"
+            "dv-change-labels"
+            "dv-extract-orthogonal-slice"
+            "dv-read-dicom-tag"
+            "dv-tile-images"
+            "dv-window-image"
+            "dv-overlay-labels"
+   )
 
-set(EXNAME "dv-decimate-mesh")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+foreach(EXNAME ${EXNAMES})
 
-set(EXNAME "dv-subdivide-mesh-loop")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
-
-set(EXNAME "dv-add-mesh-noise")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
-
-set(EXNAME "dv-mesh-similarity-vertex-distance")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
-
-set(EXNAME "dv-mesh-area-volume")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
-
-set(EXNAME "dv-extract-interface-between-segments")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
-
-set(EXNAME "dv-smooth-mesh")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
-
-set(EXNAME "dv-label-geometry")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME}
                       ${ITK_LIBRARIES}
@@ -123,222 +131,39 @@ target_link_libraries(${EXNAME}
                       ${Boost_SYSTEM_LIBRARY}
                      )
 
-set(EXNAME "dv-enforce-boundary-between-labels")
+endforeach()
+
+set(EXNAMES "dv-write-arrow-from-start-and-end"
+            "dv-mesh-quality"
+            "dv-plot-vectors"
+   )
+
+foreach(EXNAME ${EXNAMES})
+
+  add_executable(${EXNAME} ${EXNAME}.cxx)
+  target_link_libraries(${EXNAME} ${VTK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+
+  vtk_module_autoinit(
+    TARGETS ${EXNAME}
+    MODULES ${VTK_LIBRARIES}
+    )
+endforeach()
+
+set(EXNAME "dv-visualize-meshes")
 add_executable(${EXNAME} ${EXNAME}.cxx)
 target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
                       dv-commandline-utils-lib
+                      ${VTK_LIBRARIES}
+                      ${ITK_LIBRARIES}
                       ${Boost_PROGRAM_OPTIONS_LIBRARY}
                       ${Boost_FILESYSTEM_LIBRARY}
                       ${Boost_SYSTEM_LIBRARY}
                      )
 
-set(EXNAME "dv-anisotropic-smoothing")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                     )
-
-set(EXNAME "dv-compare-image-information")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                     )
-
-set(EXNAME "dv-convert-image")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                     )
-
-set(EXNAME "dv-image-information")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                     )
-
-set(EXNAME "dv-resample-volume")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                     )
-
-set(EXNAME "dv-resample-from-reference")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                     )
-
-set(EXNAME "dv-collapse-4d")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                     )
-
-set(EXNAME "dv-flip-along-axes")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                     )
-
-set(EXNAME "dv-change-information-3d")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                     )
-
-set(EXNAME "dv-binary-threshold")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                     )
-
-set(EXNAME "dv-extract-connected-components")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                     )
-
-set(EXNAME "dv-fill-holes-in-binary-image")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                     )
-set(EXNAME "dv-fill-holes-in-segmentation")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                     ${ITK_LIBRARIES}
-                     dv-commandline-utils-lib
-                     ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                     ${Boost_FILESYSTEM_LIBRARY}
-                     ${Boost_SYSTEM_LIBRARY}
-                    )
-
-set(EXNAME "dv-binary-opening")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                     )
-
-set(EXNAME "dv-segmentation-error")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                     )
-
-set(EXNAME "dv-change-labels")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                     )
-
-set(EXNAME "dv-extract-orthogonal-slice")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                     )
-
-set(EXNAME "dv-read-dicom-tag")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                     )
-
-set(EXNAME "dv-tile-images")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                    )
-set(EXNAME "dv-window-image")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                    )
-set(EXNAME "dv-overlay-labels")
-add_executable(${EXNAME} ${EXNAME}.cxx)
-target_link_libraries(${EXNAME}
-                      ${ITK_LIBRARIES}
-                      dv-commandline-utils-lib
-                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                      ${Boost_FILESYSTEM_LIBRARY}
-                      ${Boost_SYSTEM_LIBRARY}
-                    )
+vtk_module_autoinit(
+  TARGETS dv-visualize-meshes
+  MODULES ${VTK_LIBRARIES}
+  )
 
 ##
 ## Utilities depending upon CPD
@@ -363,55 +188,6 @@ if(${BUILD_CPD_UTILS})
 
 endif()
 
-##
-## Utilities depending upon VTK
-##
-
-option(BUILD_VTK_UTILS "Build utilities depending upon VTK." OFF)
-
-if(${BUILD_VTK_UTILS})
-
-  find_package(VTK REQUIRED)
-  include(${VTK_USE_FILE})
-
-  if(${APPLE})
-    find_package(Qt5 COMPONENTS
-                 Core
-                 Gui
-                 Widgets)
-  else()
-    find_package(Qt5 COMPONENTS
-                 Core
-                 Gui
-                 Widgets
-                 X11Extras)
-  endif()
-
-  set(EXNAME "dv-write-arrow-from-start-and-end")
-  add_executable(${EXNAME} ${EXNAME}.cxx)
-  target_link_libraries(${EXNAME} ${VTK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
-
-  set(EXNAME "dv-mesh-quality")
-  add_executable(${EXNAME} ${EXNAME}.cxx)
-  target_link_libraries(${EXNAME} ${VTK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
-
-  set(EXNAME "dv-plot-vectors")
-  add_executable(${EXNAME} ${EXNAME}.cxx)
-  target_link_libraries(${EXNAME} ${VTK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
-
-  set(EXNAME "dv-visualize-meshes")
-  add_executable(${EXNAME} ${EXNAME}.cxx)
-  target_link_libraries(${EXNAME}
-                        dv-commandline-utils-lib
-                        ${VTK_LIBRARIES}
-                        ${ITK_LIBRARIES}
-                        ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                        ${Boost_FILESYSTEM_LIBRARY}
-                        ${Boost_SYSTEM_LIBRARY}
-                       )
-
-endif()
-
 #############
 ## Testing ##
 #############
@@ -421,5 +197,7 @@ option(BUILD_TESTING "Build the testing tree." OFF)
 include(CTest)
 
 if(BUILD_TESTING)
+
   add_subdirectory(tests)
+
 endif()
