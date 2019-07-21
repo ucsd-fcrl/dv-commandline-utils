@@ -32,7 +32,7 @@ main( int argc, char** argv )
     vm
   );
 
-  if (vm.count("help") || vm.empty())
+  if (vm.count("help") || 1 == argc)
     {
     std::cout << description << '\n';
     return EXIT_SUCCESS;

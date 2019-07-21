@@ -26,7 +26,7 @@ main(int argc, char ** argv)
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, description), vm);
 
-  if (vm.count("help") || vm.empty())
+  if (vm.count("help") || 1 == argc)
     {
     std::cout << description << '\n';
     return EXIT_SUCCESS;
