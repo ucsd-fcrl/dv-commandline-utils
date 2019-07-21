@@ -91,7 +91,7 @@ set(EXNAMES "dv-convert-dicom-series-to-volume"
 
 foreach(EXNAME ${EXNAMES})
 
-  add_executable(${EXNAME} ${EXNAME}.cxx)
+  add_executable(${EXNAME} utils/${EXNAME}.cxx)
   target_link_libraries(${EXNAME} ${ITK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 endforeach()
@@ -123,7 +123,7 @@ set(EXNAMES "dv-label-geometry"
 
 foreach(EXNAME ${EXNAMES})
 
-add_executable(${EXNAME} ${EXNAME}.cxx)
+add_executable(${EXNAME} utils/${EXNAME}.cxx)
 target_link_libraries(${EXNAME}
                       ${ITK_LIBRARIES}
                       dv-commandline-utils-lib
@@ -141,7 +141,7 @@ set(EXNAMES "dv-write-arrow-from-start-and-end"
 
 foreach(EXNAME ${EXNAMES})
 
-  add_executable(${EXNAME} ${EXNAME}.cxx)
+  add_executable(${EXNAME} utils/${EXNAME}.cxx)
   target_link_libraries(${EXNAME} ${VTK_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
   vtk_module_autoinit(
@@ -151,7 +151,7 @@ foreach(EXNAME ${EXNAMES})
 endforeach()
 
 set(EXNAME "dv-visualize-meshes")
-add_executable(${EXNAME} ${EXNAME}.cxx)
+add_executable(${EXNAME} utils/${EXNAME}.cxx)
 target_link_libraries(${EXNAME}
                       dv-commandline-utils-lib
                       ${VTK_LIBRARIES}
@@ -177,7 +177,7 @@ if(${BUILD_CPD_UTILS})
   find_package(Cpd REQUIRED)
 
   set(EXNAME "dv-nonrigid-cpd")
-  add_executable(${EXNAME} ${EXNAME}.cxx)
+  add_executable(${EXNAME} utils/${EXNAME}.cxx)
   target_link_libraries(${EXNAME}
                         dv-commandline-utils-lib
                         Cpd::Library-C++
