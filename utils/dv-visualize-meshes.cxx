@@ -92,7 +92,7 @@ class KeyPressInteractorStyle
       // Take Rotating Screenshots
       else if (this->ScreenshotRotateKeys.find(key) != this->ScreenshotRotateKeys.cend())
         {
-        this->CaptureScreenshots(true);
+        this->CaptureScreenshots(true, 10);
         }
       // Restore Camera State
       else if (this->RestoreCameraStateKeys.find(key) != this->RestoreCameraStateKeys.cend())
@@ -142,7 +142,7 @@ class KeyPressInteractorStyle
     return this->m_SegmentationDirectory + std::to_string(this->index.GetCurrent()) + ".nii.gz";
     }
 
-  void CaptureScreenshots(const bool &rotating)
+  void CaptureScreenshots(const bool &rotating, const int &num_rotations = 1)
     {
     if (!this->screenshot_dir_exists)
       {
@@ -174,15 +174,17 @@ class KeyPressInteractorStyle
     fileStream << sb.GetString();
     fileStream.close();
 
-    auto progress = dv::Progress( this->index.GetRange() - this->index.GetStart() );
-
     const auto current = this->index.GetCurrent();
+    const auto total_iterations = (rotating ? this->index.GetRange() * num_rotations : this->index.GetRange());
+    const auto azimuth = 360.0 / total_iterations;
 
-    do {
-     
+//    auto progress = dv::Progress( total_iterations );
+
+    for (size_t it = 0; it < total_iterations; ++it)
+      {
+
       if (rotating)
         { 
-        const double azimuth = 360.0 / this->index.GetRange();
         this->GetCurrentRenderer()->GetActiveCamera()->OrthogonalizeViewUp();
         this->GetCurrentRenderer()->GetActiveCamera()->Azimuth(azimuth);
         }
@@ -194,15 +196,26 @@ class KeyPressInteractorStyle
       screenshot->Update();
 
       const auto writer = vtkSmartPointer<vtkPNGWriter>::New();
-      const auto path = folder + "/" + std::to_string(this->index.GetCurrent()) + ".png";
+
+      std::string path;
+
+      if (rotating)
+        {
+        path = folder + "/" + std::to_string(it) + ".png";
+        }
+      else
+        {
+        path = folder + "/" + std::to_string(this->index.GetCurrent()) + ".png";
+        }
+
       writer->SetFileName( path.c_str() );
       writer->SetInputConnection( screenshot->GetOutputPort() );
       writer->Write();
 
-      progress.UnitCompleted();
+// FIXME
+//      progress.UnitCompleted();
       this->Increment();
       }
-    while (current != this->index.GetCurrent());
 
     }
 
