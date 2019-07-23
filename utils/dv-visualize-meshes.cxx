@@ -87,7 +87,12 @@ class KeyPressInteractorStyle
       // Take Screenshots
       else if (this->ScreenshotKeys.find(key) != this->ScreenshotKeys.cend())
         {
-        this->CaptureScreenshots();
+        this->CaptureScreenshots(false);
+        }
+      // Take Rotating Screenshots
+      else if (this->ScreenshotRotateKeys.find(key) != this->ScreenshotRotateKeys.cend())
+        {
+        this->CaptureScreenshots(true);
         }
       // Restore Camera State
       else if (this->RestoreCameraStateKeys.find(key) != this->RestoreCameraStateKeys.cend())
@@ -137,7 +142,7 @@ class KeyPressInteractorStyle
     return this->m_SegmentationDirectory + std::to_string(this->index.GetCurrent()) + ".nii.gz";
     }
 
-  void CaptureScreenshots()
+  void CaptureScreenshots(const bool &rotating)
     {
     if (!this->screenshot_dir_exists)
       {
@@ -174,6 +179,14 @@ class KeyPressInteractorStyle
     const auto current = this->index.GetCurrent();
 
     do {
+     
+      if (rotating)
+        { 
+        const double azimuth = 360.0 / this->index.GetRange();
+        this->GetCurrentRenderer()->GetActiveCamera()->OrthogonalizeViewUp();
+        this->GetCurrentRenderer()->GetActiveCamera()->Azimuth(azimuth);
+        }
+
       const auto screenshot = vtkSmartPointer<vtkWindowToImageFilter>::New();
       screenshot->SetInput( this->GetCurrentRenderer()->GetRenderWindow() );
       screenshot->SetInputBufferTypeToRGBA();
@@ -241,6 +254,7 @@ class KeyPressInteractorStyle
   std::set<std::string> IncrementKeys{"Down", "Right", "j", "l"};
   std::set<std::string> DecrementKeys{"Up", "Left", "h", "k"};
   std::set<std::string> ScreenshotKeys{"s"};
+  std::set<std::string> ScreenshotRotateKeys{"S"};
   std::set<std::string> RestoreCameraStateKeys{"p"};
 
   dv::CameraState camera;
@@ -370,7 +384,7 @@ main( int argc, char ** argv )
   if (vm.count("restore-capture-quit"))
     {
     style->RestoreCameraState();
-    style->CaptureScreenshots();
+    style->CaptureScreenshots(false);
     window->Finalize();
     }
   else
