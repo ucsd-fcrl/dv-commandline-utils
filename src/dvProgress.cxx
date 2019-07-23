@@ -30,6 +30,13 @@ Progress
     }
 }
 
+size_t
+Progress
+::GetTotalUnits()
+{
+  return this->TotalUnits;
+}
+
 double
 Progress
 ::TotalUnitsAsFP()

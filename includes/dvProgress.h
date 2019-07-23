@@ -14,6 +14,7 @@ public:
 
   Progress(std::size_t _TotalUnits);
   void UnitCompleted();
+  size_t GetTotalUnits();
 
 protected:
 
