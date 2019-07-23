@@ -82,7 +82,7 @@ struct GetDimensionsFunction
     {
     const auto N = imageIO->GetNumberOfDimensions();
     std::string dim;
-    for (std::size_t i = 0; i < N; ++i) dim += std::to_string(imageIO->GetDimensions(i)) + ' ';
+    for (size_t i = 0; i < N; ++i) dim += std::to_string(imageIO->GetDimensions(i)) + ' ';
     return dim;
     }
 };
@@ -96,7 +96,7 @@ struct GetOriginFunction
     {
     const auto N = imageIO->GetNumberOfDimensions();
     std::string origin;
-    for (std::size_t i = 0; i < N; ++i) origin += std::to_string(imageIO->GetOrigin(i)) + ' ';
+    for (size_t i = 0; i < N; ++i) origin += std::to_string(imageIO->GetOrigin(i)) + ' ';
     return origin;
     }
 };
@@ -110,7 +110,7 @@ struct GetSpacingFunction
     {
     const auto N = imageIO->GetNumberOfDimensions();
     std::string spacing;
-    for (std::size_t i = 0; i < N; ++i) spacing += std::to_string(imageIO->GetSpacing(i)) + ' ';
+    for (size_t i = 0; i < N; ++i) spacing += std::to_string(imageIO->GetSpacing(i)) + ' ';
     return spacing;
     }
 };
@@ -124,7 +124,7 @@ struct GetDirectionFunction
     {
     const auto N = imageIO->GetNumberOfDimensions();
     std::string direction;
-    for (std::size_t i = 0; i < N; ++i)
+    for (size_t i = 0; i < N; ++i)
       {
       const auto vec = imageIO->GetDirection(i);
       for (const auto &v : vec)

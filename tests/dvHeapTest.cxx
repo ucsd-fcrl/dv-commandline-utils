@@ -7,7 +7,7 @@ int main()
   using THeap = dv::Heap<int>;
 
   THeap h;
-  for (std::size_t i = 0; i < 20; ++i)
+  for (size_t i = 0; i < 20; ++i)
     {
     h.push(i * 100 % 7);
     for (const auto d : h.data) std::cout << d << ' ';

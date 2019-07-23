@@ -5,7 +5,7 @@ namespace dv
 {
 
 Progress
-::Progress(std::size_t _TotalUnits) :
+::Progress(size_t _TotalUnits) :
   TotalUnits(_TotalUnits)
 {
 }

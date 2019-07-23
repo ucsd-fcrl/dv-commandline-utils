@@ -12,14 +12,14 @@ class Progress
 {
 public:
 
-  Progress(std::size_t _TotalUnits);
+  Progress(size_t _TotalUnits);
   void UnitCompleted();
   size_t GetTotalUnits();
 
 protected:
 
-  const std::size_t TotalUnits;
-  std::size_t CurrentUnit = 0;
+  const size_t TotalUnits;
+  size_t CurrentUnit = 0;
 
   double TotalUnitsAsFP();
   double CurrentUnitAsFP();

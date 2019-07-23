@@ -64,7 +64,7 @@ main( int argc, char* argv[] )
     }
 
   TTranslate::OutputVectorType displacement;
-  for (std::size_t i = 0; i < 3; ++i) displacement[i] = T[i];
+  for (size_t i = 0; i < 3; ++i) displacement[i] = T[i];
 
   const auto translate = TTranslate::New();
   translate->Translate( displacement );

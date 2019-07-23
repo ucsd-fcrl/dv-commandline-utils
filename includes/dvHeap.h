@@ -31,17 +31,17 @@ T pop()
   return temp;
 }
 
-std::size_t size() { return this->data.size(); }
+size_t size() { return this->data.size(); }
 
 //protected:
 std::vector<T> data;
 
-void upheap(std::size_t index)
+void upheap(size_t index)
 {
 
   if (index == 0) return;
 
-  std::size_t parent = this->get_parent(index);
+  size_t parent = this->get_parent(index);
   const auto value = this->data[index];
   while (index > 0)
     {
@@ -59,9 +59,9 @@ void upheap(std::size_t index)
   this->data[index] = value;
 }
 
-void downheap(std::size_t index)
+void downheap(size_t index)
 {
-  std::size_t child = this->get_left_child(index);
+  size_t child = this->get_left_child(index);
   const auto value = this->data[index];
 
   while (child < this->data.size()) // Make sure left child exists
@@ -87,19 +87,19 @@ void downheap(std::size_t index)
   this->data[index] = value;
 }
 
-std::size_t get_parent(const std::size_t index)
+size_t get_parent(const size_t index)
 {
   return (index - 1) / 2;
 }
 
-std::size_t
-get_left_child(const std::size_t index)
+size_t
+get_left_child(const size_t index)
 {
   return 2 * (index + 1) - 1;
 }
 
-std::size_t
-get_right_child(const std::size_t index)
+size_t
+get_right_child(const size_t index)
 {
   return this->get_left_child(index) + 1;
 }

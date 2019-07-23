@@ -45,7 +45,7 @@ void check_and_set_double_array(const rapidjson::Document &doc,
 {
   if (doc.HasMember(s.c_str()) && doc[s.c_str()].IsArray() && (3 == doc[s.c_str()].Size()))
     {
-    for (std::size_t i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 3; ++i)
       a[i] = doc[s.c_str()][i].GetDouble();
     }   
 };  

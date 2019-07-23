@@ -28,7 +28,7 @@ BooleanIndexing(const std::vector<T>& input, const std::vector<bool> logic)
     }
 
   std::vector<T> output;
-  for (std::size_t i = 0; i < input.size(); ++i)
+  for (size_t i = 0; i < input.size(); ++i)
     {
     if (logic.at(i)) output.emplace_back(input[i]);
     }

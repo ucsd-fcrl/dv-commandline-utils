@@ -20,7 +20,7 @@ GlobFiles( const std::string &pattern )
   //Glob.. GLOB_TILDE tells the globber to expand "~" in the pattern to the home directory
   glob( pattern.c_str(), GLOB_TILDE, NULL, &globbuf);
 
-  for ( std::size_t i = 0; i < globbuf.gl_pathc; ++i )
+  for ( size_t i = 0; i < globbuf.gl_pathc; ++i )
     {
     output.push_back( globbuf.gl_pathv[i] );
     }

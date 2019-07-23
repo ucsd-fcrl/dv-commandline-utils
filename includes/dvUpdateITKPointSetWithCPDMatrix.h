@@ -16,7 +16,7 @@ UpdateITKPointSetWithCPDMatrix(typename TPointSet::Pointer points, const cpd::Ma
        it != points->GetPoints()->End();
        ++it)
     {
-    for (std::size_t i = 0; i < dim; ++i)
+    for (size_t i = 0; i < dim; ++i)
       {
       it->Value()[i] = mat(it->Index(), i);
       }

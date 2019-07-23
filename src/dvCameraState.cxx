@@ -50,17 +50,17 @@ CameraState
 
   writer.Key("camera.Position");
   writer.StartArray();
-  for (std::size_t i = 0; i < 3; ++i) writer.Double(this->Position[i]);
+  for (size_t i = 0; i < 3; ++i) writer.Double(this->Position[i]);
   writer.EndArray();
   
   writer.Key("camera.FocalPoint");
   writer.StartArray();
-  for (std::size_t i = 0; i < 3; ++i) writer.Double(this->FocalPoint[i]);
+  for (size_t i = 0; i < 3; ++i) writer.Double(this->FocalPoint[i]);
   writer.EndArray();
 
   writer.Key("camera.ViewUp");
   writer.StartArray();
-  for (std::size_t i = 0; i < 3; ++i) writer.Double(this->ViewUp[i]);
+  for (size_t i = 0; i < 3; ++i) writer.Double(this->ViewUp[i]);
   writer.EndArray();
 }
 
