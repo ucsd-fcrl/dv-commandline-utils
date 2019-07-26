@@ -87,6 +87,7 @@ set(EXNAMES "dv-convert-dicom-series-to-volume"
             "dv-extract-interface-between-segments"
             "dv-smooth-mesh"
             "dv-assign-materials-to-mesh-faces"
+            "dv-extract-connected-mesh-components"
    )
 
 foreach(EXNAME ${EXNAMES})

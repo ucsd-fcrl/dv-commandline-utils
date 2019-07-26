@@ -1,6 +1,7 @@
 # Exclude these directories anywhere in your tree
 bin/
 data/
+.vscode/
 
 # Exclude these file types
 *.swp
