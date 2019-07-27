@@ -2,6 +2,7 @@
 #define dv_DeleteIsolatedPoints_h
 
 #include <set>
+#include <algorithm>
 
 namespace dv
 {
