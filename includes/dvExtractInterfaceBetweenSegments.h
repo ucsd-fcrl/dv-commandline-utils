@@ -5,7 +5,6 @@
 #include <itkMesh.h>
 #include <itkImageFileReader.h>
 #include <itkMeshFileWriter.h>
-#include <itkSTLMeshIO.h>
 //#include <itkAntiAliasBinaryImageFilter.h>
 //#include <itkCuberilleImageToMeshFilter.h>
 #include <itkBinaryMask3DMeshSource.h>
@@ -139,13 +138,6 @@ ExtractInterfaceBetweenSegments(const std::string &IImage, const std::string &OM
   const auto writer = TWriter::New();
   writer->SetInput( meshSource->GetOutput() );
   writer->SetFileName( OMesh );
-
-  const auto o_ext = OMesh.substr( OMesh.size() - 3, 3);
-  if (o_ext == "stl" || o_ext == "STL")
-  {
-    writer->SetMeshIO( itk::STLMeshIO::New() );
-  }
-
   writer->Update();
 
 }

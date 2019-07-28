@@ -7,7 +7,6 @@ namespace po = boost::program_options;
 #include <itkMesh.h>
 #include <itkMeshFileReader.h>
 #include <itkMeshFileWriter.h>
-#include <itkSTLMeshIO.h>
 #include <itkScaleTransform.h>
 #include <itkTransformMeshFilter.h>
 
@@ -56,11 +55,6 @@ main( int argc, char* argv[] )
 
   const auto reader = TReader::New();
   reader->SetFileName( inputFileName );
-  const auto i_ext = itksys::SystemTools::GetFilenameLastExtension(vm["input-mesh"].as<std::string>());
-  if (i_ext == ".stl" || i_ext == ".STL")
-    {
-    reader->SetMeshIO( itk::STLMeshIO::New() );
-    }
 
   const auto translate = TScale::New();
   translate->SetScale( scale );
@@ -72,11 +66,6 @@ main( int argc, char* argv[] )
   const auto writer = TWriter::New();
   writer->SetInput( transform->GetOutput() );
   writer->SetFileName( outputFileName );
-  const auto o_ext = itksys::SystemTools::GetFilenameLastExtension(vm["output-mesh"].as<std::string>());
-  if (o_ext == ".stl" || o_ext == ".STL")
-    {
-    writer->SetMeshIO( itk::STLMeshIO::New() );
-    }
 
   try
     {

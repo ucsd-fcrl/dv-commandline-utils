@@ -5,7 +5,6 @@
 #include <itkQuadEdgeMesh.h>
 #include <itkMeshFileReader.h>
 #include <itkMeshFileWriter.h>
-#include <itkSTLMeshIO.h>
 #include <itkSmoothingQuadEdgeMeshFilter.h>
 #include <itkQuadEdgeMeshParamMatrixCoefficients.h>
 
@@ -32,12 +31,6 @@ SmoothMesh(const std::string &IMesh,
 
   const auto reader = TReader::New();
   reader->SetFileName( IMesh );
-
-  const auto i_ext = IMesh.substr(IMesh.size() - 3, 3);
-  if (i_ext == "stl" || i_ext == "STL")
-    {
-    reader->SetMeshIO( itk::STLMeshIO::New() );
-    }
 
   TCoefficients mats;
 

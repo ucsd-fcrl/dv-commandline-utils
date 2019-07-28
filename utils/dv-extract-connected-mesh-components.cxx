@@ -9,7 +9,6 @@ namespace po = boost::program_options;
 #include <itkMesh.h>
 #include <itkMeshFileReader.h>
 #include <itkMeshFileWriter.h>
-#include <itkSTLMeshIO.h>
 #include <itkTranslationTransform.h>
 #include <itkTransformMeshFilter.h>
 #include <itksys/SystemTools.hxx>

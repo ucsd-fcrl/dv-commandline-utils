@@ -8,7 +8,6 @@ namespace po = boost::program_options;
 #include <itkMesh.h>
 #include <itkMeshFileReader.h>
 #include <itkMeshFileWriter.h>
-#include <itkSTLMeshIO.h>
 #include <itksys/SystemTools.hxx>
 #include <itkAdditiveGaussianNoiseMeshFilter.h>
 
@@ -51,11 +50,6 @@ main( int argc, char* argv[] )
 
   const auto reader = TReader::New();
   reader->SetFileName( inputFileName );
-  const auto i_ext = itksys::SystemTools::GetFilenameLastExtension(inputFileName);
-  if (i_ext == ".stl" || i_ext == ".STL")
-    {
-    reader->SetMeshIO( itk::STLMeshIO::New() );
-    }
 
   const auto noise = TNoise::New();
   noise->SetInput( reader->GetOutput() );
@@ -64,11 +58,6 @@ main( int argc, char* argv[] )
   const auto writer = TWriter::New();
   writer->SetInput( noise->GetOutput() );
   writer->SetFileName( outputFileName );
-  const auto o_ext = itksys::SystemTools::GetFilenameLastExtension(outputFileName);
-  if (o_ext == ".stl" || o_ext == ".STL")
-    {
-    writer->SetMeshIO( itk::STLMeshIO::New() );
-    }
 
   try
     {

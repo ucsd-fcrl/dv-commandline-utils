@@ -4,7 +4,6 @@
 // ITK
 #include <itkMesh.h>
 #include <itkMeshFileReader.h>
-#include <itkSTLMeshIO.h>
 
 #include <itkImage.h>
 #include <itkImageFileReader.h>
@@ -36,11 +35,6 @@ BinarizeMesh(const std::string &iMesh,
   const auto meshReader = MeshReaderType::New();
   meshReader->SetFileName( iMesh );
 
-  const auto i_ext = iMesh.substr(iMesh.size() - 3, 3);
-  if (i_ext == "stl" || i_ext == "STL")
-    {
-    meshReader->SetMeshIO( itk::STLMeshIO::New() );
-    }
 
   const auto imageReader = ImageReaderType::New();
   imageReader->SetFileName( rImage );
