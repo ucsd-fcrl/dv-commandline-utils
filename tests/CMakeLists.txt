@@ -26,6 +26,7 @@ set(EXNAMES "dvStringOperationsTest"
             "dvReverseFindIfTest"
             "dvSmartPointerTest"
             "dvSoftMaxTest"
+            "dvDeleteIsolatedPointsTest"
    )
 
 foreach(EXNAME ${EXNAMES})
