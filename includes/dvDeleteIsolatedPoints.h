@@ -23,7 +23,8 @@ DeleteIsolatedPoints(MeshType* mesh)
                  std::inserter(LinkedPoints, LinkedPoints.begin()),
                  LinkedPointsLambda);
 
-  // Get a list 
+  // Get those points which are NOT linked to any cells in the mesh.
+
   using TPointID = typename MeshType::PointIdentifier;
   std::set<TPointID> IsolatedPoints;
   for (auto p_it = mesh->GetPoints()->Begin();
@@ -35,6 +36,8 @@ DeleteIsolatedPoints(MeshType* mesh)
       IsolatedPoints.emplace( p_it.Index() );
       }
     }
+
+  // Delete those points, and their associated point data.
 
   for (const auto u : IsolatedPoints)
     {

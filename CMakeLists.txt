@@ -120,6 +120,7 @@ set(EXNAMES "dv-label-geometry"
             "dv-tile-images"
             "dv-window-image"
             "dv-overlay-labels"
+            "dv-generate-initial-model"
    )
 
 foreach(EXNAME ${EXNAMES})
