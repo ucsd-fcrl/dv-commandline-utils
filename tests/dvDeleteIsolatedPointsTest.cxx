@@ -2,6 +2,8 @@
 #include <itkDefaultDynamicMeshTraits.h>
 #include <itkTriangleCell.h>
 #include <dvDeleteIsolatedPoints.h>
+#include <itkMeshFileWriter.h>
+#include <dvSqueezePointsIds.h>
 
 const unsigned int Dimension = 2;
 using TPixel = float;
@@ -10,6 +12,7 @@ using TMesh       = itk::Mesh< TPixel, Dimension, TMeshTraits >;
 using TPoint = TMesh::PointType;
 using TCell = TMesh::CellType;
 using TTriangle = itk::TriangleCell< TCell >;
+using TMeshWriter = itk::MeshFileWriter< TMesh >;
 
 int
 main(int, char**)
@@ -40,6 +43,13 @@ main(int, char**)
 
   itkAssertOrThrowMacro(3==mesh->GetNumberOfPoints(), "Wrong number of points.");
   itkAssertOrThrowMacro(1==mesh->GetNumberOfCells(), "Wrong number of cells.");
+
+  dv::SqueezePointsIds<TMesh>( mesh );
+
+  const auto writer = TMeshWriter::New();
+  writer->SetInput( mesh );
+  writer->SetFileName( "mesh-unsqueezed.obj" );
+  writer->Update();
 
   return EXIT_SUCCESS;
 
