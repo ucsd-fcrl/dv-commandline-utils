@@ -1,8 +1,7 @@
 #ifndef dv_SqueezePointsIds_h
 #define dv_SqueezePointsIds_h
 
-#include <set>
-#include <algorithm>
+#include <map>
 
 namespace dv
 {

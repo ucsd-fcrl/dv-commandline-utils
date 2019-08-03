@@ -1,9 +1,9 @@
+#include <dvSqueezePointsIds.h>
 #include <itkMesh.h>
 #include <itkDefaultDynamicMeshTraits.h>
 #include <itkTriangleCell.h>
 #include <dvDeleteIsolatedPoints.h>
 #include <itkMeshFileWriter.h>
-#include <dvSqueezePointsIds.h>
 
 const unsigned int Dimension = 2;
 using TPixel = float;
