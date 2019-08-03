@@ -19,11 +19,13 @@ namespace po = boost::program_options;
 // => Refine
 // => Loop
 
-#include <itkAdditiveGaussianNoiseMeshFilter.h>
+#include <itkDelaunayConformingQuadEdgeMeshFilter.h>
+#include <itkAdditiveGaussianNoiseQuadEdgeMeshFilter.h>
 #include <itkQuadEdgeMeshDecimationCriteria.h>
 #include <itkSquaredEdgeLengthDecimationQuadEdgeMeshFilter.h>
 #include <itkConnectedRegionsMeshFilter.h>
 #include <dvDeleteIsolatedPoints.h>
+#include <dvSqueezePointsIds.h>
 #include <dvRefineValenceThreeVertices.h>
 #include <itkLoopTriangleCellSubdivisionQuadEdgeMeshFilter.h>
  
@@ -40,13 +42,14 @@ using TQEReader     = itk::MeshFileReader< TQEMesh >;
 using TQEWriter     = itk::MeshFileWriter< TQEMesh >;
 
 using TConnected = itk::ConnectedRegionsMeshFilter< TMesh, TMesh >;
-using TNoise = itk::AdditiveGaussianNoiseMeshFilter< TMesh >;
+using TNoise = itk::AdditiveGaussianNoiseQuadEdgeMeshFilter< TQEMesh >;
 using TCriterion  = itk::NumberOfFacesCriterion< TQEMesh >;
 using TDecimation = itk::SquaredEdgeLengthDecimationQuadEdgeMeshFilter< TQEMesh,
                                                               TQEMesh,
                                                               TCriterion >;
 using TLoop = itk::LoopTriangleCellSubdivisionQuadEdgeMeshFilter< TQEMesh, TQEMesh >;
- 
+using TDelaunay = itk::DelaunayConformingQuadEdgeMeshFilter< TQEMesh >;
+
 int
 main( int argc, char ** argv )
 {
@@ -78,10 +81,7 @@ main( int argc, char ** argv )
   const double sigma = vm["sigma"].as<double>();
 
   const auto File0 = outputMeshDirectory + "00-Largest-Connected-Component.obj";
-  const auto File1 = outputMeshDirectory + "01-Gaussian-Noise.obj";
-  const auto File2 = outputMeshDirectory + "02-Decimated.obj";
-  const auto File3 = outputMeshDirectory + "03-Isolated.obj";
-  const auto File4 = outputMeshDirectory + "04-Subdivided.obj";
+  const auto File1 = outputMeshDirectory + "01-Coarse-Mesh-Model.obj";
 
     {
     std::cout << "Extracting connected components..." << std::flush;
@@ -92,9 +92,17 @@ main( int argc, char ** argv )
     const auto connected = TConnected::New();
     connected->SetInput( reader->GetOutput() );
     connected->SetExtractionModeToLargestRegion();
+    connected->Update();
+
+    const auto mesh = TMesh::New();
+    mesh->Graft( connected->GetOutput() );
+    mesh->DisconnectPipeline();
+
+    dv::DeleteIsolatedPoints<TMesh>( mesh );
+    dv::SqueezePointsIds<TMesh>( mesh );
 
     const auto writer = TWriter::New();
-    writer->SetInput( connected->GetOutput() );
+    writer->SetInput( mesh );
     writer->SetFileName( File0 );
     writer->Update();
 
@@ -102,80 +110,32 @@ main( int argc, char ** argv )
     }
 
     {
-    std::cout << "Adding mesh noise..." << std::flush;
+    std::cout << "Generating model mesh..." << std::flush;
 
-    const auto reader = TReader::New();
+    const auto reader = TQEReader::New();
     reader->SetFileName( File0 );
 
     const auto noise = TNoise::New();
     noise->SetInput( reader->GetOutput() );
     noise->SetSigma( sigma );
 
-    const auto writer = TWriter::New();
-    writer->SetInput( noise->GetOutput() );
-    writer->SetFileName( File1 );
-    writer->Update();
-
-    std::cout << "done." << std::endl;
-    }
-
-    {
-    std::cout << "Decimating mesh..." << std::flush;
-
-    const auto reader = TQEReader::New();
-    reader->SetFileName( File1 );
-
     const auto criterion = TCriterion::New();
     const auto decimate = TDecimation::New();
  
     criterion->SetNumberOfElements(  count );
 
-    decimate->SetInput( reader->GetOutput() );
+    decimate->SetInput( noise->GetOutput() );
     decimate->SetCriterion( criterion );
-    decimate->Update();
-    decimate->GetOutput()->SqueezePointsIds();
 
-    const auto writer = TQEWriter::New();
-    writer->SetInput( decimate->GetOutput() );
-    writer->SetFileName( File2 );
-    writer->Update();
-
-    std::cout << "done." << std::endl;
-    }
-
-    {
-    std::cout << "Deleting isolated points..." << std::flush;
-
-    const auto reader = TReader::New();
-    reader->SetFileName( File2 );
-
-    const auto mesh = TMesh::New();
-    mesh->Graft( reader->GetOutput() );
-    mesh->DisconnectPipeline();
-
-    dv::DeleteIsolatedPoints<TMesh>( mesh );
-
-    const auto writer = TWriter::New();
-    writer->SetInput( mesh );
-    writer->SetFileName( File3 );
-    writer->Update();
-
-    std::cout << "done." << std::endl;
-    }
-
-    {
-    std::cout << "Subdividing mesh..." << std::flush;
-
-    const auto reader = TQEReader::New();
-    reader->SetFileName( File3 );
+    const auto delaunay = TDelaunay::New();
+    delaunay->SetInput( decimate->GetOutput() );
 
     const auto loop = TLoop::New();
-    loop->SetInput( reader->GetOutput() );
+    loop->SetInput( delaunay->GetOutput() );
 
     const auto writer = TQEWriter::New();
     writer->SetInput( loop->GetOutput() );
-    writer->SetFileName( File4 );
-
+    writer->SetFileName( File1 );
     writer->Update();
 
     std::cout << "done." << std::endl;
