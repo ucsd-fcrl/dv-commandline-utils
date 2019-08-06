@@ -28,6 +28,7 @@ namespace po = boost::program_options;
 #include <dvSqueezePointsIds.h>
 #include <dvRefineValenceThreeVertices.h>
 #include <itkLoopTriangleCellSubdivisionQuadEdgeMeshFilter.h>
+#include <dvMeshToQuadEdgeMesh.h>
  
 const unsigned int Dimension = 3;
 using TCoordinate = float;
@@ -59,7 +60,7 @@ main( int argc, char ** argv )
   description.add_options()
     ("help", "Print usage information.")
     ("input-mesh",       po::value<std::string>()->required(),  "Filename of the input mesh.")
-    ("output-directory", po::value<std::string>()->required(),  "Filename of the output mesh directory.")
+    ("output-mesh", po::value<std::string>()->required(),  "Filename of the output mesh.")
     ("count",            po::value<unsigned int>()->default_value(500), "Target number of cells in the decimated mesh.")
     ("sigma",            po::value<double>()->default_value(0.1), "Amount of gaussian noise to add to mesh vertices prior to decimation.")
   ;
@@ -76,70 +77,50 @@ main( int argc, char ** argv )
   po::notify(vm);
 
   const std::string inputMeshName(vm["input-mesh"].as<std::string>());
-  const std::string outputMeshDirectory(vm["output-directory"].as<std::string>());
+  const std::string outputMeshName(vm["output-mesh"].as<std::string>());
   const unsigned int count = vm["count"].as<unsigned int>();
   const double sigma = vm["sigma"].as<double>();
 
-  const auto File0 = outputMeshDirectory + "00-Largest-Connected-Component.obj";
-  const auto File1 = outputMeshDirectory + "01-Coarse-Mesh-Model.obj";
+  const auto reader = TReader::New();
+  reader->SetFileName( inputMeshName );
 
-    {
-    std::cout << "Extracting connected components..." << std::flush;
+  const auto connected = TConnected::New();
+  connected->SetInput( reader->GetOutput() );
+  connected->SetExtractionModeToLargestRegion();
+  connected->Update();
 
-    const auto reader = TReader::New();
-    reader->SetFileName( inputMeshName );
+  const auto mesh = TMesh::New();
+  mesh->Graft( connected->GetOutput() );
+  mesh->DisconnectPipeline();
 
-    const auto connected = TConnected::New();
-    connected->SetInput( reader->GetOutput() );
-    connected->SetExtractionModeToLargestRegion();
-    connected->Update();
+  dv::DeleteIsolatedPoints<TMesh>( mesh );
+  dv::SqueezePointsIds<TMesh>( mesh );
 
-    const auto mesh = TMesh::New();
-    mesh->Graft( connected->GetOutput() );
-    mesh->DisconnectPipeline();
+  const auto qemesh = TQEMesh::New();
+  dv::MeshToQuadEdgeMesh< TMesh, TQEMesh >( mesh, qemesh );
 
-    dv::DeleteIsolatedPoints<TMesh>( mesh );
-    dv::SqueezePointsIds<TMesh>( mesh );
+  const auto noise = TNoise::New();
+  noise->SetInput( qemesh );
+  noise->SetSigma( sigma );
 
-    const auto writer = TWriter::New();
-    writer->SetInput( mesh );
-    writer->SetFileName( File0 );
-    writer->Update();
+  const auto criterion = TCriterion::New();
+  const auto decimate = TDecimation::New();
 
-    std::cout << "done." << std::endl;
-    }
+  criterion->SetNumberOfElements(  count );
 
-    {
-    std::cout << "Generating model mesh..." << std::flush;
+  decimate->SetInput( noise->GetOutput() );
+  decimate->SetCriterion( criterion );
 
-    const auto reader = TQEReader::New();
-    reader->SetFileName( File0 );
+  const auto delaunay = TDelaunay::New();
+  delaunay->SetInput( decimate->GetOutput() );
 
-    const auto noise = TNoise::New();
-    noise->SetInput( reader->GetOutput() );
-    noise->SetSigma( sigma );
+  const auto loop = TLoop::New();
+  loop->SetInput( delaunay->GetOutput() );
 
-    const auto criterion = TCriterion::New();
-    const auto decimate = TDecimation::New();
- 
-    criterion->SetNumberOfElements(  count );
-
-    decimate->SetInput( noise->GetOutput() );
-    decimate->SetCriterion( criterion );
-
-    const auto delaunay = TDelaunay::New();
-    delaunay->SetInput( decimate->GetOutput() );
-
-    const auto loop = TLoop::New();
-    loop->SetInput( delaunay->GetOutput() );
-
-    const auto writer = TQEWriter::New();
-    writer->SetInput( loop->GetOutput() );
-    writer->SetFileName( File1 );
-    writer->Update();
-
-    std::cout << "done." << std::endl;
-    }
+  const auto writer = TQEWriter::New();
+  writer->SetInput( loop->GetOutput() );
+  writer->SetFileName( outputMeshName );
+  writer->Update();
 
   return EXIT_SUCCESS;
  
