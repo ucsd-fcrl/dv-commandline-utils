@@ -106,7 +106,7 @@ main( int argc, char ** argv )
   const auto criterion = TCriterion::New();
   const auto decimate = TDecimation::New();
 
-  criterion->SetNumberOfElements(  count );
+  criterion->SetNumberOfElements( count );
 
   decimate->SetInput( noise->GetOutput() );
   decimate->SetCriterion( criterion );
