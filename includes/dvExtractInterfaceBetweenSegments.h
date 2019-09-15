@@ -5,8 +5,6 @@
 #include <itkMesh.h>
 #include <itkImageFileReader.h>
 #include <itkMeshFileWriter.h>
-//#include <itkAntiAliasBinaryImageFilter.h>
-//#include <itkCuberilleImageToMeshFilter.h>
 #include <itkBinaryMask3DMeshSource.h>
 #include <itkStatisticsImageFilter.h>
 #include <itkMacro.h>
@@ -26,13 +24,10 @@ ExtractInterfaceBetweenSegments(const std::string &IImage, const std::string &OM
 {
 
   using TImage = itk::Image< TPixel, Dimension >;
-  using TRealImage = itk::Image< double, Dimension >;
   using TMesh   = itk::Mesh< TCoordinate, Dimension >;
 
   using ReaderType = itk::ImageFileReader< TImage >;
   using FilterType = itk::ExtractLabelsImageFilter<TImage>;
-//  using TAntiAlias = itk::AntiAliasBinaryImageFilter<TImage, TRealImage>;
-//  using TCuberille = itk::CuberilleImageToMeshFilter< TRealImage, TMesh >;
   using TMeshSource = itk::BinaryMask3DMeshSource< TImage, TMesh >;
   using TStats = itk::StatisticsImageFilter< TImage >;
   using TBall = itk::BinaryBallStructuringElement< TPixel, Dimension>;

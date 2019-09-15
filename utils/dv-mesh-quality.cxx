@@ -12,7 +12,6 @@ namespace po = boost::program_options;
 #include <vtkDoubleArray.h>
 #include <vtkCellData.h>
  
-const unsigned int Dimension = 3;
 using TCoordinate = float;
 
 using TReader = vtkSmartPointer<vtkOBJReader>;

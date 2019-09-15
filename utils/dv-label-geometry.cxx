@@ -7,8 +7,6 @@ namespace po = boost::program_options;
 #include <dvReadImageIOBase.h>
 #include <dvLabelGeometry.h>
 
-const unsigned int Dimension = 3;
-
 int
 main( int argc, char** argv )
 {

@@ -8,8 +8,6 @@ namespace po = boost::program_options;
 #include <dvImageInformationFunctors.h>
 #include <dvBinaryThreshold.h>
 
-const unsigned int Dimension = 3;
-
 int
 main(int argc, char **argv)
 {

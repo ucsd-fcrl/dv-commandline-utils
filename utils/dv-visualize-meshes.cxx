@@ -174,7 +174,6 @@ class KeyPressInteractorStyle
     fileStream << sb.GetString();
     fileStream.close();
 
-    const auto current = this->index.GetCurrent();
     const auto total_iterations = (rotating ? this->index.GetRange() * num_rotations : this->index.GetRange());
     const auto azimuth = 360.0 / total_iterations;
 

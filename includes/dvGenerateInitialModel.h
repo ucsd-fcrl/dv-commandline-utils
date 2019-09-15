@@ -41,10 +41,8 @@ using TCoordinate = float;
 using TMeshTraits = itk::DefaultDynamicMeshTraits< TCoordinate >;
 using TMesh       = itk::Mesh< TCoordinate, Dimension, TMeshTraits >;
 using TReader     = itk::MeshFileReader< TMesh >;
-using TWriter     = itk::MeshFileWriter< TMesh >;
 
 using TQEMesh       = itk::QuadEdgeMesh< TCoordinate, Dimension >;
-using TQEReader     = itk::MeshFileReader< TQEMesh >;
 using TQEWriter     = itk::MeshFileWriter< TQEMesh >;
 
 using TConnected = itk::ConnectedRegionsMeshFilter< TMesh, TMesh >;

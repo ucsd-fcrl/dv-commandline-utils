@@ -6,8 +6,6 @@ namespace po = boost::program_options;
 #include <dvCollapse4D.h>
 #include <dvReadImageIOBase.h>
 
-const unsigned int Dimension = 3;
-
 int
 main(int argc, char **argv)
 {

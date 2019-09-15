@@ -82,8 +82,6 @@ main(int argc, char ** argv)
 
   for (size_t i = 0; i < Image1->GetNumberOfDimensions(); ++i)
     {
-    const auto spacing_1 = Image1->GetSpacing(i);
-    const auto spacing_2 = Image2->GetSpacing(i);
     if (std::abs(Image1->GetSpacing(i) - Image2->GetSpacing(i)) > 1e-5)
       {
       std::cerr << "Image spacing does not match." << std::endl;
