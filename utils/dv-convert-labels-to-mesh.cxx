@@ -43,7 +43,9 @@ main( int argc, char* argv[] )
   //
   std::set<TPixel> labels(labelVector.cbegin(), labelVector.cend());
 
-  dv::ConvertLabelsToMesh<Dimension, TPixel, TCoordinate>(inputFileName, labels, outputFileName);
+  dv::ConvertLabelsToMesh<Dimension, TPixel, TCoordinate>(
+    inputFileName, labels, outputFileName
+    );
 
   return EXIT_SUCCESS;
 
