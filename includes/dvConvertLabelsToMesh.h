@@ -25,7 +25,6 @@ ConvertLabelsToMesh(const std::string &IImage, const std::set<TPixel> &LabelSet,
 {
 
   using TImage = itk::Image< TPixel, Dimension >;
-  using TRealImage = itk::Image< double, Dimension >;
   using TMesh   = itk::Mesh< TCoordinate, Dimension >;
 
   using ReaderType = itk::ImageFileReader< TImage >;
