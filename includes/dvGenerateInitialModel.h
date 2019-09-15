@@ -86,9 +86,19 @@ decimate->SetCriterion( criterion );
 
 const auto delaunay = TDelaunay::New();
 delaunay->SetInput( decimate->GetOutput() );
+delaunay->Update();
+
+const auto qemesh2 = TQEMesh::New();
+qemesh2->Graft( delaunay->GetOutput() );
+qemesh2->DisconnectPipeline();
+
+while (dv::MeshIncludesValenceThreeVertices< TQEMesh >( qemesh2 ))
+  {
+  dv::RefineValenceThreeVertices< TQEMesh >( qemesh2 );
+  }
 
 const auto loop = TLoop::New();
-loop->SetInput( delaunay->GetOutput() );
+loop->SetInput( qemesh2 );
 
 const auto writer = TQEWriter::New();
 writer->SetInput( loop->GetOutput() );
