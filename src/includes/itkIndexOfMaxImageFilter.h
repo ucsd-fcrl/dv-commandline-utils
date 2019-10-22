@@ -31,9 +31,7 @@ namespace itk
             maxIndex = i + 1;
           }
         }
-        // return static_cast<TOutput>( maxIndex );
-        return maxIndex;
-        // return A.GetElement(0);
+        return static_cast<TOutput>( maxIndex );
       }
 
     };
