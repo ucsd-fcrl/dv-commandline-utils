@@ -35,21 +35,21 @@ void ResampleVolume(const std::string &IImage,
                     const unsigned int &interpolator)
 {
   using ImageType = itk::Image<TPixel, Dimension>;
-  using ImageTypeML = itk::Image<double, Dimension>;
-  using VectorImageType = itk::VectorImage<double, Dimension>;
+  using ImageTypeML = itk::Image<float, Dimension>;
+  using VectorImageType = itk::VectorImage<float, Dimension>;
   using ReaderType = itk::ImageFileReader<ImageType>;
   using WriterType = itk::ImageFileWriter<ImageType>;
   using WriterTypeML = itk::ImageFileWriter<ImageTypeML>;
-  using TransformType = itk::IdentityTransform<double, Dimension>;
-  using ResampleType = itk::ResampleImageFilter<ImageType, ImageType>;
-  using ResampleTypeML = itk::ResampleImageFilter<ImageType, ImageTypeML>;
+  using TransformType = itk::IdentityTransform<float, Dimension>;
+  using ResampleType = itk::ResampleImageFilter<ImageType, ImageType, float, float>;
+  using ResampleTypeML = itk::ResampleImageFilter<ImageType, ImageTypeML, float, float>;
   using ChangeLabelsFilterType = itk::ChangeLabelsImageFilter<ImageType>;
   using ImageToVectorImageFilterType = itk::ComposeImageFilter<ImageTypeML>;
   using MaxFilterType = itk::IndexOfMaxImageFilter<VectorImageType, ImageType>;
 
-  using NNInterpolateType = itk::NearestNeighborInterpolateImageFunction<ImageType>;
-  using LNInterpolateType = itk::LinearInterpolateImageFunction<ImageType>;
-  using BSInterpolateType = itk::BSplineInterpolateImageFunction<ImageType>;
+  using NNInterpolateType = itk::NearestNeighborInterpolateImageFunction<ImageType, float>;
+  using LNInterpolateType = itk::LinearInterpolateImageFunction<ImageType, float>;
+  using BSInterpolateType = itk::BSplineInterpolateImageFunction<ImageType, float>;
 
   const auto reader = ReaderType::New();
   const auto writer = WriterType::New();
@@ -188,7 +188,7 @@ void ResampleVolume(const std::string &IImage,
     const auto interp = BSInterpolateType::New();
     interp->SetSplineOrder(interpolator);
     resample->SetInterpolator(interp);
-
+    
     writer->SetInput(resample->GetOutput());
     writer->SetFileName(OImage);
     writer->Update();
@@ -198,4 +198,4 @@ void ResampleVolume(const std::string &IImage,
 }
 
 } // namespace dv
-#endif 
+#endif
