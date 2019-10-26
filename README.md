@@ -10,6 +10,7 @@ Currently, only volumetric data are supported.
 
 The preferred mechanism for building this repository is using [Docker](https://www.docker.com/).  Please make sure that Docker is installed and running on your system.  At that point, the repository can be built as follows:
 
+```bash
 $ mkdir -p ~/Developer/dv-commandline-utils
 $ cd ~/Developer/dv-commandline-utils
 $ git clone https://github.com/DVigneault/dv-commandline-utils.git src
@@ -18,4 +19,5 @@ $ ./docker-build.sh
 $ ./docker-run.sh
 (dkr) $ cmake ../src
 (dkr) $ make -j$(nproc)
+```
 
