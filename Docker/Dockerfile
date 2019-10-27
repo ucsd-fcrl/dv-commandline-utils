@@ -74,6 +74,7 @@ RUN mkdir -p /Developer/repositories/dv-commandline-utils/bin \
   && cmake ../src  \
     -DCMAKE_CXX_STANDARD=14 \
     -DCMAKE_CXX_FLAGS=-std=c++14 \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
   && make -j$(nproc)
 
 ### Download public key for github.com
