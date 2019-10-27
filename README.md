@@ -64,3 +64,16 @@ $ docker run \
   sudomakeinstall/dv-commandline-utils zsh
 (dkr) $ # Modify and commit code on the host, build binaries here
 ```
+
+# Running Tests
+
+Unit tests are not automatically built in the docker image.  The steps to build and run tests are as follows:
+
+```bash
+$ cd ~/Developer/repositories/dv-commandline-utils/src
+$ ./docker-run.sh
+(dkr) $ ccmake ../src
+# Set BUILD_TESTING=ON in the curses GUI, configure, configure, generate.
+(dkr) $ make -j$(nproc)
+(dkr) $ ctest
+```
