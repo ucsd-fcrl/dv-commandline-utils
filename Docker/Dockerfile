@@ -8,6 +8,8 @@ RUN apt-get update \
   openssh-client \
   ca-certificates \
   clang \
+  clang-tidy \
+  clang-format \
   git \
   vim \
   libeigen3-dev \
