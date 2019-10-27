@@ -14,10 +14,10 @@ namespace po = boost::program_options;
 const unsigned int Dimension = 3;
 using TCoordinate = float;
 
-using TMesh      = itk::Mesh< TCoordinate, Dimension >;
-using TReader    = itk::MeshFileReader< TMesh >;
-using TWriter    = itk::MeshFileWriter< TMesh >;
-using TNoise     = itk::AdditiveGaussianNoiseMeshFilter< TMesh >;
+using TMesh   = itk::Mesh< TCoordinate, Dimension >;
+using TReader = itk::MeshFileReader< TMesh >;
+using TWriter = itk::MeshFileWriter< TMesh >;
+using TNoise  = itk::AdditiveGaussianNoiseMeshFilter< TMesh >;
 
 int
 main( int argc, char* argv[] )
