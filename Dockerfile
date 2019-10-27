@@ -67,22 +67,12 @@ RUN mkdir -p /Developer/ITK/bin \
   && cd /Developer \
   && rm -rf ./ITK
 
-RUN mkdir -p /Developer/repositories/dv-commandline-utils/bin \
-  && cd /Developer/repositories/dv-commandline-utils \
-  && git clone --depth 1 https://github.com/dvigneault/dv-commandline-utils.git src \
-  && cd ./bin \
+ADD . /code/src/
+
+RUN mkdir -p /code/bin \
+  && cd /code/bin \
   && cmake ../src  \
     -DCMAKE_CXX_STANDARD=14 \
     -DCMAKE_CXX_FLAGS=-std=c++14 \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
   && make -j$(nproc)
-
-### Download public key for github.com
-##RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
-##
-### Using ssh-agent forwarding to clone from private git repo without copying private keys into the image
-### https://docs.docker.com/develop/develop-images/build_enhancements/
-### https://blog.oddbit.com/post/2019-02-24-docker-build-learns-about-secr/
-### https://medium.com/@tonistiigi/build-secrets-and-ssh-forwarding-in-docker-18-09-ae8161d066
-### https://developer.github.com/v3/guides/using-ssh-agent-forwarding/
-##RUN --mount=type=ssh git clone git@github.com:dvigneault/resume.git Developer/resume

@@ -4,33 +4,61 @@ This repository contains a collection of commandline utilities for simple image 
 - Ideally, the pixel type is determined from the pixel type of the input file, and the appropriate template instantiation is determined dynamically.
 - The output is written to disk, as opposed to the many ITK examples which use the `QuickView` utility.
 
-Currently, only volumetric data are supported.
-
 # Building
 
 The preferred mechanism for building this repository is using [Docker](https://www.docker.com/).  Please make sure that Docker is installed and running on your system.  At that point, the repository can be built as follows:
 
 ```bash
-$ mkdir -p ~/Developer/dv-commandline-utils
-$ cd ~/Developer/dv-commandline-utils
-$ git clone https://github.com/DVigneault/dv-commandline-utils.git src
-$ cd ./src
+$ git clone https://github.com/DVigneault/dv-commandline-utils.git \
+    ~/Developer/repositories/dv-commandline-utils/src
+$ cd ~/Developer/repositories/dv-commandline-utils/src
 $ ./docker-build.sh
 ```
 
-# Developing
-
-The docker image can be spun up into a container using:
+`dv-commandline-utils` depends on quite a few packages, and two large c++ libraries (ITK and VTK), which must be built from source--so this command could take a while to finish.  Once it finishes, you should be able to see `sudomakeinstall/dv-commandline-utils` in the list of docker images on your computer:
 
 ```bash
-$ docker run --rm -it sudomakeinstall/dv-commandline-utils zsh
-(docker) $
+$ docker image ls
+REPOSITORY                             TAG                 IMAGE ID            CREATED             SIZE
+sudomakeinstall/dv-commandline-utils   latest              848b802899d4        43 seconds ago      3.08GB
 ```
 
-However, as Docker containers are ephemeral, it is not advisable to edit the source code within the container directly.  Rather, the `-v` flat is used to mount the host copy of the code (`clone`d into `~/Developer/dv-commandline-utils/src` above) onto `/Developer/dv-commandline-utils/src` in the container.  This way, the source code may be edited (either on the host or the container) and rebuilt iteratively in the container.  This way, source code changes will persist on the host machine after the container exits.
+Spinning up a container to play around with the utilities can be as easy as:
 
 ```bash
-$ cd ~/Developer/dv-commandline-utils/src
-$ ./docker-ruh.sh
-# edit source here, re-build in ../bin
+$ docker run \
+  --rm \
+  -it \
+  -v "${HOME}/hostdata":"/data" \
+  -w /code/bin \
+  sudomakeinstall/dv-commandline-utils zsh
+(dkr) $ ./dv-add-mesh-noise --help
+Allowed options:
+  --help                Print usage information.
+  --input-mesh arg      Filename of the input mesh.
+  --output-mesh arg     Filename of the output image.
+  --sigma arg           Amount of noise to be added.
+(dkr) $ ./dv-add-mesh-noise \
+  --input-mesh /data/input-mesh.obj \
+  --output-mesh /data/output-mesh.obj \
+  --sigma 0.1
+```
+
+Congrats, you're up and running!
+
+# Developing
+
+In order to set up for development, you'll want to mount your local copy of the source code on top of the copy shipped in the image, so that you can iteratively modify the code (on the local host machine) and build the binaries (in the container).  This just requires one further mount flat:
+
+
+```bash
+$ cd ~/Developer/repositories/dv-commandline-utils/src
+$ docker run \
+  --rm \
+  -it \
+  -v "${PWD}":/code/src" \
+  -v "${HOME}/hostdata":"/data" \
+  -w /code/bin \
+  sudomakeinstall/dv-commandline-utils zsh
+(dkr) $ # Modify and commit code on the host, build binaries here
 ```
