@@ -65,8 +65,14 @@ RUN mkdir -p /Developer/ITK/bin \
   && cd /Developer \
   && rm -rf ./ITK
 
-RUN mkdir -p /Developer/repositories/dv-commandline-utils/src \
-  /Developer/repositories/dv-commandline-utils/bin
+RUN mkdir -p /Developer/repositories/dv-commandline-utils/bin \
+  && cd /Developer/repositories/dv-commandline-utils \
+  && git clone --depth 1 https://github.com/dvigneault/dv-commandline-utils.git src \
+  && cd ./bin \
+  && cmake ../src  \
+    -DCMAKE_CXX_STANDARD=14 \
+    -DCMAKE_CXX_FLAGS=-std=c++14 \
+  && make -j$(nproc)
 
 ### Download public key for github.com
 ##RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
