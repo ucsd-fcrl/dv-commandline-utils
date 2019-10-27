@@ -2,9 +2,6 @@
 # Extra libraries needed for testing #
 ######################################
 
-find_package(Ceres REQUIRED)
-include_directories(${CERES_INCLUDE_DIRS})
-
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
 
@@ -24,7 +21,6 @@ set(EXNAMES "dvStringOperationsTest"
             "dvSortTest"
             "dvHeapTest"
             "dvReverseFindIfTest"
-            "dvSmartPointerTest"
             "dvSoftMaxTest"
             "dvDeleteIsolatedPointsTest"
             "dvMeshToQuadEdgeMeshTest"
@@ -38,10 +34,12 @@ foreach(EXNAME ${EXNAMES})
 
 endforeach()
 
-
-add_executable(dvTriangleAspectRatioRegularizerTest dvTriangleAspectRatioRegularizerTest.cxx)
-target_link_libraries(dvTriangleAspectRatioRegularizerTest dv-commandline-utils-lib
-                                                           ${CERES_LIBRARIES}
-                                                           ${ITK_LIBRARIES})
-add_test(dvTriangleAspectRatioRegularizerTest dvTriangleAspectRatioRegularizerTest)
+#find_package(Ceres REQUIRED)
+#include_directories(${CERES_INCLUDE_DIRS})
+#
+#add_executable(dvTriangleAspectRatioRegularizerTest dvTriangleAspectRatioRegularizerTest.cxx)
+#target_link_libraries(dvTriangleAspectRatioRegularizerTest dv-commandline-utils-lib
+#                                                           ${CERES_LIBRARIES}
+#                                                           ${ITK_LIBRARIES})
+#add_test(dvTriangleAspectRatioRegularizerTest dvTriangleAspectRatioRegularizerTest)
 
