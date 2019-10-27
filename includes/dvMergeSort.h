@@ -7,14 +7,15 @@
 - O(nlog(n)) sorting algorithm
 - Used in Timsort
 */
-namespace dv
-{
+namespace dv {
 
 template<typename It>
-void MergeSort(const It b, const It e)
+void
+MergeSort(const It b, const It e)
 {
   const auto n = std::distance(b, e);
-  if (n < 2) return;
+  if (n < 2)
+    return;
   const auto m = std::next(b, n / 2);
   MergeSort(b, m);
   MergeSort(m, e);

@@ -2,18 +2,17 @@
 #define dv_SegmentationView_h
 
 // STD
-#include <string>
-#include <vector>
 #include <array>
 #include <map>
+#include <string>
+#include <vector>
 
 // VTK
-#include <vtkSmartPointer.h>
 #include <vtkActor.h>
 #include <vtkRenderer.h>
+#include <vtkSmartPointer.h>
 
-namespace dv
-{
+namespace dv {
 
 class SegmentationView
 {
@@ -27,14 +26,11 @@ class SegmentationView
   double m_Relaxation = 0.1;
   double m_FeatureAngle = 135.0;
 
-  public:
-
-  SegmentationView(
-    const std::string FileName,
-    const std::vector<unsigned int> Labels,
-    const std::vector<std::array<double, 3>> Colors,
-    vtkRenderer* Renderer
-    );
+public:
+  SegmentationView(const std::string FileName,
+                   const std::vector<unsigned int> Labels,
+                   const std::vector<std::array<double, 3>> Colors,
+                   vtkRenderer* Renderer);
 
   std::map<unsigned int, vtkSmartPointer<vtkActor>> m_Actors;
 
@@ -42,7 +38,6 @@ class SegmentationView
 
   void AddAllActors();
   void RemoveAllActors();
-
 };
 
 }

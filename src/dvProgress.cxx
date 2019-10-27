@@ -1,52 +1,43 @@
 #include <dvProgress.h>
 #include <iomanip>
 
-namespace dv
-{
+namespace dv {
 
-Progress
-::Progress(size_t _TotalUnits) :
-  TotalUnits(_TotalUnits)
-{
-}
+Progress ::Progress(size_t _TotalUnits)
+  : TotalUnits(_TotalUnits)
+{}
 
 void
-Progress
-::UnitCompleted()
+Progress ::UnitCompleted()
 {
   ++(this->CurrentUnit);
-  double PercentCompleted = this->CurrentUnitAsFP() / this->TotalUnitsAsFP() * 100.0;
-  double n = static_cast<int>(PercentCompleted/2);
-  std::cout << '\r'
-            << '[' <<  std::string(n-1, '=') << ">" << std::string(50 - n, '.') << "] "
-            << std::setprecision(2) << std::fixed << PercentCompleted << "\% Completed.";
-  if (this->CurrentUnit == this->TotalUnits)
-    {
+  double PercentCompleted =
+    this->CurrentUnitAsFP() / this->TotalUnitsAsFP() * 100.0;
+  double n = static_cast<int>(PercentCompleted / 2);
+  std::cout << '\r' << '[' << std::string(n - 1, '=') << ">"
+            << std::string(50 - n, '.') << "] " << std::setprecision(2)
+            << std::fixed << PercentCompleted << "\% Completed.";
+  if (this->CurrentUnit == this->TotalUnits) {
     std::cout << std::endl;
-    }
-  else
-    {
+  } else {
     std::cout << std::flush;
-    }
+  }
 }
 
 size_t
-Progress
-::GetTotalUnits()
+Progress ::GetTotalUnits()
 {
   return this->TotalUnits;
 }
 
 double
-Progress
-::TotalUnitsAsFP()
+Progress ::TotalUnitsAsFP()
 {
   return static_cast<double>(this->TotalUnits);
 }
 
 double
-Progress
-::CurrentUnitAsFP()
+Progress ::CurrentUnitAsFP()
 {
   return static_cast<double>(this->CurrentUnit);
 }

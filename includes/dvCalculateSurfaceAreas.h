@@ -4,8 +4,7 @@
 #include <vector>
 #include <vtkPolyData.h>
 
-namespace dv
-{
+namespace dv {
 
 std::vector<double>
 CalculateSurfaceAreas(vtkPolyData* mesh);

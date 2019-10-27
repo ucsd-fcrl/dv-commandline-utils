@@ -9,25 +9,26 @@ namespace po = boost::program_options;
 const unsigned int Dimension = 3;
 using TCoordinate = float;
 
-int main( int argc, char* argv[] )
+int
+main(int argc, char* argv[])
 {
 
   // Declare the supported options.
   po::options_description description("Allowed options");
-  description.add_options()
-    ("help", "Print usage information.")
-    ("input-mesh",  po::value<std::string>()->required(), "Filename of the input mesh.")
-    ("output-mesh", po::value<std::string>()->required(), "Filename of the output mesh.")
-  ;
+  description.add_options()("help", "Print usage information.")(
+    "input-mesh",
+    po::value<std::string>()->required(),
+    "Filename of the input mesh.")("output-mesh",
+                                   po::value<std::string>()->required(),
+                                   "Filename of the output mesh.");
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, description), vm);
 
-  if (vm.count("help") || 1 == argc)
-    {
+  if (vm.count("help") || 1 == argc) {
     std::cout << description << '\n';
     return EXIT_SUCCESS;
-    }
+  }
 
   po::notify(vm);
 
@@ -37,6 +38,4 @@ int main( int argc, char* argv[] )
   dv::ConvertMesh<Dimension, TCoordinate>(IMesh, OMesh);
 
   return EXIT_SUCCESS;
-
 }
-

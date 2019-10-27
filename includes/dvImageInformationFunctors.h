@@ -1,195 +1,182 @@
 #ifndef dv_ImageInformationFunctors_h
 #define dv_ImageInformationFunctors_h
 
-namespace dv
-{
+namespace dv {
 
 struct GetInfoFunction
 {
   const std::string key;
-  virtual std::string
-  GetInfo(itk::ImageIOBase::Pointer imageIO) = 0;
-  protected: GetInfoFunction(std::string _key) : key(_key){};
+  virtual std::string GetInfo(itk::ImageIOBase::Pointer imageIO) = 0;
+
+protected:
+  GetInfoFunction(std::string _key)
+    : key(_key){};
 };
 
-struct GetSummaryTypeFunction
-: public GetInfoFunction
+struct GetSummaryTypeFunction : public GetInfoFunction
 {
-  GetSummaryTypeFunction():GetInfoFunction("--summary"){};
-  std::string
-  GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {
+  GetSummaryTypeFunction()
+    : GetInfoFunction("--summary"){};
+  std::string GetInfo(itk::ImageIOBase::Pointer imageIO) final
+  {
     std::stringstream ss;
     imageIO->Print(ss);
     return ss.str();
-    }
+  }
 };
 
-struct GetPixelTypeFunction
-: public GetInfoFunction
+struct GetPixelTypeFunction : public GetInfoFunction
 {
-  GetPixelTypeFunction():GetInfoFunction("--pixel-type"){};
-  std::string
-  GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {
+  GetPixelTypeFunction()
+    : GetInfoFunction("--pixel-type"){};
+  std::string GetInfo(itk::ImageIOBase::Pointer imageIO) final
+  {
     const auto pixelType = imageIO->GetPixelType();
-    return itk::ImageIOBase::GetPixelTypeAsString( pixelType );
-    }
+    return itk::ImageIOBase::GetPixelTypeAsString(pixelType);
+  }
 };
 
-struct GetComponentTypeFunction
-: public GetInfoFunction
+struct GetComponentTypeFunction : public GetInfoFunction
 {
-  GetComponentTypeFunction():GetInfoFunction("--component-type"){};
-  std::string
-  GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {
+  GetComponentTypeFunction()
+    : GetInfoFunction("--component-type"){};
+  std::string GetInfo(itk::ImageIOBase::Pointer imageIO) final
+  {
     const auto componentType = imageIO->GetComponentType();
-    return imageIO->GetComponentTypeAsString( componentType );
-    }
+    return imageIO->GetComponentTypeAsString(componentType);
+  }
 };
 
-struct GetFileTypeFunction
-: public GetInfoFunction
+struct GetFileTypeFunction : public GetInfoFunction
 {
-  GetFileTypeFunction():GetInfoFunction("--file-type"){};
-  std::string
-  GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {
+  GetFileTypeFunction()
+    : GetInfoFunction("--file-type"){};
+  std::string GetInfo(itk::ImageIOBase::Pointer imageIO) final
+  {
     const auto fileType = imageIO->GetFileType();
-    return imageIO->GetFileTypeAsString( fileType );
-    }
+    return imageIO->GetFileTypeAsString(fileType);
+  }
 };
 
-
-struct GetDimensionFunction
-: public GetInfoFunction
+struct GetDimensionFunction : public GetInfoFunction
 {
-  GetDimensionFunction():GetInfoFunction("--dimension"){};
-  std::string
-  GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {
+  GetDimensionFunction()
+    : GetInfoFunction("--dimension"){};
+  std::string GetInfo(itk::ImageIOBase::Pointer imageIO) final
+  {
     return std::to_string(imageIO->GetNumberOfDimensions());
-    }
+  }
 };
 
-struct GetDimensionsFunction
-: public GetInfoFunction
+struct GetDimensionsFunction : public GetInfoFunction
 {
-  GetDimensionsFunction():GetInfoFunction("--dimensions"){};
-  std::string
-  GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {
+  GetDimensionsFunction()
+    : GetInfoFunction("--dimensions"){};
+  std::string GetInfo(itk::ImageIOBase::Pointer imageIO) final
+  {
     const auto N = imageIO->GetNumberOfDimensions();
     std::string dim;
-    for (size_t i = 0; i < N; ++i) dim += std::to_string(imageIO->GetDimensions(i)) + ' ';
+    for (size_t i = 0; i < N; ++i)
+      dim += std::to_string(imageIO->GetDimensions(i)) + ' ';
     return dim;
-    }
+  }
 };
 
-struct GetOriginFunction
-: public GetInfoFunction
+struct GetOriginFunction : public GetInfoFunction
 {
-  GetOriginFunction():GetInfoFunction("--origin"){};
-  std::string
-  GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {
+  GetOriginFunction()
+    : GetInfoFunction("--origin"){};
+  std::string GetInfo(itk::ImageIOBase::Pointer imageIO) final
+  {
     const auto N = imageIO->GetNumberOfDimensions();
     std::string origin;
-    for (size_t i = 0; i < N; ++i) origin += std::to_string(imageIO->GetOrigin(i)) + ' ';
+    for (size_t i = 0; i < N; ++i)
+      origin += std::to_string(imageIO->GetOrigin(i)) + ' ';
     return origin;
-    }
+  }
 };
 
-struct GetSpacingFunction
-: public GetInfoFunction
+struct GetSpacingFunction : public GetInfoFunction
 {
-  GetSpacingFunction():GetInfoFunction("--spacing"){};
-  std::string
-  GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {
+  GetSpacingFunction()
+    : GetInfoFunction("--spacing"){};
+  std::string GetInfo(itk::ImageIOBase::Pointer imageIO) final
+  {
     const auto N = imageIO->GetNumberOfDimensions();
     std::string spacing;
-    for (size_t i = 0; i < N; ++i) spacing += std::to_string(imageIO->GetSpacing(i)) + ' ';
+    for (size_t i = 0; i < N; ++i)
+      spacing += std::to_string(imageIO->GetSpacing(i)) + ' ';
     return spacing;
-    }
+  }
 };
 
-struct GetDirectionFunction
-: public GetInfoFunction
+struct GetDirectionFunction : public GetInfoFunction
 {
-  GetDirectionFunction():GetInfoFunction("--direction"){};
-  std::string
-  GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {
+  GetDirectionFunction()
+    : GetInfoFunction("--direction"){};
+  std::string GetInfo(itk::ImageIOBase::Pointer imageIO) final
+  {
     const auto N = imageIO->GetNumberOfDimensions();
     std::string direction;
-    for (size_t i = 0; i < N; ++i)
-      {
+    for (size_t i = 0; i < N; ++i) {
       const auto vec = imageIO->GetDirection(i);
-      for (const auto &v : vec)
-        {
+      for (const auto& v : vec) {
         direction += std::to_string(v) + ' ';
-        }
-      direction += '\n';
       }
+      direction += '\n';
+    }
     return direction;
-    }
+  }
 };
 
-struct GetSizeInPixelsFunction
-: public GetInfoFunction
+struct GetSizeInPixelsFunction : public GetInfoFunction
 {
-  GetSizeInPixelsFunction():GetInfoFunction("--size-in-pixels"){};
-  std::string
-  GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {
+  GetSizeInPixelsFunction()
+    : GetInfoFunction("--size-in-pixels"){};
+  std::string GetInfo(itk::ImageIOBase::Pointer imageIO) final
+  {
     return std::to_string(imageIO->GetImageSizeInPixels());
-    }
+  }
 };
 
-struct GetSizeInComponentsFunction
-: public GetInfoFunction
+struct GetSizeInComponentsFunction : public GetInfoFunction
 {
-  GetSizeInComponentsFunction():GetInfoFunction("--size-in-components"){};
-  std::string
-  GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {
+  GetSizeInComponentsFunction()
+    : GetInfoFunction("--size-in-components"){};
+  std::string GetInfo(itk::ImageIOBase::Pointer imageIO) final
+  {
     return std::to_string(imageIO->GetImageSizeInComponents());
-    }
+  }
 };
 
-struct GetPixelStrideFunction
-: public GetInfoFunction
+struct GetPixelStrideFunction : public GetInfoFunction
 {
-  GetPixelStrideFunction():GetInfoFunction("--pixel-stride"){};
-  std::string
-  GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {
+  GetPixelStrideFunction()
+    : GetInfoFunction("--pixel-stride"){};
+  std::string GetInfo(itk::ImageIOBase::Pointer imageIO) final
+  {
     return std::to_string(imageIO->GetPixelStride());
-    }
+  }
 };
 
-struct GetNumberOfComponentsFunction
-: public GetInfoFunction
+struct GetNumberOfComponentsFunction : public GetInfoFunction
 {
-  GetNumberOfComponentsFunction():GetInfoFunction("--number-of-components"){};
-  std::string
-  GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {
+  GetNumberOfComponentsFunction()
+    : GetInfoFunction("--number-of-components"){};
+  std::string GetInfo(itk::ImageIOBase::Pointer imageIO) final
+  {
     return std::to_string(imageIO->GetNumberOfComponents());
-    }
+  }
 };
 
-struct GetByteOrderFunction
-: public GetInfoFunction
+struct GetByteOrderFunction : public GetInfoFunction
 {
-  GetByteOrderFunction():GetInfoFunction("--byte-order"){};
-  std::string
-  GetInfo(itk::ImageIOBase::Pointer imageIO) final
-    {
+  GetByteOrderFunction()
+    : GetInfoFunction("--byte-order"){};
+  std::string GetInfo(itk::ImageIOBase::Pointer imageIO) final
+  {
     return std::to_string(imageIO->GetByteOrder());
-    }
+  }
 };
 
 }

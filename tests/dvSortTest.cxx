@@ -1,15 +1,16 @@
-#include <dvInsertionSort.h>
-#include <dvMergeSort.h>
-#include <dvHeapSort.h>
-#include <dvQuickSort.h>
-#include <dvHeap.h>
-#include <cstdlib>
 #include <algorithm>
 #include <cassert>
+#include <cstdlib>
+#include <dvHeap.h>
+#include <dvHeapSort.h>
+#include <dvInsertionSort.h>
+#include <dvMergeSort.h>
+#include <dvQuickSort.h>
 #include <iostream>
 #include <numeric>
 
-int main()
+int
+main()
 {
 
   std::vector<int> v(20);
@@ -45,9 +46,11 @@ int main()
 
   std::random_shuffle(v.begin(), v.end());
   dv::Heap<int> h;
-  for (const auto i : v) h.push(i);
+  for (const auto i : v)
+    h.push(i);
   v.clear();
-  while (h.size() > 0) v.push_back(h.pop());
+  while (h.size() > 0)
+    v.push_back(h.pop());
   assert(std::is_sorted(v.cbegin(), v.cend()));
 
   ////////////////
@@ -60,5 +63,4 @@ int main()
   assert(std::is_sorted(v.cbegin(), v.cend()));
 
   return EXIT_SUCCESS;
-
 }

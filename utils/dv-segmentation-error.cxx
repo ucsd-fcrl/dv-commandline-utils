@@ -8,26 +8,26 @@ namespace po = boost::program_options;
 #include <dvSegmentationError.h>
 
 int
-main( int argc, char* argv[] )
+main(int argc, char* argv[])
 {
 
   // Declare the supported options.
   po::options_description description("Allowed options");
-  description.add_options()
-    ("help", "Print usage information.")
-    ("source-image", po::value<std::string>()->required(), "Filename of source image.")
-    ("target-image", po::value<std::string>()->required(), "Filename of target image.")
-    ("label", po::value<long>()->default_value(1),         "Label.")
-  ;
+  description.add_options()("help", "Print usage information.")(
+    "source-image",
+    po::value<std::string>()->required(),
+    "Filename of source image.")("target-image",
+                                 po::value<std::string>()->required(),
+                                 "Filename of target image.")(
+    "label", po::value<long>()->default_value(1), "Label.");
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, description), vm);
 
-  if (vm.count("help") || 1 == argc)
-    {
+  if (vm.count("help") || 1 == argc) {
     std::cout << description << '\n';
     return EXIT_SUCCESS;
-    }
+  }
 
   po::notify(vm);
 
@@ -35,8 +35,7 @@ main( int argc, char* argv[] )
   const std::string TImage = vm["target-image"].as<std::string>();
   const long Label = vm["label"].as<long>();
 
-  switch (dv::ReadImageIOBase(SImage)->GetComponentType())
-    {
+  switch (dv::ReadImageIOBase(SImage)->GetComponentType()) {
     case itk::ImageIOBase::UCHAR:
       dv::SegmentationError<3, unsigned char>(SImage, TImage, Label);
       break;
@@ -65,9 +64,7 @@ main( int argc, char* argv[] )
       std::cerr << "ERROR: Unrecognized pixel type." << std::endl;
       return EXIT_FAILURE;
       break;
-    }
+  }
 
   return EXIT_SUCCESS;
-
 }
-

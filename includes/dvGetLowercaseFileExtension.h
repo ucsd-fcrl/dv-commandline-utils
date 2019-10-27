@@ -4,11 +4,10 @@
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
-namespace dv
-{
+namespace dv {
 
 std::string
-GetLowercaseFileExtension(const std::string &fileName);
+GetLowercaseFileExtension(const std::string& fileName);
 
 }
 

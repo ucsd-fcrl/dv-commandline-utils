@@ -1,15 +1,14 @@
 #ifndef dv_ReadImageIOBase_h
 #define dv_ReadImageIOBase_h
 
-#include <string>
 #include <itkImageFileReader.h>
 #include <itkImageIOBase.h>
+#include <string>
 
-namespace dv
-{
+namespace dv {
 
 itk::ImageIOBase::Pointer
-ReadImageIOBase(const std::string &fileName);
+ReadImageIOBase(const std::string& fileName);
 
 }
 

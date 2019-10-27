@@ -4,30 +4,32 @@
 namespace po = boost::program_options;
 
 // Custom
-#include <dvReadImageIOBase.h>
 #include <dvBinaryOpening.h>
+#include <dvReadImageIOBase.h>
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
 
   // Declare the supported options.
   po::options_description description("Allowed options");
-  description.add_options()
-    ("help", "Print usage information.")
-    ("input-image", po::value<std::string>()->required(), "Filename of input image.")
-    ("output-image", po::value<std::string>()->required(), "Filename of output image.")
-    ("radius", po::value<unsigned int>()->default_value(3), "Radius of structuring element.")
-  ;
+  description.add_options()("help", "Print usage information.")(
+    "input-image",
+    po::value<std::string>()->required(),
+    "Filename of input image.")("output-image",
+                                po::value<std::string>()->required(),
+                                "Filename of output image.")(
+    "radius",
+    po::value<unsigned int>()->default_value(3),
+    "Radius of structuring element.");
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, description), vm);
 
-  if (vm.count("help") || 1 == argc)
-    {
+  if (vm.count("help") || 1 == argc) {
     std::cout << description << '\n';
     return EXIT_SUCCESS;
-    }
+  }
 
   po::notify(vm);
 
@@ -35,8 +37,7 @@ main(int argc, char **argv)
   const std::string OImage = vm["output-image"].as<std::string>();
   const unsigned int radius = vm["radius"].as<unsigned int>();
 
-  switch (dv::ReadImageIOBase(IImage)->GetComponentType())
-    {
+  switch (dv::ReadImageIOBase(IImage)->GetComponentType()) {
     case itk::ImageIOBase::UCHAR:
       dv::BinaryOpening<3, unsigned char>(IImage, OImage, radius);
       break;
@@ -71,7 +72,7 @@ main(int argc, char **argv)
       std::cerr << "ERROR: Unrecognized pixel type." << std::endl;
       return EXIT_FAILURE;
       break;
-    }
+  }
 
   return EXIT_SUCCESS;
 }

@@ -18,11 +18,11 @@ Notes:
 - Not stable (doesn't preserve order of equal elements)
 */
 
-namespace dv
-{
+namespace dv {
 
 template<typename It>
-void HeapSort(const It b, const It e)
+void
+HeapSort(const It b, const It e)
 {
   std::make_heap(b, e);
   std::sort_heap(b, e);

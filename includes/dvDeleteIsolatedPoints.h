@@ -1,11 +1,10 @@
 #ifndef dv_DeleteIsolatedPoints_h
 #define dv_DeleteIsolatedPoints_h
 
-#include <set>
 #include <algorithm>
+#include <set>
 
-namespace dv
-{
+namespace dv {
 template<typename MeshType>
 void
 DeleteIsolatedPoints(MeshType* mesh)
@@ -16,7 +15,7 @@ DeleteIsolatedPoints(MeshType* mesh)
   mesh->BuildCellLinks();
   using TCellID = typename MeshType::CellIdentifier;
   std::set<TCellID> LinkedPoints;
-  const auto LinkedPointsLambda = [](const auto it){ return it.Index(); };
+  const auto LinkedPointsLambda = [](const auto it) { return it.Index(); };
 
   std::transform(mesh->GetCellLinks()->Begin(),
                  mesh->GetCellLinks()->End(),
@@ -27,24 +26,19 @@ DeleteIsolatedPoints(MeshType* mesh)
 
   using TPointID = typename MeshType::PointIdentifier;
   std::set<TPointID> IsolatedPoints;
-  for (auto p_it = mesh->GetPoints()->Begin();
-       p_it != mesh->GetPoints()->End();
-       ++p_it)
-    {
-    if (0 == LinkedPoints.count(p_it.Index()))
-      {
-      IsolatedPoints.emplace( p_it.Index() );
-      }
+  for (auto p_it = mesh->GetPoints()->Begin(); p_it != mesh->GetPoints()->End();
+       ++p_it) {
+    if (0 == LinkedPoints.count(p_it.Index())) {
+      IsolatedPoints.emplace(p_it.Index());
     }
+  }
 
   // Delete those points, and their associated point data.
 
-  for (const auto u : IsolatedPoints)
-    {
-    mesh->GetPoints()->DeleteIndex( u );
-    mesh->GetPointData()->DeleteIndex( u );
-    }
-
+  for (const auto u : IsolatedPoints) {
+    mesh->GetPoints()->DeleteIndex(u);
+    mesh->GetPointData()->DeleteIndex(u);
+  }
 }
 }
 

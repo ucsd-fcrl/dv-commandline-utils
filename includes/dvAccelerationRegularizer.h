@@ -2,23 +2,19 @@
 #ifndef dvAccelerationRegularizer_h
 #define dvAccelerationRegularizer_h
 
-#include <limits>
 #include <ceres/ceres.h>
+#include <limits>
 
-namespace dv
-{
+namespace dv {
 template<class TMovingMesh>
-class AccelerationRegularizer :
-public ceres::CostFunction
+class AccelerationRegularizer : public ceres::CostFunction
 {
 
-  public:
-
+public:
   AccelerationRegularizer(
-    const typename std::vector<typename TMovingMesh::Pointer>
-      &_movingVector,
-    const typename std::vector<typename TMovingMesh::PointsContainer::Pointer>
-      &_initialPointsVector,
+    const typename std::vector<typename TMovingMesh::Pointer>& _movingVector,
+    const typename std::vector<typename TMovingMesh::PointsContainer::Pointer>&
+      _initialPointsVector,
     unsigned int _frame,
     unsigned int _index);
 
@@ -26,17 +22,17 @@ public ceres::CostFunction
                 double* residuals,
                 double** jacobians) const;
 
-  ~AccelerationRegularizer(){}
+  ~AccelerationRegularizer() {}
 
 private:
-
   unsigned int GetNumberOfFrames() const;
   unsigned int GetPrevFrame() const;
   unsigned int GetCurrentFrame() const;
   unsigned int GetNextFrame() const;
 
   const typename std::vector<typename TMovingMesh::Pointer> movingVector;
-  const typename std::vector<typename TMovingMesh::PointsContainer::Pointer> &initialPointsVector;
+  const typename std::vector<typename TMovingMesh::PointsContainer::Pointer>&
+    initialPointsVector;
 
   const unsigned int frame;
   const unsigned int index;
@@ -47,4 +43,3 @@ private:
 #include <dvAccelerationRegularizer.hxx>
 
 #endif
-

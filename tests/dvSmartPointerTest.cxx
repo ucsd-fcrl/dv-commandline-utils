@@ -1,8 +1,9 @@
+#include <cassert>
 #include <dvSmartPointer.h>
 #include <iostream>
-#include <cassert>
 
-int main()
+int
+main()
 {
 
   using T = dv::SmartPointer<int>;
@@ -13,10 +14,10 @@ int main()
   assert(1 == number.get_reference_count());
 
   {
-  T number2(number);
+    T number2(number);
 
-  assert(2 == number.get_reference_count() );
-  assert(2 == number2.get_reference_count());
+    assert(2 == number.get_reference_count());
+    assert(2 == number2.get_reference_count());
   }
 
   assert(1 == number.get_reference_count());
@@ -28,5 +29,4 @@ int main()
   T number4(5);
 
   return EXIT_SUCCESS;
-
 }

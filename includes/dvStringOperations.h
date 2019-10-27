@@ -3,8 +3,7 @@
 
 #include <string>
 
-namespace dv
-{
+namespace dv {
 
 std::string
 TrimCharactersFromEnd(const std::string& s, char c);

@@ -1,17 +1,17 @@
 #include <vtkArrowSource.h>
 #include <vtkMath.h>
 #include <vtkMinimalStandardRandomSequence.h>
+#include <vtkOBJWriter.h>
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
-#include <vtkOBJWriter.h>
 
 #include <array>
 
-namespace dv
-{
-void ArrowWithStartAndEnd(const double startPoint[3],
+namespace dv {
+void
+ArrowWithStartAndEnd(const double startPoint[3],
                      const double endPoint[3],
                      const std::string fileName,
                      const int tipResolution,
@@ -19,8 +19,8 @@ void ArrowWithStartAndEnd(const double startPoint[3],
 {
 
   const auto arrowSource = vtkSmartPointer<vtkArrowSource>::New();
-  arrowSource->SetTipResolution( tipResolution );
-  arrowSource->SetShaftResolution( shaftResolution );
+  arrowSource->SetTipResolution(tipResolution);
+  arrowSource->SetShaftResolution(shaftResolution);
 
   const auto rng = vtkSmartPointer<vtkMinimalStandardRandomSequence>::New();
   rng->SetSeed(8775070);
@@ -37,11 +37,10 @@ void ArrowWithStartAndEnd(const double startPoint[3],
 
   // The Z axis is an arbitrary vector cross X
   double arbitrary[3];
-  for (auto i = 0; i < 3; ++i)
-    {
+  for (auto i = 0; i < 3; ++i) {
     rng->Next();
     arbitrary[i] = rng->GetRangeValue(-10, 10);
-    }
+  }
   vtkMath::Cross(normalizedX, arbitrary, normalizedZ);
   vtkMath::Normalize(normalizedZ);
 
@@ -51,12 +50,11 @@ void ArrowWithStartAndEnd(const double startPoint[3],
   const auto matrix = vtkSmartPointer<vtkMatrix4x4>::New();
   matrix->Identity();
 
-  for (auto i = 0; i < 3; ++i)
-    {
+  for (auto i = 0; i < 3; ++i) {
     matrix->SetElement(i, 0, normalizedX[i]);
     matrix->SetElement(i, 1, normalizedY[i]);
     matrix->SetElement(i, 2, normalizedZ[i]);
-    }
+  }
 
   // Apply the transforms
   const auto transform = vtkSmartPointer<vtkTransform>::New();
@@ -73,6 +71,5 @@ void ArrowWithStartAndEnd(const double startPoint[3],
   writer->SetFileName(fileName.c_str());
   writer->SetInputConnection(transformPD->GetOutputPort());
   writer->Update();
-
 }
 }

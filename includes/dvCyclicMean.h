@@ -3,11 +3,11 @@
 
 #include <cassert>
 
-namespace dv
-{
+namespace dv {
 
 template<typename T>
-T CyclicMean(const T &val1, const T &val2, const T &l_bound, const T &u_bound)
+T
+CyclicMean(const T& val1, const T& val2, const T& l_bound, const T& u_bound)
 {
   assert(l_bound < u_bound);
   assert((l_bound <= val1) && (val1 < u_bound));

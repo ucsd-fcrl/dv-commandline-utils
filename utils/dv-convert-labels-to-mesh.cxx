@@ -11,26 +11,28 @@ using TCoordinate = float;
 using TPixel = unsigned char;
 
 int
-main( int argc, char* argv[] )
+main(int argc, char* argv[])
 {
 
   // Declare the supported options.
   po::options_description description("Allowed options");
-  description.add_options()
-    ("help", "Print usage information.")
-    ("input-image", po::value<std::string>()->required(),          "Filename of the input mesh.")
-    ("output-mesh", po::value<std::string>()->required(),          "Filename of the output image.")
-    ("labels",      po::value<std::vector<short>>()->multitoken(), "Labels to extract from input image.")
-  ;
+  description.add_options()("help", "Print usage information.")(
+    "input-image",
+    po::value<std::string>()->required(),
+    "Filename of the input mesh.")("output-mesh",
+                                   po::value<std::string>()->required(),
+                                   "Filename of the output image.")(
+    "labels",
+    po::value<std::vector<short>>()->multitoken(),
+    "Labels to extract from input image.");
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, description), vm);
 
-  if (vm.count("help") || 1 == argc)
-    {
+  if (vm.count("help") || 1 == argc) {
     std::cout << description << '\n';
     return EXIT_SUCCESS;
-    }
+  }
 
   po::notify(vm);
 
@@ -44,9 +46,7 @@ main( int argc, char* argv[] )
   std::set<TPixel> labels(labelVector.cbegin(), labelVector.cend());
 
   dv::ConvertLabelsToMesh<Dimension, TPixel, TCoordinate>(
-    inputFileName, labels, outputFileName
-    );
+    inputFileName, labels, outputFileName);
 
   return EXIT_SUCCESS;
-
 }

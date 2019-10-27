@@ -6,34 +6,31 @@
 #include <itkMeshFileReader.h>
 #include <itkMeshFileWriter.h>
 
-namespace dv
-{
+namespace dv {
 
 template<unsigned int Dimension, typename TCoordinate>
 void
-ConvertMesh(const std::string &IMesh,
-            const std::string &OMesh)
+ConvertMesh(const std::string& IMesh, const std::string& OMesh)
 {
-  using TMesh   = itk::Mesh< TCoordinate, Dimension >;
-  using TReader = itk::MeshFileReader< TMesh >;
-  using TWriter = itk::MeshFileWriter< TMesh >;
+  using TMesh = itk::Mesh<TCoordinate, Dimension>;
+  using TReader = itk::MeshFileReader<TMesh>;
+  using TWriter = itk::MeshFileWriter<TMesh>;
 
   //
   // Reader
   //
 
   const auto reader = TReader::New();
-  reader->SetFileName( IMesh );
+  reader->SetFileName(IMesh);
 
   //
   // Writer
   //
 
   const auto writer = TWriter::New();
-  writer->SetInput( reader->GetOutput() );
-  writer->SetFileName( OMesh );
+  writer->SetInput(reader->GetOutput());
+  writer->SetFileName(OMesh);
   writer->Update();
-
 }
 
 }

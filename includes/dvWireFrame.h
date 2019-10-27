@@ -2,42 +2,38 @@
 #define dvWireFrame_h
 
 //#include "vtkLocalExampleModule.h" // export macro
-#include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkExtractEdges.h>
-#include <vtkTubeFilter.h>
 #include <vtkGlyph3D.h>
-#include <vtkSphereSource.h>
-#include <vtkRenderer.h>
-#include <vtkProperty.h>
 #include <vtkLoopSubdivisionFilter.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkProperty.h>
+#include <vtkRenderer.h>
+#include <vtkSphereSource.h>
 #include <vtkTriangleFilter.h>
+#include <vtkTubeFilter.h>
 
-namespace dv
-{
-//class VTKLOCALEXAMPLE_EXPORT WireFrame
+namespace dv {
+// class VTKLOCALEXAMPLE_EXPORT WireFrame
 class WireFrame
 {
 
 public:
-
-  WireFrame(vtkRenderer* _renderer,
-            vtkPolyData* _mesh)
-  : renderer(_renderer), mesh(_mesh){}
+  WireFrame(vtkRenderer* _renderer, vtkPolyData* _mesh)
+    : renderer(_renderer)
+    , mesh(_mesh)
+  {}
 
   double radius = 0.015;
   unsigned int tubesSides = 10;
-  double wireframeColor[3] = {1.0, 0.4, 0.4};
-  double surfaceColor[3] = {1.0, 0.8, 0.8};
+  double wireframeColor[3] = { 1.0, 0.4, 0.4 };
+  double surfaceColor[3] = { 1.0, 0.8, 0.8 };
 
-  void
-  Setup();
+  void Setup();
 
-  void
-  SetVisible(bool visible);
+  void SetVisible(bool visible);
 
 private:
-
   // Edges
   vtkSmartPointer<vtkExtractEdges> edges = nullptr;
   vtkSmartPointer<vtkTubeFilter> tubes = nullptr;
@@ -63,7 +59,6 @@ private:
   vtkPolyData* mesh = nullptr;
 
   bool hasBeenSetup = false;
-
 };
 
 }

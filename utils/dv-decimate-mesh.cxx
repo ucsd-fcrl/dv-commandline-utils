@@ -4,47 +4,50 @@
 namespace po = boost::program_options;
 
 // ITK
+#include <itkMeshFileReader.h>
+#include <itkMeshFileWriter.h>
 #include <itkQuadEdgeMesh.h>
 #include <itkQuadEdgeMeshDecimationCriteria.h>
 #include <itkQuadricDecimationQuadEdgeMeshFilter.h>
-#include <itkMeshFileReader.h>
-#include <itkMeshFileWriter.h>
- 
+
 const unsigned int Dimension = 3;
 using TCoordinate = float;
- 
-using TMesh       = itk::QuadEdgeMesh< TCoordinate, Dimension >;
-using TReader     = itk::MeshFileReader< TMesh >;
-using TWriter     = itk::MeshFileWriter< TMesh >;
-//using TCriterion  = itk::NumberOfPointsCriterion< TMesh >;
-using TCriterion  = itk::NumberOfFacesCriterion< TMesh >;
-using TDecimation = itk::QuadricDecimationQuadEdgeMeshFilter< TMesh,
-                                                              TMesh,
-                                                              TCriterion >;
- 
+
+using TMesh = itk::QuadEdgeMesh<TCoordinate, Dimension>;
+using TReader = itk::MeshFileReader<TMesh>;
+using TWriter = itk::MeshFileWriter<TMesh>;
+// using TCriterion  = itk::NumberOfPointsCriterion< TMesh >;
+using TCriterion = itk::NumberOfFacesCriterion<TMesh>;
+using TDecimation =
+  itk::QuadricDecimationQuadEdgeMeshFilter<TMesh, TMesh, TCriterion>;
+
 int
-main( int argc, char ** argv )
+main(int argc, char** argv)
 {
- 
+
   // Declare the supported options.
   po::options_description description("Allowed options");
-  description.add_options()
-    ("help", "Print usage information.")
-    ("input-mesh",      po::value<std::string>()->required(),    "Filename of the input mesh.")
-    ("output-mesh",     po::value<std::string>()->required(),    "Filename of the output image.")
-    ("count",           po::value<unsigned int>()->required(),   "Target number of cells in output.")
-    ("change-topology", po::value<bool>()->default_value(false), "Allow change in topology?")
-    ("verbose",         po::value<bool>()->default_value(false), "Verbosity.")
-  ;
+  description.add_options()("help", "Print usage information.")(
+    "input-mesh",
+    po::value<std::string>()->required(),
+    "Filename of the input mesh.")("output-mesh",
+                                   po::value<std::string>()->required(),
+                                   "Filename of the output image.")(
+    "count",
+    po::value<unsigned int>()->required(),
+    "Target number of cells in output.")(
+    "change-topology",
+    po::value<bool>()->default_value(false),
+    "Allow change in topology?")(
+    "verbose", po::value<bool>()->default_value(false), "Verbosity.");
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, description), vm);
 
-  if (vm.count("help") || 1 == argc)
-    {
+  if (vm.count("help") || 1 == argc) {
     std::cout << description << '\n';
     return EXIT_SUCCESS;
-    }
+  }
 
   po::notify(vm);
 
@@ -56,37 +59,37 @@ main( int argc, char ** argv )
 
   const auto criterion = TCriterion::New();
   const auto decimate = TDecimation::New();
- 
-  criterion->SetTopologicalChange( topology );
-  criterion->SetNumberOfElements(  count );
+
+  criterion->SetTopologicalChange(topology);
+  criterion->SetNumberOfElements(count);
 
   const auto reader = TReader::New();
-  reader->SetFileName( inputMeshName );
- 
-  decimate->SetInput( reader->GetOutput() );
-  decimate->SetCriterion( criterion );
+  reader->SetFileName(inputMeshName);
 
-  if (verbose)
-    {
+  decimate->SetInput(reader->GetOutput());
+  decimate->SetCriterion(criterion);
+
+  if (verbose) {
     decimate->Update();
 
     std::cout << "Input mesh:\n"
-              << "\tNumber of points: "  << reader->GetOutput()->GetNumberOfPoints()
-              << "\n\tNumber of cells: " << reader->GetOutput()->GetNumberOfCells()
-              << std::endl;
- 
+              << "\tNumber of points: "
+              << reader->GetOutput()->GetNumberOfPoints()
+              << "\n\tNumber of cells: "
+              << reader->GetOutput()->GetNumberOfCells() << std::endl;
+
     std::cout << "Decimated mesh:\n"
-              << "\tNumber of points: "  << decimate->GetOutput()->GetNumberOfPoints()
-              << "\n\tNumber of cells: " << decimate->GetOutput()->GetNumberOfCells()
-              << std::endl;
-    }
- 
+              << "\tNumber of points: "
+              << decimate->GetOutput()->GetNumberOfPoints()
+              << "\n\tNumber of cells: "
+              << decimate->GetOutput()->GetNumberOfCells() << std::endl;
+  }
+
   const auto writer = TWriter::New();
- 
-  writer->SetFileName( outputMeshName );
-  writer->SetInput( decimate->GetOutput() );
+
+  writer->SetFileName(outputMeshName);
+  writer->SetInput(decimate->GetOutput());
   writer->Update();
- 
+
   return EXIT_SUCCESS;
- 
 }

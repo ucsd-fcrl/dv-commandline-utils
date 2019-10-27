@@ -7,53 +7,52 @@ namespace po = boost::program_options;
 #include <itkFixedArray.h>
 
 // Custom
-#include <dvReadImageIOBase.h>
 #include <dvFlipAlongAxes.h>
+#include <dvReadImageIOBase.h>
 
 int
-main(int argc, char ** argv)
+main(int argc, char** argv)
 {
 
   // Declare the supported options.
   po::options_description description("Allowed options");
-  description.add_options()
-    ("help", "Print usage information.")
-    ("input-image",  po::value<std::string>()->required(),                             "Filename of the input mesh.")
-    ("output-image", po::value<std::string>()->required(),                             "Filename of the output image.")
-    ("order",        po::value<std::vector<unsigned int>>()->multitoken()->required(), "e.g., 1 0 0 to flip the first axis.")
-  ;
+  description.add_options()("help", "Print usage information.")(
+    "input-image",
+    po::value<std::string>()->required(),
+    "Filename of the input mesh.")("output-image",
+                                   po::value<std::string>()->required(),
+                                   "Filename of the output image.")(
+    "order",
+    po::value<std::vector<unsigned int>>()->multitoken()->required(),
+    "e.g., 1 0 0 to flip the first axis.");
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, description), vm);
 
-  if (vm.count("help") || 1 == argc)
-    {
+  if (vm.count("help") || 1 == argc) {
     std::cout << description << '\n';
     return EXIT_SUCCESS;
-    }
+  }
 
   po::notify(vm);
 
   const std::string IImage = vm["input-image"].as<std::string>();
   const std::string OImage = vm["output-image"].as<std::string>();
-  const std::vector<unsigned int> orderVec = vm["order"].as<std::vector<unsigned int>>();
+  const std::vector<unsigned int> orderVec =
+    vm["order"].as<std::vector<unsigned int>>();
 
-  switch (dv::ReadImageIOBase(IImage)->GetNumberOfDimensions())
-    {
+  switch (dv::ReadImageIOBase(IImage)->GetNumberOfDimensions()) {
 
-    case 2:
-      {
+    case 2: {
       constexpr unsigned int DIM = 2;
       using TArray = itk::FixedArray<unsigned int, DIM>;
 
       TArray order;
-      for (unsigned int i = 0; i < DIM; ++i)
-        {
+      for (unsigned int i = 0; i < DIM; ++i) {
         order[i] = orderVec.at(i);
-        }
+      }
 
-      switch (dv::ReadImageIOBase(IImage)->GetComponentType())
-        {
+      switch (dv::ReadImageIOBase(IImage)->GetComponentType()) {
         case itk::ImageIOBase::UCHAR:
           dv::FlipAlongAxes<DIM, unsigned char>(IImage, OImage, order);
           break;
@@ -90,20 +89,17 @@ main(int argc, char ** argv)
           break;
       }
       break;
-      }
-    case 3:
-      {
+    }
+    case 3: {
       constexpr unsigned int DIM = 3;
       using TArray = itk::FixedArray<unsigned int, DIM>;
 
       TArray order;
-      for (unsigned int i = 0; i < DIM; ++i)
-        {
+      for (unsigned int i = 0; i < DIM; ++i) {
         order[i] = orderVec.at(i);
-        }
+      }
 
-      switch (dv::ReadImageIOBase(IImage)->GetComponentType())
-        {
+      switch (dv::ReadImageIOBase(IImage)->GetComponentType()) {
         case itk::ImageIOBase::UCHAR:
           dv::FlipAlongAxes<DIM, unsigned char>(IImage, OImage, order);
           break;
@@ -140,12 +136,12 @@ main(int argc, char ** argv)
           break;
       }
       break;
-      }
+    }
     default:
       std::cerr << "ERROR: Unsupported dimension." << std::endl;
       return EXIT_FAILURE;
       break;
-    }
+  }
 
   return EXIT_SUCCESS;
 }

@@ -2,39 +2,33 @@
 #ifndef dvTriangleAspectRatioRegularizer_h
 #define dvTriangleAspectRatioRegularizer_h
 
-#include <limits>
+#include <array>
 #include <ceres/ceres.h>
 #include <itkMacro.h>
-#include <array>
+#include <limits>
 
-namespace dv
-{
+namespace dv {
 template<class TMesh>
-class TriangleAspectRatioRegularizer :
-public ceres::CostFunction
+class TriangleAspectRatioRegularizer : public ceres::CostFunction
 {
 
-  public:
-
+public:
   typedef typename TMesh::CoordRepType TReal;
 
   TriangleAspectRatioRegularizer(
-    const typename TMesh::Pointer
-      &_moving,
-    const typename TMesh::PointsContainer::Pointer
-      &_initialPoints,
+    const typename TMesh::Pointer& _moving,
+    const typename TMesh::PointsContainer::Pointer& _initialPoints,
     unsigned int _index);
 
   bool Evaluate(const double* const* parameters,
                 double* residuals,
                 double** jacobians) const;
 
-  ~TriangleAspectRatioRegularizer(){}
+  ~TriangleAspectRatioRegularizer() {}
 
 private:
-
-  const typename TMesh::Pointer &moving;
-  const typename TMesh::PointsContainer::Pointer &initialPoints;
+  const typename TMesh::Pointer& moving;
+  const typename TMesh::PointsContainer::Pointer& initialPoints;
 
   unsigned int index;
   std::array<unsigned int, 3> point_indices;
@@ -46,4 +40,3 @@ private:
 #include <dvTriangleAspectRatioRegularizer.hxx>
 
 #endif
-

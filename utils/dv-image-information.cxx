@@ -12,25 +12,25 @@ namespace po = boost::program_options;
 #include <dvReadImageIOBase.h>
 
 int
-main( int argc, char** argv )
+main(int argc, char** argv)
 {
 
   std::vector<dv::GetInfoFunction*> FunctionMap;
 
-  dv::GetSummaryTypeFunction        summary;
-  dv::GetPixelTypeFunction          pixel_type;
-  dv::GetComponentTypeFunction      component_type;
-  dv::GetFileTypeFunction           file_type;
-  dv::GetDimensionFunction          dimension;
-  dv::GetDimensionsFunction         dimensions;
-  dv::GetOriginFunction             origin;
-  dv::GetSpacingFunction            spacing;
-  dv::GetDirectionFunction          direction;
-  dv::GetSizeInPixelsFunction       size_in_pixels;
-  dv::GetSizeInComponentsFunction   size_in_components;
-  dv::GetPixelStrideFunction        pixel_stride;
+  dv::GetSummaryTypeFunction summary;
+  dv::GetPixelTypeFunction pixel_type;
+  dv::GetComponentTypeFunction component_type;
+  dv::GetFileTypeFunction file_type;
+  dv::GetDimensionFunction dimension;
+  dv::GetDimensionsFunction dimensions;
+  dv::GetOriginFunction origin;
+  dv::GetSpacingFunction spacing;
+  dv::GetDirectionFunction direction;
+  dv::GetSizeInPixelsFunction size_in_pixels;
+  dv::GetSizeInComponentsFunction size_in_components;
+  dv::GetPixelStrideFunction pixel_stride;
   dv::GetNumberOfComponentsFunction number_of_components;
-  dv::GetByteOrderFunction          byte_order;
+  dv::GetByteOrderFunction byte_order;
 
   FunctionMap.emplace_back(&summary);
   FunctionMap.emplace_back(&pixel_type);
@@ -47,18 +47,16 @@ main( int argc, char** argv )
   FunctionMap.emplace_back(&number_of_components);
   FunctionMap.emplace_back(&byte_order);
 
-  if ( argc != 3 )
-    {
+  if (argc != 3) {
     std::cerr << "Usage:\n"
-              << argv[0]
-              << " <InputFileName>"
+              << argv[0] << " <InputFileName>"
               << " <Option>\n";
     std::cerr << "Available options:\n";
-    for (const auto &f : FunctionMap)
+    for (const auto& f : FunctionMap)
       std::cerr << f->key << '\n';
     std::cerr << std::flush;
     return EXIT_FAILURE;
-    }
+  }
 
   const std::string inputFileName(argv[1]);
   const std::string option(argv[2]);
@@ -66,18 +64,16 @@ main( int argc, char** argv )
   const auto imageIO = dv::ReadImageIOBase(inputFileName);
 
   bool found = false;
-  for (const auto &f : FunctionMap)
-    {
-    if (option != f->key) continue;
+  for (const auto& f : FunctionMap) {
+    if (option != f->key)
+      continue;
     std::cout << f->GetInfo(imageIO) << std::endl;
     found = true;
-    }
-  if (!found)
-    {
+  }
+  if (!found) {
     std::cerr << "ERROR: Option not recognized." << std::endl;
     return EXIT_FAILURE;
-    }
+  }
 
   return EXIT_SUCCESS;
 }
-

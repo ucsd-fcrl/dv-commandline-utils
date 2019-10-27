@@ -7,10 +7,9 @@ main(int, char**)
 
   size_t N = 25;
   auto pgrs = dv::Progress(N);
-  for (size_t i = 0; i < N; ++i)
-    {
+  for (size_t i = 0; i < N; ++i) {
     pgrs.UnitCompleted();
-    }
+  }
 
   return EXIT_SUCCESS;
 }

@@ -6,70 +6,66 @@
 
 #include <set>
 
-namespace itk
+namespace itk {
+
+namespace Functor {
+
+template<typename TInput, typename TOutput = TInput>
+class ExtractLabelsFunctor
 {
+public:
+  ExtractLabelsFunctor(){};
+  ~ExtractLabelsFunctor(){};
 
-  namespace Functor
+  inline TOutput operator()(const TInput& A)
   {
+    // Checks the functLabels for the value. Returns 1 if included. 0 otherwise
+    return static_cast<TOutput>(functLabels.count(A));
+  }
 
-    template< typename TInput, typename TOutput = TInput>
-    class ExtractLabelsFunctor
-    {
-    public:
-      ExtractLabelsFunctor() {};
-      ~ExtractLabelsFunctor() {};
+  void SetLabels(std::set<TInput> value) { functLabels = value; }
 
-      inline TOutput operator()( const TInput & A )
-      {
-        // Checks the functLabels for the value. Returns 1 if included. 0 otherwise
-        return static_cast<TOutput>( functLabels.count(A) );
-      }
+private:
+  std::set<TInput> functLabels;
+};
+};
 
-      void SetLabels( std::set<TInput> value )
-      {
-        functLabels = value;
-      }
+template<typename TInputImage, typename TOutputImage = TInputImage>
+class ExtractLabelsImageFilter
+  : public UnaryFunctorImageFilter<
+      TInputImage,
+      TOutputImage,
+      Functor::ExtractLabelsFunctor<typename TInputImage::PixelType,
+                                    typename TOutputImage::PixelType>>
+{
+public:
+  using Self = ExtractLabelsImageFilter;
+  using Superclass = UnaryFunctorImageFilter<
+    TInputImage,
+    TOutputImage,
+    Functor::ExtractLabelsFunctor<typename TInputImage::PixelType,
+                                  typename TOutputImage::PixelType>>;
 
-    private:
-      std::set<TInput>  functLabels;
+  using Pointer = SmartPointer<Self>;
+  using ConstPointer = SmartPointer<const Self>;
 
-    };
-  };
+  itkNewMacro(Self);
+  itkTypeMacro(ExtractLabelsImageFilter, UnaryFunctorImageFilter);
 
-  template<typename TInputImage, typename TOutputImage = TInputImage>
-  class ExtractLabelsImageFilter :
-  public UnaryFunctorImageFilter< TInputImage,TOutputImage,
-  Functor::ExtractLabelsFunctor< typename TInputImage::PixelType, typename TOutputImage::PixelType> >
+  void SetLabels(std::set<typename TInputImage::PixelType> value)
   {
-  public:
+    this->GetFunctor().SetLabels(value);
+  }
 
-    using Self = ExtractLabelsImageFilter;
-    using Superclass = UnaryFunctorImageFilter< TInputImage,
-                                                TOutputImage,
-                                                Functor::ExtractLabelsFunctor< typename TInputImage::PixelType, typename TOutputImage::PixelType > >;
+protected:
+  ExtractLabelsImageFilter() {}
+  virtual ~ExtractLabelsImageFilter() {}
 
-    using Pointer = SmartPointer< Self >;
-    using ConstPointer = SmartPointer< const Self >;
+private:
+  ExtractLabelsImageFilter(const Self&); // purposely not implemented
+  void operator=(const Self&);           // purposely not implemented
 
-    itkNewMacro( Self );
-    itkTypeMacro( ExtractLabelsImageFilter, UnaryFunctorImageFilter );
-
-    void SetLabels( std::set<typename TInputImage::PixelType> value )
-    {
-      this->GetFunctor().SetLabels( value );
-    }
-
-  protected:
-
-    ExtractLabelsImageFilter() {}
-    virtual ~ExtractLabelsImageFilter() {}
-
-  private:
-
-    ExtractLabelsImageFilter( const Self & ); // purposely not implemented
-    void operator=(  const Self & );      // purposely not implemented
-
-  };   // end of class
+}; // end of class
 };
 
 #endif

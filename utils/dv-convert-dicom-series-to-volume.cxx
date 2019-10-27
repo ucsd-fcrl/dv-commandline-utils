@@ -4,22 +4,22 @@
 namespace po = boost::program_options;
 
 // ITK
-#include <itkImage.h>
 #include <itkGDCMImageIO.h>
-#include <itkImageSeriesReader.h>
+#include <itkImage.h>
 #include <itkImageFileWriter.h>
+#include <itkImageSeriesReader.h>
 
 // STD headers
 #include <map>
-#include <vector>
 #include <string>
+#include <vector>
 
 // GDCM headers
-#include <gdcmReader.h>
-#include <gdcmMediaStorage.h>
-#include <gdcmStringFilter.h>
 #include <gdcmAttribute.h>
+#include <gdcmMediaStorage.h>
+#include <gdcmReader.h>
 #include <gdcmSorter.h>
+#include <gdcmStringFilter.h>
 
 // Custom
 #include <dvDICOMHeaderAttributes.h>
@@ -28,46 +28,48 @@ namespace po = boost::program_options;
 const unsigned int Dimension = 3;
 using PixelType = signed short;
 
-using ImageType = itk::Image< PixelType, Dimension >;
-using ReaderType = itk::ImageSeriesReader< ImageType >;
+using ImageType = itk::Image<PixelType, Dimension>;
+using ReaderType = itk::ImageSeriesReader<ImageType>;
 using ImageIOType = itk::GDCMImageIO;
-using WriterType = itk::ImageFileWriter< ImageType >;
+using WriterType = itk::ImageFileWriter<ImageType>;
 
 std::string
 AddSlash(const char* arr)
 {
   std::string str = arr;
-  if ('/' != str.back()) str += '/';
+  if ('/' != str.back())
+    str += '/';
   return str;
 }
 
 int
-main( int argc, char* argv[] )
+main(int argc, char* argv[])
 {
 
   /////////////////////////////////////
   // Deal with commandline arguments //
   /////////////////////////////////////
 
-  if (3 < argc)
-    {
+  if (3 < argc) {
     std::cerr << "Usage:\n"
               << argv[0] << " <inputDir> <outputDir>" << std::endl;
     return EXIT_FAILURE;
-    }
+  }
 
-  const std::string inputDirectory  = AddSlash(argv[1]);
+  const std::string inputDirectory = AddSlash(argv[1]);
   const std::string outputDirectory = AddSlash(argv[2]);
   const std::string outputExtension = (argc > 3) ? argv[3] : "mha";
 
-  constexpr auto SliceAttributePair = std::make_pair(0x0020,0x0013);
-  constexpr auto FrameAttributePair = std::make_pair(0x0008,0x0033);
+  constexpr auto SliceAttributePair = std::make_pair(0x0020, 0x0013);
+  constexpr auto FrameAttributePair = std::make_pair(0x0008, 0x0033);
 
-  gdcm::Tag tSliceLocation(SliceAttributePair.first,SliceAttributePair.second);
-  gdcm::Tag tFrameLocation(FrameAttributePair.first,FrameAttributePair.second);
+  gdcm::Tag tSliceLocation(SliceAttributePair.first, SliceAttributePair.second);
+  gdcm::Tag tFrameLocation(FrameAttributePair.first, FrameAttributePair.second);
 
-  using TSliceAttribute = gdcm::Attribute<SliceAttributePair.first,SliceAttributePair.second>;
-  using TFrameAttribute = gdcm::Attribute<FrameAttributePair.first,FrameAttributePair.second>;
+  using TSliceAttribute =
+    gdcm::Attribute<SliceAttributePair.first, SliceAttributePair.second>;
+  using TFrameAttribute =
+    gdcm::Attribute<FrameAttributePair.first, FrameAttributePair.second>;
 
   constexpr auto SliceSortFunction = &dv::SortByAttribute<TSliceAttribute>;
   constexpr auto FrameSortFunction = &dv::SortByAttribute<TFrameAttribute>;
@@ -77,9 +79,10 @@ main( int argc, char* argv[] )
   ///////////////////////////////////
 
   gdcm::Directory gdcmDir;
-  gdcmDir.Load( inputDirectory.c_str() );
+  gdcmDir.Load(inputDirectory.c_str());
 
-  std::cout << gdcmDir.GetFilenames().size() << " files were discovered." << std::endl;
+  std::cout << gdcmDir.GetFilenames().size() << " files were discovered."
+            << std::endl;
   std::cout << "Sorting the images in the input directory..." << std::endl;
 
   // Define the tags we need
@@ -88,16 +91,16 @@ main( int argc, char* argv[] )
   tags.emplace(tFrameLocation);
 
   gdcm::Sorter sorter;
-  sorter.SetTagsToRead( tags );
+  sorter.SetTagsToRead(tags);
 
   std::cout << "Sorting by frame number...";
-  sorter.SetSortFunction( FrameSortFunction );
-  sorter.StableSort( gdcmDir.GetFilenames() );
+  sorter.SetSortFunction(FrameSortFunction);
+  sorter.StableSort(gdcmDir.GetFilenames());
   std::cout << "done." << std::endl;
 
   std::cout << "Sorting by slice location...";
-  sorter.SetSortFunction( SliceSortFunction );
-  sorter.StableSort( sorter.GetFilenames() );
+  sorter.SetSortFunction(SliceSortFunction);
+  sorter.StableSort(sorter.GetFilenames());
   std::cout << "done." << std::endl;
 
   // Get a sorted std::vector of file names
@@ -111,102 +114,86 @@ main( int argc, char* argv[] )
   std::cout << "Determining the frame number of each image..." << std::endl;
 
   // The frame is the key, the list of file names is the map
-  std::map<unsigned int,std::vector<std::string>> frameMap;
+  std::map<unsigned int, std::vector<std::string>> frameMap;
 
-  for (auto fileName = fileNames.begin();
-       fileName != fileNames.end();
-       ++fileName)
-    {
+  for (auto fileName = fileNames.begin(); fileName != fileNames.end();
+       ++fileName) {
 
     // Read in the file
     gdcm::Reader reader;
-    reader.SetFileName( fileName->c_str() );
+    reader.SetFileName(fileName->c_str());
 
-    if (!reader.ReadSelectedTags(tags))
-      {
+    if (!reader.ReadSelectedTags(tags)) {
       std::cerr << "Couldn't read the selected tags." << std::endl;
       return EXIT_FAILURE;
-      }
+    }
 
-    for (const auto t : tags)
-      {
-      if (!reader.GetFile().GetDataSet().FindDataElement( t ))
-        {
+    for (const auto t : tags) {
+      if (!reader.GetFile().GetDataSet().FindDataElement(t)) {
         std::cerr << "Couldn't find the tag: " << t << std::endl;
         return EXIT_FAILURE;
-        }
       }
+    }
 
     // Get the values of the tags
     gdcm::StringFilter filter;
-    filter.SetFile( reader.GetFile() );
+    filter.SetFile(reader.GetFile());
 
-    const std::string sl = filter.ToString( tSliceLocation );
+    const std::string sl = filter.ToString(tSliceLocation);
 
     // Calculate the frame number
     (sl == previous) ? frame++ : frame = 0;
     previous = sl;
 
     // Add the file name to the relevant list
-    auto &v = frameMap[frame];
+    auto& v = frameMap[frame];
     v.push_back(*fileName);
-
-    }
+  }
 
   // Print out some info
   std::cout << "Number of frames: " << frameMap.size() << std::endl;
 
   // Make sure each frame has the same number of slices
-  for (unsigned int i = 0; i + 1 < frameMap.size(); ++i)
-    {
-    if (frameMap[i].size() != frameMap[i+1].size())
-      {
+  for (unsigned int i = 0; i + 1 < frameMap.size(); ++i) {
+    if (frameMap[i].size() != frameMap[i + 1].size()) {
       std::cerr << "Error: Different number of slices!" << std::endl;
-      std::cerr << "Frame " << i << ": " << frameMap[i].size() << " slices." << std::endl;
-      std::cerr << "Frame " << (i+1) << ": " << frameMap[i+1].size() << " slices." << std::endl;
+      std::cerr << "Frame " << i << ": " << frameMap[i].size() << " slices."
+                << std::endl;
+      std::cerr << "Frame " << (i + 1) << ": " << frameMap[i + 1].size()
+                << " slices." << std::endl;
       return EXIT_FAILURE;
-      }
     }
+  }
 
-  for (auto it = frameMap.cbegin(); it != frameMap.cend(); ++it)
-    {
+  for (auto it = frameMap.cbegin(); it != frameMap.cend(); ++it) {
 
     ReaderType::Pointer reader = ReaderType::New();
     ImageIOType::Pointer dicomIO = ImageIOType::New();
-    reader->SetImageIO( dicomIO );
-    reader->SetFileNames( it->second );
+    reader->SetImageIO(dicomIO);
+    reader->SetFileNames(it->second);
 
-    try
-      {
+    try {
       reader->Update();
-      }
-    catch (itk::ExceptionObject &ex)
-      {
+    } catch (itk::ExceptionObject& ex) {
       std::cout << ex << std::endl;
       return EXIT_FAILURE;
-      }
+    }
 
-    const std::string outputFileName
-      = outputDirectory + std::to_string(it->first) + ".vtk";
+    const std::string outputFileName =
+      outputDirectory + std::to_string(it->first) + ".vtk";
     std::cout << "Writing File: " << outputFileName << std::endl;
 
     WriterType::Pointer writer = WriterType::New();
-    writer->SetFileName( outputFileName );
-    writer->SetInput( reader->GetOutput() );
-  
-    try
-      {
+    writer->SetFileName(outputFileName);
+    writer->SetInput(reader->GetOutput());
+
+    try {
       writer->Update();
-      }
-    catch (itk::ExceptionObject &ex)
-      {
+    } catch (itk::ExceptionObject& ex) {
       std::cout << ex << std::endl;
       return EXIT_FAILURE;
-      }
-
     }
+  }
 
   return EXIT_SUCCESS;
-
 }
-

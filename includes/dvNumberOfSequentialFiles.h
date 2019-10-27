@@ -4,9 +4,7 @@
 #include <cstdlib>
 #include <functional>
 
-namespace
-dv
-{
+namespace dv {
 
 size_t
 NumberOfSequentialFiles(const std::function<std::string(size_t)> formatter);

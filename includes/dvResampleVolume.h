@@ -2,21 +2,21 @@
 #define dv_ResampleVolume_h
 
 // ITK
-#include <itkImage.h>
+#include <itkFileTools.h>
 #include <itkIdentityTransform.h>
-#include <itkResampleImageFilter.h>
+#include <itkImage.h>
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
-#include <itkFileTools.h>
+#include <itkResampleImageFilter.h>
 
-#include <itkNearestNeighborInterpolateImageFunction.h>
-#include <itkLinearInterpolateImageFunction.h>
 #include <itkBSplineInterpolateImageFunction.h>
+#include <itkLinearInterpolateImageFunction.h>
+#include <itkNearestNeighborInterpolateImageFunction.h>
 
-#include <itkChangeLabelsImageFilter.h>
 #include <itkBinaryThresholdImageFilter.h>
-#include <itkImageFileWriter.h>
+#include <itkChangeLabelsImageFilter.h>
 #include <itkComposeImageFilter.h>
+#include <itkImageFileWriter.h>
 
 #include <itkVectorImage.h>
 // #include <itkImageAlgorithm.h>
@@ -25,14 +25,14 @@
 
 #include <dvImageToSet.h>
 
-namespace dv
-{
+namespace dv {
 
-template <unsigned int Dimension, typename TPixel>
-void ResampleVolume(const std::string &IImage,
-                    const std::string &OImage,
-                    const double &spacing,
-                    const unsigned int &interpolator)
+template<unsigned int Dimension, typename TPixel>
+void
+ResampleVolume(const std::string& IImage,
+               const std::string& OImage,
+               const double& spacing,
+               const unsigned int& interpolator)
 {
   using ImageType = itk::Image<TPixel, Dimension>;
   using ImageTypeML = itk::Image<float, Dimension>;
@@ -41,15 +41,20 @@ void ResampleVolume(const std::string &IImage,
   using WriterType = itk::ImageFileWriter<ImageType>;
   using WriterTypeML = itk::ImageFileWriter<ImageTypeML>;
   using TransformType = itk::IdentityTransform<float, Dimension>;
-  using ResampleType = itk::ResampleImageFilter<ImageType, ImageType, float, float>;
-  using ResampleTypeML = itk::ResampleImageFilter<ImageType, ImageTypeML, float, float>;
+  using ResampleType =
+    itk::ResampleImageFilter<ImageType, ImageType, float, float>;
+  using ResampleTypeML =
+    itk::ResampleImageFilter<ImageType, ImageTypeML, float, float>;
   using ChangeLabelsFilterType = itk::ChangeLabelsImageFilter<ImageType>;
   using ImageToVectorImageFilterType = itk::ComposeImageFilter<ImageTypeML>;
   using MaxFilterType = itk::IndexOfMaxImageFilter<VectorImageType, ImageType>;
 
-  using NNInterpolateType = itk::NearestNeighborInterpolateImageFunction<ImageType, float>;
-  using LNInterpolateType = itk::LinearInterpolateImageFunction<ImageType, float>;
-  using BSInterpolateType = itk::BSplineInterpolateImageFunction<ImageType, float>;
+  using NNInterpolateType =
+    itk::NearestNeighborInterpolateImageFunction<ImageType, float>;
+  using LNInterpolateType =
+    itk::LinearInterpolateImageFunction<ImageType, float>;
+  using BSInterpolateType =
+    itk::BSplineInterpolateImageFunction<ImageType, float>;
 
   const auto reader = ReaderType::New();
   const auto writer = WriterType::New();
@@ -68,132 +73,130 @@ void ResampleVolume(const std::string &IImage,
   auto inputSize = image->GetLargestPossibleRegion().GetSize();
   auto inputSpacing = image->GetSpacing();
   typename ImageType::SizeType outputSize;
-  for (unsigned int i = 0; i < Dimension; ++i)
-  {
-    outputSize[i] = std::floor(double(inputSize[i]) * inputSpacing[i] / outputSpacing[i]);
+  for (unsigned int i = 0; i < Dimension; ++i) {
+    outputSize[i] =
+      std::floor(double(inputSize[i]) * inputSpacing[i] / outputSpacing[i]);
   }
 
-  switch (interpolator)
-  {
-  case 0:
-  {
-    const auto resample = ResampleType::New();
-    resample->SetTransform(TransformType::New());
-    resample->SetOutputStartIndex(image->GetLargestPossibleRegion().GetIndex());
-    resample->SetOutputOrigin(image->GetOrigin());
-    resample->SetOutputDirection(image->GetDirection());
-    resample->SetOutputSpacing(outputSpacing);
-    resample->SetSize(outputSize);
-    resample->SetInput(image);
+  switch (interpolator) {
+    case 0: {
+      const auto resample = ResampleType::New();
+      resample->SetTransform(TransformType::New());
+      resample->SetOutputStartIndex(
+        image->GetLargestPossibleRegion().GetIndex());
+      resample->SetOutputOrigin(image->GetOrigin());
+      resample->SetOutputDirection(image->GetDirection());
+      resample->SetOutputSpacing(outputSpacing);
+      resample->SetSize(outputSize);
+      resample->SetInput(image);
 
-    const auto interp = NNInterpolateType::New();
-    resample->SetInterpolator(interp);
+      const auto interp = NNInterpolateType::New();
+      resample->SetInterpolator(interp);
 
-    writer->SetInput(resample->GetOutput());
-    writer->SetFileName(OImage);
-    writer->Update();
+      writer->SetInput(resample->GetOutput());
+      writer->SetFileName(OImage);
+      writer->Update();
 
-    break;
-  }
-  case 1:
-  {
-    const auto resample = ResampleType::New();
-    resample->SetTransform(TransformType::New());
-    resample->SetOutputStartIndex(image->GetLargestPossibleRegion().GetIndex());
-    resample->SetOutputOrigin(image->GetOrigin());
-    resample->SetOutputDirection(image->GetDirection());
-    resample->SetOutputSpacing(outputSpacing);
-    resample->SetSize(outputSize);
-    resample->SetInput(image);
-
-    const auto interp = LNInterpolateType::New();
-    resample->SetInterpolator(interp);
-
-    writer->SetInput(resample->GetOutput());
-    writer->SetFileName(OImage);
-    writer->Update();
-
-    break;
-  }
-  case 2:
-  {
-    const auto writerML = WriterTypeML::New();
-
-    // linearly interpolate classes separately
-    const auto interp = LNInterpolateType::New();
-    const auto imageToVectorImageFilter = ImageToVectorImageFilterType::New();
-
-    // labels set
-    const auto labels_set = dv::ImageToSet<Dimension, TPixel>(image);
-    std::map<TPixel, TPixel> label_map;
-    for (const auto &x : labels_set)
-    {
-      int s = (int)x;
-      label_map[s] = 0;
+      break;
     }
+    case 1: {
+      const auto resample = ResampleType::New();
+      resample->SetTransform(TransformType::New());
+      resample->SetOutputStartIndex(
+        image->GetLargestPossibleRegion().GetIndex());
+      resample->SetOutputOrigin(image->GetOrigin());
+      resample->SetOutputDirection(image->GetDirection());
+      resample->SetOutputSpacing(outputSpacing);
+      resample->SetSize(outputSize);
+      resample->SetInput(image);
 
-    for (const auto &x : labels_set)
-    {
-      int s = (int)x;
+      const auto interp = LNInterpolateType::New();
+      resample->SetInterpolator(interp);
 
-      // Ignore background.
-      if (s == 0)
-        continue;
+      writer->SetInput(resample->GetOutput());
+      writer->SetFileName(OImage);
+      writer->Update();
 
-      label_map[s] = 1;
-
-      const auto filter = ChangeLabelsFilterType::New();
-      filter->SetLabelMap(label_map);
-      filter->SetInput(reader->GetOutput());
-
-      const auto resampleML = ResampleTypeML::New();
-      resampleML->SetTransform(TransformType::New());
-      resampleML->SetOutputStartIndex(image->GetLargestPossibleRegion().GetIndex());
-      resampleML->SetOutputOrigin(image->GetOrigin());
-      resampleML->SetOutputDirection(image->GetDirection());
-      resampleML->SetOutputSpacing(outputSpacing);
-      resampleML->SetSize(outputSize);
-      resampleML->SetInput(filter->GetOutput());
-      resampleML->SetInterpolator(interp);
-      resampleML->Update();
-
-      // Add output of resample to composite filter
-      imageToVectorImageFilter->SetInput(s - 1, resampleML->GetOutput());
-      imageToVectorImageFilter->Update();
-
-      label_map[s] = 0;
+      break;
     }
+    case 2: {
+      const auto writerML = WriterTypeML::New();
 
-    // get the max of each vector in VectorImage output from imageToVectorImageFilter
-    const auto maxFilter = MaxFilterType::New();
-    maxFilter->SetInput(imageToVectorImageFilter->GetOutput());
-    maxFilter->Update();
+      // linearly interpolate classes separately
+      const auto interp = LNInterpolateType::New();
+      const auto imageToVectorImageFilter = ImageToVectorImageFilterType::New();
 
-    writer->SetInput(maxFilter->GetOutput());
-    writer->SetFileName(OImage);
-    writer->Update();
-    break;
-  }
-  default:
-  {
-    const auto resample = ResampleType::New();
-    resample->SetTransform(TransformType::New());
-    resample->SetOutputStartIndex(image->GetLargestPossibleRegion().GetIndex());
-    resample->SetOutputOrigin(image->GetOrigin());
-    resample->SetOutputDirection(image->GetDirection());
-    resample->SetOutputSpacing(outputSpacing);
-    resample->SetSize(outputSize);
-    resample->SetInput(image);
+      // labels set
+      const auto labels_set = dv::ImageToSet<Dimension, TPixel>(image);
+      std::map<TPixel, TPixel> label_map;
+      for (const auto& x : labels_set) {
+        int s = (int)x;
+        label_map[s] = 0;
+      }
 
-    const auto interp = BSInterpolateType::New();
-    interp->SetSplineOrder(interpolator);
-    resample->SetInterpolator(interp);
-    
-    writer->SetInput(resample->GetOutput());
-    writer->SetFileName(OImage);
-    writer->Update();
-    break;
-  }
+      for (const auto& x : labels_set) {
+        int s = (int)x;
+
+        // Ignore background.
+        if (s == 0)
+          continue;
+
+        label_map[s] = 1;
+
+        const auto filter = ChangeLabelsFilterType::New();
+        filter->SetLabelMap(label_map);
+        filter->SetInput(reader->GetOutput());
+
+        const auto resampleML = ResampleTypeML::New();
+        resampleML->SetTransform(TransformType::New());
+        resampleML->SetOutputStartIndex(
+          image->GetLargestPossibleRegion().GetIndex());
+        resampleML->SetOutputOrigin(image->GetOrigin());
+        resampleML->SetOutputDirection(image->GetDirection());
+        resampleML->SetOutputSpacing(outputSpacing);
+        resampleML->SetSize(outputSize);
+        resampleML->SetInput(filter->GetOutput());
+        resampleML->SetInterpolator(interp);
+        resampleML->Update();
+
+        // Add output of resample to composite filter
+        imageToVectorImageFilter->SetInput(s - 1, resampleML->GetOutput());
+        imageToVectorImageFilter->Update();
+
+        label_map[s] = 0;
+      }
+
+      // get the max of each vector in VectorImage output from
+      // imageToVectorImageFilter
+      const auto maxFilter = MaxFilterType::New();
+      maxFilter->SetInput(imageToVectorImageFilter->GetOutput());
+      maxFilter->Update();
+
+      writer->SetInput(maxFilter->GetOutput());
+      writer->SetFileName(OImage);
+      writer->Update();
+      break;
+    }
+    default: {
+      const auto resample = ResampleType::New();
+      resample->SetTransform(TransformType::New());
+      resample->SetOutputStartIndex(
+        image->GetLargestPossibleRegion().GetIndex());
+      resample->SetOutputOrigin(image->GetOrigin());
+      resample->SetOutputDirection(image->GetDirection());
+      resample->SetOutputSpacing(outputSpacing);
+      resample->SetSize(outputSize);
+      resample->SetInput(image);
+
+      const auto interp = BSInterpolateType::New();
+      interp->SetSplineOrder(interpolator);
+      resample->SetInterpolator(interp);
+
+      writer->SetInput(resample->GetOutput());
+      writer->SetFileName(OImage);
+      writer->Update();
+      break;
+    }
   }
 }
 

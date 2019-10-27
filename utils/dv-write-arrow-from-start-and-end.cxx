@@ -7,36 +7,34 @@ namespace po = boost::program_options;
 #include <dvWriteArrowFromStartAndEnd.h>
 
 int
-main( int argc, char** argv )
+main(int argc, char** argv)
 {
 
   // Declare the supported options.
   po::options_description description("Allowed options");
-  description.add_options()
-    ("help", "Print usage information.")
-    ("point-1", po::value<std::vector<double>>()->multitoken(), "Starting point.")
-    ("point-2", po::value<std::vector<double>>()->multitoken(), "Ending point.")
-    ("file-name", po::value<std::string>()->required(), "Filename of mesh.")
-    ("tip-resolution",  po::value<int>()->default_value(25), "Tip resolution.")
-    ("shaft-resolution",  po::value<int>()->default_value(25), "Shaft resolution.")
-  ;
+  description.add_options()("help", "Print usage information.")(
+    "point-1",
+    po::value<std::vector<double>>()->multitoken(),
+    "Starting point.")(
+    "point-2", po::value<std::vector<double>>()->multitoken(), "Ending point.")(
+    "file-name", po::value<std::string>()->required(), "Filename of mesh.")(
+    "tip-resolution", po::value<int>()->default_value(25), "Tip resolution.")(
+    "shaft-resolution",
+    po::value<int>()->default_value(25),
+    "Shaft resolution.");
 
   po::variables_map vm;
-  po::store(
-    po::parse_command_line(
-      argc,
-      argv,
-      description,
-      po::command_line_style::unix_style ^ po::command_line_style::allow_short
-      ),
-    vm
-  );
+  po::store(po::parse_command_line(argc,
+                                   argv,
+                                   description,
+                                   po::command_line_style::unix_style ^
+                                     po::command_line_style::allow_short),
+            vm);
 
-  if (vm.count("help") || 1 == argc)
-    {
+  if (vm.count("help") || 1 == argc) {
     std::cout << description << '\n';
     return EXIT_SUCCESS;
-    }
+  }
 
   po::notify(vm);
 
@@ -48,8 +46,8 @@ main( int argc, char** argv )
   const int tipResolution = vm["tip-resolution"].as<int>();
   const int shaftResolution = vm["shaft-resolution"].as<int>();
 
-  dv::ArrowWithStartAndEnd(point1.data(), point2.data(), fileName, tipResolution, shaftResolution);
+  dv::ArrowWithStartAndEnd(
+    point1.data(), point2.data(), fileName, tipResolution, shaftResolution);
 
   return EXIT_SUCCESS;
-
 }

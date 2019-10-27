@@ -1,10 +1,11 @@
-#include <dvSoftMax.h>
-#include <cstdlib>
-#include <iostream>
-#include <cassert>
 #include <algorithm>
+#include <cassert>
+#include <cstdlib>
+#include <dvSoftMax.h>
+#include <iostream>
 
-int main()
+int
+main()
 {
 
   using T = double;
@@ -13,7 +14,8 @@ int main()
 
   const auto p = dv::SoftMax(v);
 
-  for (const auto i : p) std::cout << i << ' ';
+  for (const auto i : p)
+    std::cout << i << ' ';
   std::cout << std::endl;
 
   const auto sum = std::accumulate(p.cbegin(), p.cend(), static_cast<T>(0.0));

@@ -3,29 +3,31 @@
 
 namespace po = boost::program_options;
 
-#include <dvReadImageIOBase.h>
 #include <dvChangeInformation3D.h>
+#include <dvReadImageIOBase.h>
 
 int
-main(int argc, char ** argv)
+main(int argc, char** argv)
 {
 
   po::options_description description("Allowed options");
-  description.add_options()
-    ("help", "Print usage information.")
-    ("input-image",     po::value<std::string>()->required(), "Filename of the input image.")
-    ("reference-image", po::value<std::string>()->required(), "Filename of the reference image.")
-    ("output-image",    po::value<std::string>()->required(), "Filename of the output image.")
-  ;
+  description.add_options()("help", "Print usage information.")(
+    "input-image",
+    po::value<std::string>()->required(),
+    "Filename of the input image.")("reference-image",
+                                    po::value<std::string>()->required(),
+                                    "Filename of the reference image.")(
+    "output-image",
+    po::value<std::string>()->required(),
+    "Filename of the output image.");
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, description), vm);
 
-  if (vm.count("help") || 1 == argc)
-    {
+  if (vm.count("help") || 1 == argc) {
     std::cout << description << '\n';
     return EXIT_SUCCESS;
-    }
+  }
 
   po::notify(vm);
 
@@ -33,8 +35,7 @@ main(int argc, char ** argv)
   const auto RImage = vm["reference-image"].as<std::string>();
   const auto OImage = vm["output-image"].as<std::string>();
 
-  switch (dv::ReadImageIOBase(IImage)->GetComponentType())
-    {
+  switch (dv::ReadImageIOBase(IImage)->GetComponentType()) {
     case itk::ImageIOBase::UCHAR:
       dv::ChangeInformation3D<3, unsigned char>(IImage, RImage, OImage);
       break;
@@ -69,7 +70,7 @@ main(int argc, char ** argv)
       std::cerr << "ERROR: Unrecognized pixel type." << std::endl;
       return EXIT_FAILURE;
       break;
-    }
- 
+  }
+
   return EXIT_SUCCESS;
 }

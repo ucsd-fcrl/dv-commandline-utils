@@ -3,8 +3,7 @@
 
 #include <cpd/nonrigid.hpp>
 
-namespace dv
-{
+namespace dv {
 template<typename TPointSet>
 cpd::Matrix
 ITKPointSetToCPDMatrix(typename TPointSet::Pointer points)
@@ -16,16 +15,13 @@ ITKPointSetToCPDMatrix(typename TPointSet::Pointer points)
 
   for (TPSIt it = points->GetPoints()->Begin();
        it != points->GetPoints()->End();
-       ++it)
-    {
-    for (size_t i = 0; i < dim; ++i)
-      {
+       ++it) {
+    for (size_t i = 0; i < dim; ++i) {
       mat(it->Index(), i) = it->Value()[i];
-      }
     }
+  }
 
   return mat;
-
 }
 
 }

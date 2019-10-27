@@ -13,35 +13,35 @@ namespace po = boost::program_options;
 const unsigned int Dimension = 3;
 using TCoordinate = float;
 
-using TMesh      = itk::Mesh< TCoordinate, Dimension >;
-using TReader    = itk::MeshFileReader< TMesh >;
-using TWriter    = itk::MeshFileWriter< TMesh >;
-using TScale     = itk::ScaleTransform< TCoordinate, Dimension >;
-using TTransform = itk::TransformMeshFilter< TMesh, TMesh, TScale >;
+using TMesh = itk::Mesh<TCoordinate, Dimension>;
+using TReader = itk::MeshFileReader<TMesh>;
+using TWriter = itk::MeshFileWriter<TMesh>;
+using TScale = itk::ScaleTransform<TCoordinate, Dimension>;
+using TTransform = itk::TransformMeshFilter<TMesh, TMesh, TScale>;
 
 int
-main( int argc, char* argv[] )
+main(int argc, char* argv[])
 {
 
   // Declare the supported options.
   po::options_description description("Allowed options");
-  description.add_options()
-    ("help", "Print usage information.")
-    ("input-mesh",  po::value<std::string>()->required(), "Filename of the input mesh.")
-    ("output-mesh", po::value<std::string>()->required(), "Filename of the output image.")
-    ("x",           po::value<double>()->required(), "Translation in the x direction.")
-    ("y",           po::value<double>()->required(), "Translation in the y direction.")
-    ("z",           po::value<double>()->required(), "Translation in the z direction.")
-  ;
+  description.add_options()("help", "Print usage information.")(
+    "input-mesh",
+    po::value<std::string>()->required(),
+    "Filename of the input mesh.")("output-mesh",
+                                   po::value<std::string>()->required(),
+                                   "Filename of the output image.")(
+    "x", po::value<double>()->required(), "Translation in the x direction.")(
+    "y", po::value<double>()->required(), "Translation in the y direction.")(
+    "z", po::value<double>()->required(), "Translation in the z direction.");
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, description), vm);
 
-  if (vm.count("help") || 1 == argc)
-    {
+  if (vm.count("help") || 1 == argc) {
     std::cout << description << '\n';
     return EXIT_SUCCESS;
-    }
+  }
 
   po::notify(vm);
 
@@ -54,31 +54,26 @@ main( int argc, char* argv[] )
   scale[2] = vm["z"].as<double>();
 
   const auto reader = TReader::New();
-  reader->SetFileName( inputFileName );
+  reader->SetFileName(inputFileName);
 
   const auto translate = TScale::New();
-  translate->SetScale( scale );
+  translate->SetScale(scale);
 
   const auto transform = TTransform::New();
-  transform->SetInput( reader->GetOutput() );
-  transform->SetTransform( translate );
+  transform->SetInput(reader->GetOutput());
+  transform->SetTransform(translate);
 
   const auto writer = TWriter::New();
-  writer->SetInput( transform->GetOutput() );
-  writer->SetFileName( outputFileName );
+  writer->SetInput(transform->GetOutput());
+  writer->SetFileName(outputFileName);
 
-  try
-    {
+  try {
     writer->Update();
-    }
-  catch ( itk::ExceptionObject & err )
-    {
+  } catch (itk::ExceptionObject& err) {
     std::cerr << "There was a problem writing the file." << std::endl;
     std::cerr << err << std::endl;
     return EXIT_FAILURE;
-    }
+  }
 
   return EXIT_SUCCESS;
-
 }
-
