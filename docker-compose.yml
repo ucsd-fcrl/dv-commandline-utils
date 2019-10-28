@@ -1,0 +1,8 @@
+version: '3.7'
+
+services:
+  dv-commandline-utils:
+    build:
+      context: .
+    image: sudomakeinstall/dv-commandline-utils
+    working_dir: /code/bin

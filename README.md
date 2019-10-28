@@ -28,41 +28,21 @@ sudomakeinstall/dv-commandline-utils   latest              848b802899d4        4
 Spinning up a container to play around with the utilities can be as easy as:
 
 ```bash
-$ docker run \
-  --rm \
-  -it \
-  -v "${HOME}/hostdata":"/data" \
-  -w /code/bin \
-  sudomakeinstall/dv-commandline-utils zsh
+$ ./docker-run.sh
 (dkr) $ ./dv-add-mesh-noise --help
 Allowed options:
   --help                Print usage information.
   --input-mesh arg      Filename of the input mesh.
   --output-mesh arg     Filename of the output image.
   --sigma arg           Amount of noise to be added.
-(dkr) $ ./dv-add-mesh-noise \
-  --input-mesh /data/input-mesh.obj \
-  --output-mesh /data/output-mesh.obj \
-  --sigma 0.1
 ```
 
-Congrats, you're up and running!
-
-# Developing
-
-In order to set up for development, you'll want to mount your local copy of the source code on top of the copy shipped in the image, so that you can iteratively modify the code (on the local host machine) and build the binaries (in the container).  This just requires one further mount flat:
-
+Congrats, you're up and running!  However, in order to access data on your host machine, or build the local copy of the code, you'll want to mount some volumes, similar to docker-compose.override.yml.example.  Copy this over and edit the paths as necessary to get started:
 
 ```bash
-$ cd ~/Developer/repositories/dv-commandline-utils/src
-$ docker run \
-  --rm \
-  -it \
-  -v "${PWD}":/code/src" \
-  -v "${HOME}/hostdata":"/data" \
-  -w /code/bin \
-  sudomakeinstall/dv-commandline-utils zsh
-(dkr) $ # Modify and commit code on the host, build binaries here
+$ cp ./docker-compose.override.yml.example ./docker-compose.override.yml
+$ vim ./docker-compose.override.yml # Edit paths; this file will be ignored by git.
+$ ./docker-run.sh
 ```
 
 # Running Tests
