@@ -1,8 +1,8 @@
-# syntax=docker/dockerfile:experimental
 FROM ubuntu:19.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Install dependencies
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
   openssh-client \
@@ -67,8 +67,10 @@ RUN mkdir -p /Developer/ITK/bin \
   && cd /Developer \
   && rm -rf ./ITK
 
+# Add the source for this repository
 ADD . /code/src/
 
+# Build this repo
 RUN mkdir -p /code/bin \
   && cd /code/bin \
   && cmake ../src  \
