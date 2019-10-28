@@ -25,6 +25,8 @@ REPOSITORY                             TAG                 IMAGE ID            C
 sudomakeinstall/dv-commandline-utils   latest              848b802899d4        43 seconds ago      3.08GB
 ```
 
+# Running
+
 Spinning up a container to play around with the utilities can be as easy as:
 
 ```bash
