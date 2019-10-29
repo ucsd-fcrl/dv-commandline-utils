@@ -2,13 +2,12 @@ version: '3.7'
 
 services:
   dv-commandline-utils:
-    # Mount host repo to aid development
     volumes:
+      # Mount host repo to aid development
       - type: bind
         source: .
         target: /code/src
-    # Mount a directory to access data
-    volumes:
+      # Mount a directory to access data
       - type: bind
         source: ${HOME}/Dropbox/datasets/
         target: /data
