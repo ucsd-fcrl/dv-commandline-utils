@@ -5,11 +5,26 @@
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
 
+find_package(VTK REQUIRED)
+if(${APPLE})
+  find_package(Qt5 COMPONENTS
+               Core
+               Gui
+               Widgets)
+else()
+  find_package(Qt5 COMPONENTS
+               Core
+               Gui
+               Widgets
+               X11Extras)
+endif()
+
 ###########
 ## Tests ##
 ###########
 
-set(EXNAMES "dvStringOperationsTest"
+set(EXNAMES "dvCameraStateTest"
+            "dvStringOperationsTest"
             "dvVectorOperationsTest"
             "dvMathTest"
             "dvProgressTest"
@@ -29,8 +44,13 @@ set(EXNAMES "dvStringOperationsTest"
 foreach(EXNAME ${EXNAMES})
 
   add_executable(${EXNAME} ${EXNAME}.cxx)
-  target_link_libraries(${EXNAME} dv-commandline-utils-lib ${ITK_LIBRARIES})
+  target_link_libraries(${EXNAME} dv-commandline-utils-lib ${ITK_LIBRARIES} ${VTK_LIBRARIES})
   add_test(${EXNAME} ${EXNAME})
+
+  vtk_module_autoinit(
+    TARGETS ${EXNAME}
+    MODULES ${VTK_LIBRARIES}
+    )
 
 endforeach()
 

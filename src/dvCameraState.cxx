@@ -64,7 +64,7 @@ CameraState ::SerializeJSON(
 }
 
 void
-CameraState ::DeserializeJSON(const rapidjson::Document& d)
+CameraState::DeserializeJSON(const rapidjson::Document& d)
 {
   check_and_set_double(d, this->ViewAngle, "camera.ViewAngle");
   check_and_set_double(d, this->ParallelScale, "camera.ParallelScale");
