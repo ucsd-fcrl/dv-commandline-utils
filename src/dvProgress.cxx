@@ -3,13 +3,17 @@
 
 namespace dv {
 
-Progress ::Progress(size_t _TotalUnits)
+Progress::Progress(size_t _TotalUnits)
   : TotalUnits(_TotalUnits)
 {}
 
 void
-Progress ::UnitCompleted()
+Progress::UnitCompleted()
 {
+  if (this->CurrentUnit >= this->TotalUnits) {
+    return;
+  }
+
   ++(this->CurrentUnit);
   double PercentCompleted =
     this->CurrentUnitAsFP() / this->TotalUnitsAsFP() * 100.0;
@@ -25,19 +29,19 @@ Progress ::UnitCompleted()
 }
 
 size_t
-Progress ::GetTotalUnits()
+Progress::GetTotalUnits()
 {
   return this->TotalUnits;
 }
 
 double
-Progress ::TotalUnitsAsFP()
+Progress::TotalUnitsAsFP()
 {
   return static_cast<double>(this->TotalUnits);
 }
 
 double
-Progress ::CurrentUnitAsFP()
+Progress::CurrentUnitAsFP()
 {
   return static_cast<double>(this->CurrentUnit);
 }

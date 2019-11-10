@@ -201,7 +201,7 @@ public:
                 : this->index.GetRange());
     const auto azimuth = 360.0 / total_iterations;
 
-    //    auto progress = dv::Progress( total_iterations );
+    auto progress = dv::Progress( total_iterations );
 
     for (size_t it = 0; it < total_iterations; ++it) {
 
@@ -230,8 +230,7 @@ public:
       writer->SetInputConnection(screenshot->GetOutputPort());
       writer->Write();
 
-      // FIXME
-      //      progress.UnitCompleted();
+      progress.UnitCompleted();
       this->Increment();
     }
   }
