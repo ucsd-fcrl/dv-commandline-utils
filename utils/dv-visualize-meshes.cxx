@@ -38,41 +38,49 @@ GetListOfColors()
 {
 
   std::vector<std::array<double, 3>> colors;
-  colors.emplace_back(std::array<double, 3>{ 0.0 / 255, 0.0 / 255, 0.0 / 255 });
+  colors.emplace_back(std::array<double, 3>{ 0.0, 0.0, 0.0 });
   colors.emplace_back(
-    std::array<double, 3>{ 255.0 / 255, 0.0 / 255, 0.0 / 255 });
+    std::array<double, 3>{ 255.0, 0.0, 0.0 });
   colors.emplace_back(
-    std::array<double, 3>{ 255.0 / 255, 255.0 / 255, 0.0 / 255 });
+    std::array<double, 3>{ 255.0, 255.0, 0.0 });
   colors.emplace_back(
-    std::array<double, 3>{ 127.0 / 255, 255.0 / 255, 0.0 / 255 });
+    std::array<double, 3>{ 127.0, 255.0, 0.0 });
   colors.emplace_back(
-    std::array<double, 3>{ 255.0 / 255, 0.0 / 255, 255.0 / 255 });
+    std::array<double, 3>{ 255.0, 0.0, 255.0 });
   colors.emplace_back(
-    std::array<double, 3>{ 255.0 / 255, 127.0 / 255, 0.0 / 255 });
+    std::array<double, 3>{ 255.0, 127.0, 0.0 });
   colors.emplace_back(
-    std::array<double, 3>{ 0.0 / 255, 127.0 / 255, 255.0 / 255 });
+    std::array<double, 3>{ 0.0, 127.0, 255.0 });
   colors.emplace_back(
-    std::array<double, 3>{ 255.0 / 255, 0.0 / 255, 127.0 / 255 });
+    std::array<double, 3>{ 255.0, 0.0, 127.0 });
   colors.emplace_back(
-    std::array<double, 3>{ 0.0 / 255, 27.0 / 255, 155.0 / 255 });
+    std::array<double, 3>{ 0.0, 27.0, 155.0 });
   colors.emplace_back(
-    std::array<double, 3>{ 155.0 / 255, 0.0 / 255, 27.0 / 255 });
+    std::array<double, 3>{ 155.0, 0.0, 27.0 });
   colors.emplace_back(
-    std::array<double, 3>{ 0.0 / 255, 255.0 / 255, 0.0 / 255 });
+    std::array<double, 3>{ 0.0, 255.0, 0.0 });
   colors.emplace_back(
-    std::array<double, 3>{ 0.0 / 255, 255.0 / 255, 255.0 / 255 });
+    std::array<double, 3>{ 0.0, 255.0, 255.0 });
   colors.emplace_back(
-    std::array<double, 3>{ 0.0 / 255, 255.0 / 255, 127.0 / 255 });
+    std::array<double, 3>{ 0.0, 255.0, 127.0 });
   colors.emplace_back(
-    std::array<double, 3>{ 127.0 / 255, 0.0 / 255, 255.0 / 255 });
+    std::array<double, 3>{ 127.0, 0.0, 255.0 });
   colors.emplace_back(
-    std::array<double, 3>{ 0.0 / 255, 0.0 / 255, 255.0 / 255 });
+    std::array<double, 3>{ 0.0, 0.0, 255.0 });
   colors.emplace_back(
-    std::array<double, 3>{ 255.0 / 255, 127.0 / 255, 255.0 / 255 });
+    std::array<double, 3>{ 255.0, 127.0, 255.0 });
   colors.emplace_back(
-    std::array<double, 3>{ 127.0 / 255, 127.0 / 255, 255.0 / 255 });
+    std::array<double, 3>{ 127.0, 127.0, 255.0 });
   colors.emplace_back(
-    std::array<double, 3>{ 127.0 / 255, 127.0 / 255, 127.0 / 255 });
+    std::array<double, 3>{ 127.0, 127.0, 127.0 });
+
+  for (auto &color : colors)
+    {
+    for (auto &channel : color)
+      {
+      channel /= 255;
+      }
+    }
 
   return colors;
 }
@@ -117,7 +125,6 @@ public:
 
   void Increment()
   {
-
     this->m_SegViews.at(this->GetCurrentSegmentationFileName())
       .RemoveAllActors();
     this->index.Increment();
@@ -414,8 +421,12 @@ main(int argc, char** argv)
 
   window->Render();
 
-  if (vm.count("restore-capture-quit")) {
+  if (camera_state_exists)
+    {
     style->RestoreCameraState();
+    }
+
+  if (vm.count("restore-capture-quit")) {
     style->CaptureScreenshots(false);
     window->Finalize();
   } else {
