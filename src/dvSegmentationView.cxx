@@ -1,6 +1,7 @@
 // ITK
 #include <itkImage.h>
 #include <itkImageFileReader.h>
+#include <itkConstantPadImageFilter.h>
 #include <itkImageToVTKImageFilter.h>
 
 // VTK
@@ -39,15 +40,24 @@ SegmentationView::Setup(const std::string file_name)
 
   using TImage = itk::Image<short, 3>;
   using TITKReader = itk::ImageFileReader<TImage>;
+  using TPad = itk::ConstantPadImageFilter<TImage, TImage>;
   using TITK2VTK = itk::ImageToVTKImageFilter<TImage>;
+
+  TImage::SizeType size;
+  size.Fill( 1 );
 
   const auto reader = TITKReader::New();
   reader->SetFileName(file_name);
-  reader->Update();
+
+  const auto pad = TPad::New();
+  pad->SetInput( reader->GetOutput() );
+  pad->SetPadLowerBound( size );
+  pad->SetPadUpperBound( size );
+  pad->Update();
 
   const auto mat = vtkSmartPointer<vtkMatrix4x4>::New();
   const auto trans = vtkSmartPointer<vtkTransform>::New();
-  dv::GetVTKTransformationMatrixFromITKImage<TImage>(reader->GetOutput(), mat);
+  dv::GetVTKTransformationMatrixFromITKImage<TImage>(pad->GetOutput(), mat);
 
   trans->SetMatrix(mat);
   trans->Translate(-trans->GetMatrix()->GetElement(0, 3),
@@ -55,7 +65,7 @@ SegmentationView::Setup(const std::string file_name)
                    -trans->GetMatrix()->GetElement(2, 3));
 
   const auto itk2vtk = TITK2VTK::New();
-  itk2vtk->SetInput(reader->GetOutput());
+  itk2vtk->SetInput(pad->GetOutput());
   itk2vtk->Update();
 
   const auto voi = vtkSmartPointer<vtkExtractVOI>::New();
