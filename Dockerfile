@@ -21,8 +21,6 @@ RUN apt-get update \
   qt5-qmake \
   libqt5x11extras5-dev \
   rapidjson-dev \
-  libboost-filesystem-dev \
-  libboost-program-options-dev \
   zsh \
   curl \
   && rm -rf /var/lib/apt/lists/*
@@ -67,6 +65,16 @@ RUN mkdir -p /Developer/ITK/bin \
   && cd /Developer \
   && rm -rf ./ITK
 
+# Build Boost
+RUN mkdir -p /Developer/boost \
+  && cd /Developer/boost \
+  && curl -L https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.gz -o ./boost.tar.gz \
+  && tar -xvzf ./boost.tar.gz -C ./ --strip-components=1 \
+  && ./bootstrap.sh \
+  && ./b2 link=static --with-program_options --with-filesystem install --with-system \
+  && cd /Developer \
+  && rm -rf ./boost
+
 # Add the source for this repository
 ADD . /code/src/
 
@@ -77,4 +85,5 @@ RUN mkdir -p /code/bin \
     -DCMAKE_CXX_STANDARD=14 \
     -DCMAKE_CXX_FLAGS=-std=c++14 \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+    -DBoost_USE_STATIC_LIBS=ON \
   && make -j$(nproc)
