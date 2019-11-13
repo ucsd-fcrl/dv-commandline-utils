@@ -86,4 +86,5 @@ RUN mkdir -p /code/bin \
     -DCMAKE_CXX_FLAGS=-std=c++14 \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
     -DBoost_USE_STATIC_LIBS=ON \
+    -DBUILD_SHARED_LIBS=OFF \
   && make -j$(nproc)
