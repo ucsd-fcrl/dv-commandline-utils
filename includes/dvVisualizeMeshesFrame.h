@@ -46,14 +46,14 @@ void TurnAllActorsOn() {
   }
 }
 
-void SetOpacity(const double opacity) {
+void SetHue(const double hue) {
 
   for (auto &sv : this->m_SegmentationViews) {
-    sv.SetOpacity(opacity);
+    sv.SetHue(hue);
   }
 
   for (auto &mv : this->m_MeshViews) {
-    mv.SetOpacity(opacity);
+    mv.SetHue(hue);
   }
 
 }

@@ -12,6 +12,7 @@
 #include <vtkRenderer.h>
 #include <vtkSmartPointer.h>
 #include <vtkProperty.h>
+#include <vtkMath.h>
 
 namespace dv {
 
@@ -43,9 +44,11 @@ public:
   void AddAllActors();
   void RemoveAllActors();
 
-  void SetOpacity(const double opacity) {
+  void SetHue(const double hue) {
+    double r, g, b;
+    vtkMath::HSVToRGB(hue, 1.0, 1.0, &r, &g, &b);
     for (auto &a : this->m_Actors) {
-      a.second->GetProperty()->SetOpacity( opacity );
+      a.second->GetProperty()->SetColor( r, g, b );
     }
   }
 

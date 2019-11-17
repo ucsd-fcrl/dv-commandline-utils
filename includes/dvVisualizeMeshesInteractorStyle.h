@@ -81,9 +81,9 @@ public:
     if (this->all_on) {
 
       for (size_t i = 0; i < this->m_Frames.size(); ++i) {
-        const auto opacity = 1.0 - (static_cast<double>(i) / this->m_Frames.size());
+        const auto hue = 1.0 - (static_cast<double>(i) / this->m_Frames.size());
         this->m_Frames[i].TurnAllActorsOn();
-        this->m_Frames[i].SetOpacity(opacity);
+        this->m_Frames[i].SetHue( (hue + 1.0) / 2.0 );
       }
       this->GetCurrentRenderer()->GetRenderWindow()->Render();
     } else {

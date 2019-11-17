@@ -6,6 +6,7 @@
 #include <vtkOBJReader.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
+#include <vtkMath.h>
 
 namespace dv {
 
@@ -60,8 +61,10 @@ public:
     this->m_Renderer->RemoveActor(this->m_Actor);
   }
 
-  void SetOpacity(const double opacity) {
-    this->m_Actor->GetProperty()->SetOpacity( opacity );
+  void SetHue(const double hue) {
+    double r, g, b;
+    vtkMath::HSVToRGB(hue, 1.0, 1.0, &r, &g, &b);
+    this->m_Actor->GetProperty()->SetColor(r, g, b);
   }
 
   void Update(std::string file_name) {
