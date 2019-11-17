@@ -2,6 +2,8 @@
 # Extra libraries needed for testing #
 ######################################
 
+find_package(Boost COMPONENTS program_options filesystem system REQUIRED)
+
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
 
@@ -39,12 +41,16 @@ set(EXNAMES "dvCameraStateTest"
             "dvSoftMaxTest"
             "dvDeleteIsolatedPointsTest"
             "dvMeshToQuadEdgeMeshTest"
+            "dvVisualizeMeshesInteractorStyleTest"
+            "dvVisualizeMeshesFrameTest"
+            "dvMeshViewTest"
+            "dvSegmentationViewTest"
    )
 
 foreach(EXNAME ${EXNAMES})
 
   add_executable(${EXNAME} ${EXNAME}.cxx)
-  target_link_libraries(${EXNAME} dv-commandline-utils-lib ${ITK_LIBRARIES} ${VTK_LIBRARIES})
+  target_link_libraries(${EXNAME} dv-commandline-utils-lib ${ITK_LIBRARIES} ${VTK_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY})
   add_test(${EXNAME} ${EXNAME})
 
   vtk_module_autoinit(
@@ -53,13 +59,3 @@ foreach(EXNAME ${EXNAMES})
     )
 
 endforeach()
-
-#find_package(Ceres REQUIRED)
-#include_directories(${CERES_INCLUDE_DIRS})
-#
-#add_executable(dvTriangleAspectRatioRegularizerTest dvTriangleAspectRatioRegularizerTest.cxx)
-#target_link_libraries(dvTriangleAspectRatioRegularizerTest dv-commandline-utils-lib
-#                                                           ${CERES_LIBRARIES}
-#                                                           ${ITK_LIBRARIES})
-#add_test(dvTriangleAspectRatioRegularizerTest dvTriangleAspectRatioRegularizerTest)
-

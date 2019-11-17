@@ -24,18 +24,29 @@ namespace dv {
 
 SegmentationView::SegmentationView(
   const std::string FileName,
+  vtkRenderer* Renderer,
   const std::vector<unsigned int> Labels,
-  const std::vector<std::array<double, 3>> Colors,
-  vtkRenderer* Renderer)
-  : m_Labels(Labels)
-  , m_Colors(Colors)
+  const std::vector<std::array<double, 3>> Colors)
+  : m_FileName(FileName)
   , m_Renderer(Renderer)
+  , m_Labels(Labels)
+  , m_Colors(Colors)
 {
-  this->Setup(FileName);
+  this->Setup();
+}
+
+SegmentationView::SegmentationView(const SegmentationView& other) {
+  this->m_FileName = other.m_FileName;
+  this->m_Renderer = other.m_Renderer;
+  this->m_Labels   = other.m_Labels;
+  this->m_Colors   = other.m_Colors;
+
+  this->Setup();
+  
 }
 
 void
-SegmentationView::Setup(const std::string file_name)
+SegmentationView::Setup()
 {
 
   using TImage = itk::Image<short, 3>;
@@ -47,7 +58,7 @@ SegmentationView::Setup(const std::string file_name)
   size.Fill( 1 );
 
   const auto reader = TITKReader::New();
-  reader->SetFileName(file_name);
+  reader->SetFileName(this->m_FileName);
 
   const auto pad = TPad::New();
   pad->SetInput( reader->GetOutput() );
@@ -113,18 +124,14 @@ SegmentationView::Setup(const std::string file_name)
 }
 
 void
-SegmentationView::AddAllActors()
-{
-
+SegmentationView::AddAllActors() {
   for (const auto& a : this->m_Actors) {
     this->m_Renderer->AddActor(a.second);
   }
 }
 
 void
-SegmentationView::RemoveAllActors()
-{
-
+SegmentationView::RemoveAllActors() {
   for (const auto& a : this->m_Actors) {
     this->m_Renderer->RemoveActor(a.second);
   }

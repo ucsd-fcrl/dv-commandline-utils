@@ -11,33 +11,44 @@
 #include <vtkActor.h>
 #include <vtkRenderer.h>
 #include <vtkSmartPointer.h>
+#include <vtkProperty.h>
 
 namespace dv {
 
-class SegmentationView
-{
+class SegmentationView {
 
-  std::vector<unsigned int> m_Labels;
-  std::vector<std::array<double, 3>> m_Colors;
-  vtkSmartPointer<vtkRenderer> m_Renderer = nullptr;
-
-  double m_SampleRate = 1;
-  unsigned int m_Iterations = 10;
-  double m_Relaxation = 0.1;
-  double m_FeatureAngle = 135.0;
+  static constexpr double m_SampleRate = 1;
+  static constexpr unsigned int m_Iterations = 10;
+  static constexpr double m_Relaxation = 0.1;
+  static constexpr double m_FeatureAngle = 135.0;
 
 public:
+
+  std::string m_FileName;
+  vtkSmartPointer<vtkRenderer> m_Renderer;
+  std::vector<unsigned int> m_Labels;
+  std::vector<std::array<double, 3>> m_Colors;
+
+  SegmentationView(const SegmentationView& other);
+
+  void Setup();
+
   SegmentationView(const std::string FileName,
+                   vtkRenderer* Renderer,
                    const std::vector<unsigned int> Labels,
-                   const std::vector<std::array<double, 3>> Colors,
-                   vtkRenderer* Renderer);
+                   const std::vector<std::array<double, 3>> Colors);
 
   std::map<unsigned int, vtkSmartPointer<vtkActor>> m_Actors;
 
-  void Setup(const std::string file_name);
-
   void AddAllActors();
   void RemoveAllActors();
+
+  void SetOpacity(const double opacity) {
+    for (auto &a : this->m_Actors) {
+      a.second->GetProperty()->SetOpacity( opacity );
+    }
+  }
+
 };
 
 }

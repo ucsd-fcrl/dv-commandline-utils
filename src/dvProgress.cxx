@@ -17,8 +17,8 @@ Progress::UnitCompleted()
   ++(this->CurrentUnit);
   double PercentCompleted =
     this->CurrentUnitAsFP() / this->TotalUnitsAsFP() * 100.0;
-  double n = static_cast<int>(PercentCompleted / 2);
-  std::cout << '\r' << '[' << std::string(n - 1, '=') << ">"
+  double n = static_cast<int>(PercentCompleted / 2.0);
+  std::cout << '\r' << '[' << std::string(n, '=') << ">"
             << std::string(50 - n, '.') << "] " << std::setprecision(2)
             << std::fixed << PercentCompleted << "\% Completed.";
   if (this->CurrentUnit == this->TotalUnits) {
