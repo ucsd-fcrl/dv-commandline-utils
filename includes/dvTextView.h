@@ -4,6 +4,7 @@
 #include <vtkTextProperty.h>
 #include <vtkTextActor.h>
 #include <vtkSmartPointer.h>
+#include <vtkRenderer.h>
 
 namespace dv {
 

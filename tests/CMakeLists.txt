@@ -44,6 +44,7 @@ set(EXNAMES "dvCameraStateTest"
             "dvVisualizeMeshesInteractorStyleTest"
             "dvVisualizeMeshesFrameTest"
             "dvMeshViewTest"
+            "dvTextViewTest"
             "dvSegmentationViewTest"
    )
 
