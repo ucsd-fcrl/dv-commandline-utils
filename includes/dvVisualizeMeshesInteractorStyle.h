@@ -65,6 +65,10 @@ public:
              this->ScreenshotRotateKeys.cend()) {
       this->CaptureScreenshots(true, 10);
     }
+    // Toggle Text Annotations
+    else if (this->ToggleTextAnnotationsKeys.find(key) != this->ToggleTextAnnotationsKeys.cend()) {
+        this->ToggleTextAnnotations();
+    }
     // Restore Camera State
     else if (this->RestoreCameraStateKeys.find(key) !=
              this->RestoreCameraStateKeys.cend()) {
@@ -73,6 +77,11 @@ public:
 
     // Forward events
     vtkInteractorStyleTrackballCamera::OnKeyPress();
+  }
+
+  void ToggleTextAnnotations() {
+    this->m_TextAnnotationsVisible = !(this->m_TextAnnotationsVisible);
+    this->RenderForCurrentFrame();
   }
 
   void ToggleAllOn() {
@@ -98,7 +107,8 @@ public:
     for (auto &f : this->m_Frames) {
       f.TurnAllActorsOff();
     }
-    this->m_Frames.at(index.GetCurrent()).TurnAllActorsOn();
+    this->m_Frames.at(this->index.GetCurrent()).TurnAllActorsOn();
+    this->m_Frames.at(this->index.GetCurrent()).SetTextAnnotationsVisible(this->m_TextAnnotationsVisible);
     this->GetCurrentRenderer()->GetRenderWindow()->Render();
   }
 
@@ -228,12 +238,15 @@ public:
 
   bool all_on = false;
 
+  bool m_TextAnnotationsVisible = false;
+
   std::set<std::string> ToggleAllOnKeys{ "a" };
   std::set<std::string> IncrementKeys{ "Down", "Right", "j", "l" };
   std::set<std::string> DecrementKeys{ "Up", "Left", "h", "k" };
   std::set<std::string> ScreenshotKeys{ "s" };
   std::set<std::string> ScreenshotRotateKeys{ "S" };
   std::set<std::string> RestoreCameraStateKeys{ "p" };
+  std::set<std::string> ToggleTextAnnotationsKeys{"t"};
 
   dv::CameraState camera;
 

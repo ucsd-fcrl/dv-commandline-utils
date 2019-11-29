@@ -12,6 +12,8 @@ namespace po = boost::program_options;
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
 #include <vtkSmartPointer.h>
+#include <vtkTextActor.h>
+
 
 // Custom
 #include <dvCycle.h>
@@ -163,6 +165,8 @@ main(int argc, char** argv)
       frame.AddSegmentationView(FileName, labels, dv::GetListOfColors());
     }
 
+  frame.AddTextView(std::to_string(i));
+
   Frames.push_back(frame);
 
   }
@@ -198,4 +202,5 @@ main(int argc, char** argv)
   }
 
   return EXIT_SUCCESS;
+
 }

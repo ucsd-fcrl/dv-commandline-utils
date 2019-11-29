@@ -8,6 +8,7 @@
 // Custom
 #include <dvMeshView.h>
 #include <dvSegmentationView.h>
+#include <dvTextView.h>
 
 namespace dv {
 
@@ -18,9 +19,15 @@ public:
 vtkRenderer* m_Renderer;
 std::vector<MeshView> m_MeshViews;
 std::vector<SegmentationView> m_SegmentationViews;
+std::vector<TextView> m_TextViews;
 
 VisualizeMeshesFrame(vtkRenderer* Renderer) {
   this->m_Renderer = Renderer;
+}
+
+void AddTextView(const std::string& text) {
+  auto tv = dv::TextView(text, this->m_Renderer);
+  this->m_TextViews.push_back(tv);
 }
 
 void AddMeshView(const std::string& FileName) {
@@ -44,6 +51,10 @@ void TurnAllActorsOn() {
   for (auto &mv : this->m_MeshViews) {
     mv.AddActor();
   }
+
+  for (auto &tv : this->m_TextViews) {
+    tv.AddActor();
+  }
 }
 
 void SetHue(const double hue) {
@@ -58,6 +69,19 @@ void SetHue(const double hue) {
 
 }
 
+void SetTextAnnotationsVisible(const bool &Visible) {
+
+  if (Visible) {
+    for (auto &tv : this->m_TextViews) {
+      tv.AddActor();
+    }
+  } else {
+    for (auto &tv : this->m_TextViews) {
+      tv.RemoveActor();
+    }
+  }
+}
+
 void TurnAllActorsOff() {
   for (auto &sv : this->m_SegmentationViews) {
     sv.RemoveAllActors();
@@ -65,6 +89,10 @@ void TurnAllActorsOff() {
 
   for (auto &mv : this->m_MeshViews) {
     mv.RemoveActor();
+  }
+
+  for (auto &tv : this->m_TextViews) {
+    tv.RemoveActor();
   }
 }
 
