@@ -7,6 +7,9 @@ find_package(Boost COMPONENTS program_options filesystem system REQUIRED)
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
 
+find_package(Ceres REQUIRED)
+include_directories(${CERES_INCLUDE_DIRS})
+
 find_package(VTK REQUIRED)
 if(${APPLE})
   find_package(Qt5 COMPONENTS
@@ -25,7 +28,8 @@ endif()
 ## Tests ##
 ###########
 
-set(EXNAMES "dvCameraStateTest"
+set(EXNAMES "dvAccelerationRegularizerTest"
+            "dvCameraStateTest"
             "dvStringOperationsTest"
             "dvVectorOperationsTest"
             "dvMathTest"
@@ -50,7 +54,7 @@ set(EXNAMES "dvCameraStateTest"
 
 foreach(EXNAME ${EXNAMES})
 
-  add_executable(${EXNAME} ${EXNAME}.cxx)
+  add_executable(${EXNAME} src/${EXNAME}.cxx)
   target_link_libraries(${EXNAME} dv-commandline-utils-lib ${ITK_LIBRARIES} ${VTK_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY})
   add_test(${EXNAME} ${EXNAME})
 

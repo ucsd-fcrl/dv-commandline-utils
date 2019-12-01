@@ -13,6 +13,10 @@ RUN apt-get update \
   git \
   vim \
   libeigen3-dev \
+  libgoogle-glog-dev \
+  libgflags-dev \
+  libsuitesparse-dev \
+  libceres-dev \
   cmake \
   cmake-curses-gui \
   coreutils \

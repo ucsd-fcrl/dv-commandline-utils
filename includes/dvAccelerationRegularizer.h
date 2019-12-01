@@ -4,6 +4,7 @@
 
 #include <ceres/ceres.h>
 #include <limits>
+#include <vnl/vnl_math.h>
 
 namespace dv {
 template<class TMovingMesh>
