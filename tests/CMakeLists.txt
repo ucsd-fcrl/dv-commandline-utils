@@ -29,7 +29,9 @@ endif()
 ###########
 
 set(EXNAMES "dvAccelerationRegularizerTest"
+            "dvGenerateInitialModelTest"
             "dvCameraStateTest"
+            "dvEdgeLengthRegularizerTest"
             "dvStringOperationsTest"
             "dvVectorOperationsTest"
             "dvMathTest"
