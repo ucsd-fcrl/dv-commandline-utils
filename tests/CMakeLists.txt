@@ -30,6 +30,7 @@ endif()
 
 set(EXNAMES "dvAccelerationRegularizerTest"
             "dvGenerateInitialModelTest"
+            "dvGetListOfColorsTest"
             "dvCameraStateTest"
             "dvEdgeLengthRegularizerTest"
             "dvStringOperationsTest"
