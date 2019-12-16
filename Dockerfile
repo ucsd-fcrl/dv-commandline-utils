@@ -12,6 +12,7 @@ RUN apt-get update \
   clang-format \
   git \
   vim \
+  unzip \
   libeigen3-dev \
   libgoogle-glog-dev \
   libgflags-dev \
@@ -32,9 +33,11 @@ RUN apt-get update \
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 # Build VTK
-RUN mkdir -p /Developer/VTK/bin \
+RUN mkdir -p /Developer/VTK/bin/ \
   && cd /Developer/VTK \
-  && git clone --depth 1 https://github.com/Kitware/VTK.git src \
+  && curl -L https://github.com/Kitware/VTK/archive/c2f38ba.zip --output ./archive.zip \
+  && unzip archive.zip \
+  && mv ./VTK*/ ./src/ \
   && cd /Developer/VTK/bin \
   && cmake ../src \
     -DCMAKE_CXX_STANDARD=14 \
@@ -51,7 +54,9 @@ RUN mkdir -p /Developer/VTK/bin \
 # Build ITK
 RUN mkdir -p /Developer/ITK/bin \
   && cd /Developer/ITK \
-  && git clone --depth 1 https://github.com/InsightSoftwareConsortium/ITK.git src \
+  && curl -L https://github.com/InsightSoftwareConsortium/ITK/archive/d5158e0.zip --output archive.zip \
+  && unzip archive.zip \
+  && mv ./ITK*/ ./src/ \
   && cd /Developer/ITK/bin \
   && cmake ../src \
     -DCMAKE_CXX_STANDARD=14 \
@@ -64,6 +69,7 @@ RUN mkdir -p /Developer/ITK/bin \
     -DModule_IOMeshSTL=ON \
     -DModule_SubdivisionQuadEdgeMeshFilter=ON \
     -DModule_ITKVtkGlue=ON \
+    -DModule_Cuberille=ON \
   && make -j$(nproc) \
   && make install \
   && cd /Developer \

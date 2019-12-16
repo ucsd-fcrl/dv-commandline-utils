@@ -8,7 +8,7 @@ namespace dv
 {
 
 std::vector<std::array<double, 3>>
-GetListOfColors()
+GetListOfColors(const bool normalize = true)
 {
 
   std::vector<std::array<double, 3>> colors;
@@ -48,13 +48,13 @@ GetListOfColors()
   colors.emplace_back(
     std::array<double, 3>{ 127.0, 127.0, 127.0 });
 
-  for (auto &color : colors)
-    {
-    for (auto &channel : color)
-      {
-      channel /= 255;
+  if (normalize) {
+    for (auto &color : colors) {
+      for (auto &channel : color) {
+        channel /= 255.0;
       }
     }
+  }
 
   return colors;
 }
