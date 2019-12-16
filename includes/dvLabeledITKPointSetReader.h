@@ -14,7 +14,7 @@ LabeledITKPointSetReader(const std::string&file_name) {
   std::ifstream file(file_name);
 
   typename TPointSet::PointType point;
-  unsigned char l;
+  size_t l;
   size_t i = 0;
 
   while (file >> point[0] >> point[1] >> point[2] >> l) {

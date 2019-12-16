@@ -57,6 +57,7 @@ set(EXNAMES "dvAccelerationRegularizerTest"
             "dvLabeledITKPointSetWriterTest"
             "dvLabeledITKPointSetReaderTest"
             "dvLabeledVTKPointSetReaderTest"
+            "dvLabeledITKPointSetToPointSetMapTest"
    )
 
 foreach(EXNAME ${EXNAMES})
