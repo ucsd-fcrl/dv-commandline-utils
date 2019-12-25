@@ -7,6 +7,7 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkLookupTable.h>
 
 using TMesh = itk::Mesh<float, 3>;
 using TSource = itk::RegularSphereMeshSource< TMesh >;
@@ -24,6 +25,7 @@ int main(int argc, char* argv[]) {
   const auto renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
   renderWindow->AddRenderer(renderer);
   const auto renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+
   renderWindowInteractor->SetRenderWindow(renderWindow);
   renderer->AddActor(actor);
   renderWindow->Render();
