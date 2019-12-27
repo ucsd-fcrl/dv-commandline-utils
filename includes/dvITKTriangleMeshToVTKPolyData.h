@@ -24,7 +24,11 @@ vtkSmartPointer<vtkPolyData> ITKTriangleMeshToVTKPolyData(typename TMesh::Pointe
     for (auto it = mesh->GetPoints()->Begin();
          it != mesh->GetPoints()->End();
          ++it) {
-      points->InsertNextPoint( it.Value()[0], it.Value()[1], it.Value()[2] );
+      points->InsertPoint(
+        it.Index(),
+        it.Value()[0],
+        it.Value()[1],
+        it.Value()[2] );
     }
     polydata->SetPoints(points);
   }
@@ -36,7 +40,7 @@ vtkSmartPointer<vtkPolyData> ITKTriangleMeshToVTKPolyData(typename TMesh::Pointe
     for (auto it = mesh->GetPointData()->Begin();
          it != mesh->GetPointData()->End();
          ++it) {
-      point_data->InsertNextValue(it.Value());    
+      point_data->InsertValue(it.Index(), it.Value());    
     }
     polydata->GetPointData()->SetScalars(point_data);
   }
@@ -44,6 +48,7 @@ vtkSmartPointer<vtkPolyData> ITKTriangleMeshToVTKPolyData(typename TMesh::Pointe
   // Cells
   if (nullptr != mesh->GetCells()) {
     const auto triangles = vtkSmartPointer<vtkCellArray>::New();
+    const auto cell_data = vtkSmartPointer<vtkFloatArray>::New();
     for (auto it = mesh->GetCells()->Begin();
          it != mesh->GetCells()->End();
          ++it) {
@@ -51,22 +56,17 @@ vtkSmartPointer<vtkPolyData> ITKTriangleMeshToVTKPolyData(typename TMesh::Pointe
       for (size_t i = 0; i < 3; ++i) {
         triangle->GetPointIds()->SetId(i, it.Value()->GetPointIds()[i]);
       }
-      triangles->InsertNextCell(triangle);
+      triangles->InsertNextCell( triangle );
+      // Cell Data
+      if (nullptr != mesh->GetCellData()) {
+          cell_data->InsertNextValue(
+            mesh->GetCellData()->ElementAt(it.Index()));    
+      }
     }
+    polydata->GetCellData()->SetScalars(cell_data);
     polydata->SetPolys(triangles);
   }
 
-  // Cell Data
-  if (nullptr != mesh->GetCellData() &&
-      (mesh->GetCellData()->Size() > 0)) {
-    const auto cell_data = vtkSmartPointer<vtkFloatArray>::New();
-    for (auto it = mesh->GetCellData()->Begin();
-         it != mesh->GetCellData()->End();
-         ++it) {
-      cell_data->InsertNextValue(it.Value());    
-    }
-    polydata->GetCellData()->SetScalars(cell_data);
-  }
 
   return polydata;
 }
