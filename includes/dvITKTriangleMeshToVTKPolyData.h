@@ -73,7 +73,6 @@ vtkSmartPointer<vtkPolyData> ITKTriangleMeshToVTKPolyData(typename TMesh::Pointe
     polydata->SetPolys(triangles);
   }
 
-
   return polydata;
 }
 

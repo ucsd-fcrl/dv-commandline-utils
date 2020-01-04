@@ -9,14 +9,10 @@
 #include <itkMesh.h>
 #include <itkImage.h>
 #include <itkImageFileReader.h>
-#include <itkBinaryThresholdImageFilter.h>
 #include <itkConstantPadImageFilter.h>
-#include <itkNearestNeighborInterpolateImageFunction.h>
 #include <itkPointSet.h>
 #include <itkMesh.h>
 #include <itkCuberilleImageToMeshFilter.h>
-#include <itkTriangleCell.h>
-#include <itkTriangleHelper.h>
 
 // Custom
 #include <dvLabeledITKPointSetWriter.h>
@@ -32,11 +28,8 @@ SegmentationToLabeledPointSet(const std::string& input_image, const std::string&
   using TPointSet = itk::PointSet<TCoordinate, Dimension>;
   using TReader = itk::ImageFileReader<TImage>;
   using TPad = itk::ConstantPadImageFilter<TImage, TImage>;
-  using TBinarize = itk::BinaryThresholdImageFilter< TImage, TImage >;
-  using TInterp = itk::NearestNeighborInterpolateImageFunction< TImage >;
   using TMesh = itk::Mesh<double, TImage::ImageDimension>;
   using TExtract = itk::CuberilleImageToMeshFilter< TImage, TMesh >;
-  using TTriangleHelper = itk::TriangleHelper< typename TMesh::PointType >;
 
   const auto reader = TReader::New();
   reader->SetFileName( input_image );
@@ -53,25 +46,15 @@ SegmentationToLabeledPointSet(const std::string& input_image, const std::string&
   pad->SetPadLowerBound(padding);
   pad->SetConstant(static_cast<TPixel>(0));
 
-  const auto binarize = TBinarize::New();
-  binarize->SetInput( pad->GetOutput() );
-  binarize->SetInsideValue( 1 );
-  binarize->SetOutsideValue( 0 );
-  binarize->SetLowerThreshold( 1 );
-
   const auto extract = TExtract::New();
-  extract->SetInput( binarize->GetOutput() );
+  extract->SetInput( pad->GetOutput() );
   extract->GenerateTriangleFacesOff();
   extract->ProjectVerticesToIsoSurfaceOff();
+  extract->SavePixelAsCellDataOn();
   extract->Update();
 
   const auto mesh = TMesh::New();
   mesh->Graft( extract->GetOutput() );
-
-  const auto interp = TInterp::New();
-  interp->SetInputImage( image );
-
-  const auto half_spacing = image->GetSpacing() * 0.5;
 
   const auto points = TPointSet::New();
 
@@ -87,20 +70,7 @@ SegmentationToLabeledPointSet(const std::string& input_image, const std::string&
       mesh->GetPoint(cell->GetPointIds()[2])
       );
 
-    auto normal = TTriangleHelper::ComputeNormal(
-      mesh->GetPoint(cell->GetPointIds()[0]),
-      mesh->GetPoint(cell->GetPointIds()[1]),
-      mesh->GetPoint(cell->GetPointIds()[2])
-    );
-
-    normal.Normalize();
-
-    for (size_t i = 0; i < 3; ++i) {
-      normal[i] *= half_spacing[i];
-    }
-
-    const auto resample = centroid + normal;
-    const auto label = interp->Evaluate( resample );
+    const auto label = mesh->GetCellData()->ElementAt( it.Index() );
 
     itkAssertOrThrowMacro(label != 0, "Label == 0");
 

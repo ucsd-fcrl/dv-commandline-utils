@@ -63,6 +63,9 @@ set(EXNAMES "dvAccelerationRegularizerTest"
             "dvAdditiveGaussianNoiseMeshFilterCellDataTest"
             "dvDelaunayConformingQuadEdgeMeshFilterCellDataTest"
             "dvDecimationQuadEdgeMeshFilterCellDataTest"
+            "dvCuberilleQuadEdgeMeshTest"
+            "dvPolyDataWriterCellDataTest"
+            "dvVTKPolyDataToITKTriangleMeshTest"
    )
 
 foreach(EXNAME ${EXNAMES})

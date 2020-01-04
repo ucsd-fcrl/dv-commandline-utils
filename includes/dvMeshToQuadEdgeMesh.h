@@ -16,30 +16,31 @@ MeshToQuadEdgeMesh(TMesh* input, TQEMesh* output)
     output->SetPoint(it->Index(), it->Value());
   }
 
-  // Point Data
-  for (auto it = input->GetPointData()->Begin();
-       it != input->GetPointData()->End();
-       ++it) {
-    output->SetPointData(it->Index(), it->Value());
-  }
+//  // Point Data
+//  for (auto it = input->GetPointData()->Begin();
+//       it != input->GetPointData()->End();
+//       ++it) {
+//    output->SetPointData(it->Index(), it->Value());
+//  }
 
   // Cells
-  for (auto it = input->GetCells()->Begin(); it != input->GetCells()->End();
-       ++it) {
+  for (auto it = input->GetCells()->Begin(); it != input->GetCells()->End(); ++it) {
     const auto N = it->Value()->GetNumberOfPoints();
     std::vector<size_t> pt_ids;
     for (size_t i = 0; i < N; ++i) {
       pt_ids.push_back(it->Value()->GetPointIds()[i]);
     }
     output->AddFace(pt_ids);
+    output->SetCellData(it->Index(), input->GetCellData()->ElementAt(it->Index()));
   }
 
-  // Cell Data
-  for (auto it = input->GetCellData()->Begin();
-       it != input->GetCellData()->End();
-       ++it) {
-    output->SetPointData(it->Index(), it->Value());
-  }
+//  output->SetCellData( input->GetCellData()->CastToSTLContainer() );
+//  // Cell Data
+//  for (auto it = input->GetCellData()->Begin();
+//       it != input->GetCellData()->End();
+//       ++it) {
+//    output->SetCellData(it->Index(), it->Value());
+//  }
 }
 
 }
