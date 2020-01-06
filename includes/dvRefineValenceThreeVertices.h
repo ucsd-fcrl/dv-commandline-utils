@@ -42,6 +42,7 @@ RefineValenceThreeVertices(typename TMesh::Pointer mesh) {
       const auto delete_vertex = TDeleteVertex::New();
       delete_vertex->SetInput( mesh );
       const auto new_qe = delete_vertex->Evaluate( qe );
+      mesh->DeletePoint(delete_vertex->GetOldPointID());
 
 
 
