@@ -89,9 +89,9 @@ GenerateInitialModel(const std::string& inputMeshName,
   qemesh2->Graft(delaunay->GetOutput());
   qemesh2->DisconnectPipeline();
 
-  while (dv::MeshIncludesValenceThreeVertices<TQEMesh>(qemesh2)) {
-    dv::RefineValenceThreeVertices<TQEMesh>(qemesh2);
-  }
+//  while (dv::MeshIncludesValenceThreeVertices<TQEMesh>(qemesh2)) {
+//    dv::RefineValenceThreeVertices<TQEMesh>(qemesh2);
+//  }
 
   const auto loop = TLoop::New();
   loop->SetInput(qemesh2);

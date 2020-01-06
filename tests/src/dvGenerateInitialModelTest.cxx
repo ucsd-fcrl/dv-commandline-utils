@@ -98,9 +98,9 @@ int main() {
   const auto mesh = TMesh::New();
   mesh->Graft( loop->GetOutput() );
 
-  if (dv::MeshIncludesValenceThreeVertices<TMesh>( mesh )) {
-    throw 0;
-  }
+//  if (dv::MeshIncludesValenceThreeVertices<TMesh>( mesh )) {
+//    throw 0;
+//  }
 
   // Visualize
   const auto polydata = dv::ITKTriangleMeshToVTKPolyData<TMesh>( mesh );
