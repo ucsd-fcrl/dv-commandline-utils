@@ -46,11 +46,13 @@ RefineValenceThreeVertices(typename TMesh::Pointer mesh) {
 
 
 
-      const auto cell_data = mesh->GetCellData()->ElementAt(qe->GetLeft());
-      for (const auto &id : deleted_cell_ids) {
-        mesh->GetCellData()->DeleteIndex(id);
+      if (nullptr != mesh->GetCellData()) {
+        const auto cell_data = mesh->GetCellData()->ElementAt(deleted_cell_ids.front());
+        for (const auto &id : deleted_cell_ids) {
+          mesh->GetCellData()->DeleteIndex(id);
+        }
+        mesh->SetCellData( new_qe->GetLeft(), cell_data );
       }
-      mesh->SetCellData( new_qe->GetLeft(), cell_data );
 
 
 
