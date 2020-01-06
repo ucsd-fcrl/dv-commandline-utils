@@ -31,16 +31,19 @@ int main(int argc, char** argv) {
 
   dv::AssignCellDataByOctant< TMesh >( mesh );
 
+  itkAssertOrThrowMacro(
+    mesh->GetNumberOfCells() == mesh->GetCellData()->Size(),
+    "Cell Data Mismatch");
+
   const auto i_polydata = dv::ITKTriangleMeshToVTKPolyData<TMesh>( mesh );
 
   dv::RefineValenceThreeVertices< TMesh >( mesh );
+  mesh->SqueezePointsIds();
+  mesh->DisconnectPipeline();
 
-  std::cout << mesh->GetNumberOfCells() << std::endl;
-  std::cout << mesh->GetCellData()->Size() << std::endl;
-
-//  for (auto it = mesh->GetCells()->Begin(); it != mesh->GetCells()->End(); ++it) {
-//    
-//  }
+  itkAssertOrThrowMacro(
+    mesh->GetNumberOfCells() == mesh->GetCellData()->Size(),
+    "Cell Data Mismatch");
 
   const auto o_polydata = dv::ITKTriangleMeshToVTKPolyData<TMesh>( mesh );
 
