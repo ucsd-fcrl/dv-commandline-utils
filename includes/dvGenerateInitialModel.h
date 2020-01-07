@@ -1,76 +1,74 @@
 #ifndef dv_GenerateInitialModel_h
 #define dv_GenerateInitialModel_h
 
-// STD
-#include <string>
-
 // ITK
-#include <itkAdditiveGaussianNoiseQuadEdgeMeshFilter.h>
-#include <itkConnectedRegionsMeshFilter.h>
-#include <itkDefaultDynamicMeshTraits.h>
-#include <itkDelaunayConformingQuadEdgeMeshFilter.h>
-#include <itkLoopTriangleCellSubdivisionQuadEdgeMeshFilter.h>
-#include <itkMesh.h>
-#include <itkMeshFileReader.h>
-#include <itkMeshFileWriter.h>
+#include <itkImageFileReader.h>
+#include <itkConstantPadImageFilter.h>
+#include <itkCuberilleImageToMeshFilter.h>
 #include <itkQuadEdgeMesh.h>
+#include <itkAdditiveGaussianNoiseQuadEdgeMeshFilter.h>
 #include <itkQuadEdgeMeshDecimationCriteria.h>
 #include <itkSquaredEdgeLengthDecimationQuadEdgeMeshFilter.h>
+#include <itkDelaunayConformingQuadEdgeMeshFilter.h>
+#include <itkLoopTriangleCellSubdivisionQuadEdgeMeshFilter.h>
 
-// DV
-#include <dvDeleteIsolatedPoints.h>
-#include <dvMeshToQuadEdgeMesh.h>
+// VTK
+#include <vtkPolyDataWriter.h>
+
+// Custom
+#include <dvITKTriangleMeshToVTKPolyData.h>
 #include <dvRefineValenceThreeVertices.h>
-#include <dvSqueezePointsIds.h>
 
 namespace dv {
 
 void
-GenerateInitialModel(const std::string& inputMeshName,
+GenerateInitialModel(const std::string& inputSegmentationName,
                      const std::string& outputMeshName,
                      const unsigned int& count,
                      const double& sigma)
 {
 
+  using TPixel = unsigned char;
   const unsigned int Dimension = 3;
   using TCoordinate = float;
+  using TMesh = itk::QuadEdgeMesh<TCoordinate, Dimension>;
 
-  using TMeshTraits = itk::DefaultDynamicMeshTraits<TCoordinate>;
-  using TMesh = itk::Mesh<TCoordinate, Dimension, TMeshTraits>;
-  using TReader = itk::MeshFileReader<TMesh>;
+  using TImage = itk::Image<TPixel, Dimension>;
+  using TReader = itk::ImageFileReader<TImage>;
+  using TPad = itk::ConstantPadImageFilter<TImage, TImage>;
+  using TExtract = itk::CuberilleImageToMeshFilter< TImage, TMesh >;
 
-  using TQEMesh = itk::QuadEdgeMesh<TCoordinate, Dimension>;
-  using TQEWriter = itk::MeshFileWriter<TQEMesh>;
-
-  using TConnected = itk::ConnectedRegionsMeshFilter<TMesh, TMesh>;
-  using TNoise = itk::AdditiveGaussianNoiseQuadEdgeMeshFilter<TQEMesh>;
-  using TCriterion = itk::NumberOfFacesCriterion<TQEMesh>;
+  using TNoise = itk::AdditiveGaussianNoiseQuadEdgeMeshFilter<TMesh>;
+  using TCriterion = itk::NumberOfFacesCriterion<TMesh>;
   using TDecimation = itk::
-    SquaredEdgeLengthDecimationQuadEdgeMeshFilter<TQEMesh, TQEMesh, TCriterion>;
+    SquaredEdgeLengthDecimationQuadEdgeMeshFilter<TMesh, TMesh, TCriterion>;
+  using TDelaunay = itk::DelaunayConformingQuadEdgeMeshFilter<TMesh>;
   using TLoop =
-    itk::LoopTriangleCellSubdivisionQuadEdgeMeshFilter<TQEMesh, TQEMesh>;
-  using TDelaunay = itk::DelaunayConformingQuadEdgeMeshFilter<TQEMesh>;
+    itk::LoopTriangleCellSubdivisionQuadEdgeMeshFilter<TMesh, TMesh>;
 
   const auto reader = TReader::New();
-  reader->SetFileName(inputMeshName);
+  reader->SetFileName( inputSegmentationName );
+  reader->Update();
 
-  const auto connected = TConnected::New();
-  connected->SetInput(reader->GetOutput());
-  connected->SetExtractionModeToLargestRegion();
-  connected->Update();
+  const auto image = TImage::New();
+  image->Graft( reader->GetOutput() );
+  typename TImage::SizeType padding;
+  padding.Fill(1);
 
-  const auto mesh = TMesh::New();
-  mesh->Graft(connected->GetOutput());
-  mesh->DisconnectPipeline();
+  const auto pad = TPad::New();
+  pad->SetInput(image);
+  pad->SetPadUpperBound(padding);
+  pad->SetPadLowerBound(padding);
+  pad->SetConstant(static_cast<TPixel>(0));
 
-  dv::DeleteIsolatedPoints<TMesh>(mesh);
-  dv::SqueezePointsIds<TMesh>(mesh);
-
-  const auto qemesh = TQEMesh::New();
-  dv::MeshToQuadEdgeMesh<TMesh, TQEMesh>(mesh, qemesh);
+  const auto extract = TExtract::New();
+  extract->SetInput( pad->GetOutput() );
+  extract->GenerateTriangleFacesOn();
+  extract->ProjectVerticesToIsoSurfaceOff();
+  extract->SavePixelAsCellDataOn();
 
   const auto noise = TNoise::New();
-  noise->SetInput(qemesh);
+  noise->SetInput( extract->GetOutput() );
   noise->SetSigma(sigma);
 
   const auto criterion = TCriterion::New();
@@ -85,20 +83,21 @@ GenerateInitialModel(const std::string& inputMeshName,
   delaunay->SetInput(decimate->GetOutput());
   delaunay->Update();
 
-  const auto qemesh2 = TQEMesh::New();
-  qemesh2->Graft(delaunay->GetOutput());
-  qemesh2->DisconnectPipeline();
+  const auto mesh = TMesh::New();
+  mesh->Graft( delaunay->GetOutput() );
+  mesh->DisconnectPipeline();
 
-//  while (dv::MeshIncludesValenceThreeVertices<TQEMesh>(qemesh2)) {
-//    dv::RefineValenceThreeVertices<TQEMesh>(qemesh2);
-//  }
+  dv::RefineValenceThreeVertices< TMesh >( mesh );
 
   const auto loop = TLoop::New();
-  loop->SetInput(qemesh2);
+  loop->SetInput( mesh );
+  loop->Update();
 
-  const auto writer = TQEWriter::New();
-  writer->SetInput(loop->GetOutput());
-  writer->SetFileName(outputMeshName);
+  const auto poly_data = dv::ITKTriangleMeshToVTKPolyData< TMesh >( loop->GetOutput() );
+
+  const auto writer = vtkSmartPointer< vtkPolyDataWriter >::New();
+  writer->SetInputData( poly_data );
+  writer->SetFileName(outputMeshName.c_str());
   writer->Update();
 }
 
