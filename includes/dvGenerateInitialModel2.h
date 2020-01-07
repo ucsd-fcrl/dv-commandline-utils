@@ -17,6 +17,7 @@
 
 // Custom
 #include <dvITKTriangleMeshToVTKPolyData.h>
+#include <dvRefineValenceThreeVertices.h>
 
 namespace dv {
 
@@ -80,9 +81,16 @@ GenerateInitialModel2(const std::string& inputSegmentationName,
 
   const auto delaunay = TDelaunay::New();
   delaunay->SetInput(decimate->GetOutput());
+  delaunay->Update();
+
+  const auto mesh = TMesh::New();
+  mesh->Graft( delaunay->GetOutput() );
+  mesh->DisconnectPipeline();
+
+  dv::RefineValenceThreeVertices< TMesh >( mesh );
 
   const auto loop = TLoop::New();
-  loop->SetInput( delaunay->GetOutput() );
+  loop->SetInput( mesh );
   loop->Update();
 
   const auto poly_data = dv::ITKTriangleMeshToVTKPolyData< TMesh >( loop->GetOutput() );
