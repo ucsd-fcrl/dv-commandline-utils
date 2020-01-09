@@ -4,6 +4,9 @@
 #include <itkQuadEdgeMesh.h>
 #include <itkQuadEdgeMeshEulerOperatorDeleteCenterVertexFunction.h>
 
+// TODO: Deleting cell data should be integrated into the EulerOperator
+// and merged into the master ITK branch
+
 namespace dv {
 
 template<typename TMesh>
@@ -62,6 +65,8 @@ RefineValenceThreeVertices(typename TMesh::Pointer mesh) {
       break;
     }
   } while (vertex_was_deleted);
+
+  mesh->SqueezePointsIds();
 
 }
 

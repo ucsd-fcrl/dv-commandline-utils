@@ -42,7 +42,7 @@ GenerateInitialModel(const std::string& inputSegmentationName,
   using TCriterion = itk::NumberOfFacesCriterion<TMesh>;
   using TDecimation = itk::
     SquaredEdgeLengthDecimationQuadEdgeMeshFilter<TMesh, TMesh, TCriterion>;
-  using TDelaunay = itk::DelaunayConformingQuadEdgeMeshFilter<TMesh>;
+//  using TDelaunay = itk::DelaunayConformingQuadEdgeMeshFilter<TMesh>;
   using TLoop =
     itk::LoopTriangleCellSubdivisionQuadEdgeMeshFilter<TMesh, TMesh>;
 
@@ -78,15 +78,18 @@ GenerateInitialModel(const std::string& inputSegmentationName,
 
   decimate->SetInput(noise->GetOutput());
   decimate->SetCriterion(criterion);
-
-  const auto delaunay = TDelaunay::New();
-  delaunay->SetInput(decimate->GetOutput());
-  delaunay->Update();
+  decimate->Update();
 
   const auto mesh = TMesh::New();
-  mesh->Graft( delaunay->GetOutput() );
+  mesh->Graft( decimate->GetOutput() );
   mesh->DisconnectPipeline();
 
+  // FIXME: Delaunay triangulation segfaults with certain parameters
+//  const auto delaunay = TDelaunay::New();
+//  delaunay->SetInput( decimate->GetOutput() );
+//  delaunay->Update();
+
+  // TODO: Refactor into proper itk::MeshToMeshFilter
   dv::RefineValenceThreeVertices< TMesh >( mesh );
 
   const auto loop = TLoop::New();
