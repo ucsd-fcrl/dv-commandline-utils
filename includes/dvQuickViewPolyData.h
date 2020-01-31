@@ -21,7 +21,7 @@ QuickViewPolyData(vtkPolyData* polydata) {
   const auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   mapper->SetInputData(polydata);
 
-  const auto lut = dv::GetLookupTable();
+  const auto lut = dv::LUT::Rainbow();
 
   mapper->SetScalarRange(0, 8);
   mapper->SetLookupTable(lut);

@@ -28,7 +28,7 @@ QuickViewSideBySidePolyData(vtkPolyData* i_polydata, vtkPolyData* o_polydata) {
   const auto o_actor = vtkSmartPointer<vtkActor>::New();
   o_actor->SetMapper(o_mapper);
 
-  const auto lut = dv::GetLookupTable();
+  const auto lut = dv::LUT::Rainbow();
 
   i_mapper->SetScalarRange(0, 8);
   i_mapper->SetLookupTable(lut);

@@ -4,10 +4,18 @@
 #include <vtkLookupTable.h>
 #include <vtkSmartPointer.h>
 
-namespace dv
-{
+namespace dv {
+
+namespace LUT {
+
 vtkSmartPointer<vtkLookupTable>
-GetLookupTable();
-}
+Rainbow();
+
+vtkSmartPointer<vtkLookupTable>
+SQUEEZ();
+
+} // end namespace LUT
+
+} // end namespace dv
 
 #endif
