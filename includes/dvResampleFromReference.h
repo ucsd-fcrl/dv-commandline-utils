@@ -12,9 +12,33 @@
 #include <itkNearestNeighborInterpolateImageFunction.h>
 #include <itkLabelImageGenericInterpolateImageFunction.h>
 
-template<class TImage,typename TCoordRep> class ReducedBSplineInterpolateImageFunction : public itk::BSplineInterpolateImageFunction<TImage,TCoordRep> {};
-
 namespace dv {
+
+template<class TImage,typename TCoordRep, unsigned int SplineOrder> class BSplineInterpolator : public itk::BSplineInterpolateImageFunction<TImage,TCoordRep> {
+  public:
+  /** Standard class type aliases. */
+  using Self = BSplineInterpolator;
+  using Superclass =
+    itk::BSplineInterpolateImageFunction<TImage,TCoordRep>;
+  using Pointer = itk::SmartPointer<Self>;
+  using ConstPointer = itk::SmartPointer<const Self>;
+
+  /** Method for creation through the object factory. */
+  itkNewMacro(Self);
+
+  /** Run-time type information (and related methods). */
+  itkTypeMacro(Self, Superclass);
+
+  BSplineInterpolator() {
+    this->SetSplineOrder( SplineOrder );
+  }
+
+};
+
+template<class TImage, typename TCoordRep> class BSplineInterpolator2 : public BSplineInterpolator<TImage, TCoordRep, 2>{};
+template<class TImage, typename TCoordRep> class BSplineInterpolator3 : public BSplineInterpolator<TImage, TCoordRep, 3>{};
+template<class TImage, typename TCoordRep> class BSplineInterpolator4 : public BSplineInterpolator<TImage, TCoordRep, 4>{};
+template<class TImage, typename TCoordRep> class BSplineInterpolator5 : public BSplineInterpolator<TImage, TCoordRep, 5>{};
 
 template<unsigned int Dimension, typename TPixel>
 void
@@ -45,8 +69,14 @@ ResampleFromReference(const std::string IImage,
     itk::LabelImageGenericInterpolateImageFunction<TImage,itk::NearestNeighborInterpolateImageFunction>;
   using GLNInterpolateType =
     itk::LabelImageGenericInterpolateImageFunction<TImage,itk::LinearInterpolateImageFunction>;
-  using GBSInterpolateType =
-    itk::LabelImageGenericInterpolateImageFunction<TImage,ReducedBSplineInterpolateImageFunction>;
+  using GBSInterpolateType2 =
+    itk::LabelImageGenericInterpolateImageFunction<TImage,BSplineInterpolator2>;
+  using GBSInterpolateType3 =
+    itk::LabelImageGenericInterpolateImageFunction<TImage,BSplineInterpolator3>;
+  using GBSInterpolateType4 =
+    itk::LabelImageGenericInterpolateImageFunction<TImage,BSplineInterpolator4>;
+  using GBSInterpolateType5 =
+    itk::LabelImageGenericInterpolateImageFunction<TImage,BSplineInterpolator5>;
 
   const auto iReader = TReader::New();
   const auto rReader = TReader::New();
@@ -124,18 +154,52 @@ ResampleFromReference(const std::string IImage,
       }
       break;
     }
-    default: {
+    case 2: {
       if (voting) {
-        const auto interp = GBSInterpolateType::New();
-// TODO: Setting spline order is not currently supported.
-// https://discourse.itk.org/t/labelimagegenericinterpolateimagefunction-and-bsplineinterpolateimagefunction/2668
-//        interp->SetSplineOrder(interpolator);
+        const auto interp = GBSInterpolateType2::New();
         resample->SetInterpolator(interp);
       } else {
         const auto interp = BSInterpolateType::New();
         interp->SetSplineOrder(interpolator);
         resample->SetInterpolator(interp);
       }
+      break;
+    }
+    case 3: {
+      if (voting) {
+        const auto interp = GBSInterpolateType3::New();
+        resample->SetInterpolator(interp);
+      } else {
+        const auto interp = BSInterpolateType::New();
+        interp->SetSplineOrder(interpolator);
+        resample->SetInterpolator(interp);
+      }
+      break;
+    }
+    case 4: {
+      if (voting) {
+        const auto interp = GBSInterpolateType4::New();
+        resample->SetInterpolator(interp);
+      } else {
+        const auto interp = BSInterpolateType::New();
+        interp->SetSplineOrder(interpolator);
+        resample->SetInterpolator(interp);
+      }
+      break;
+    }
+    case 5: {
+      if (voting) {
+        const auto interp = GBSInterpolateType5::New();
+        resample->SetInterpolator(interp);
+      } else {
+        const auto interp = BSInterpolateType::New();
+        interp->SetSplineOrder(interpolator);
+        resample->SetInterpolator(interp);
+      }
+      break;
+    }
+    default: {
+      itkAssertOrThrowMacro(false, "This interpolator is not supported.");
       break;
     }
   }
