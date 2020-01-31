@@ -10,6 +10,9 @@
 #include <itkBSplineInterpolateImageFunction.h>
 #include <itkLinearInterpolateImageFunction.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
+#include <itkLabelImageGenericInterpolateImageFunction.h>
+
+template<class TImage,typename TCoordRep> class ReducedBSplineInterpolateImageFunction : public itk::BSplineInterpolateImageFunction<TImage,TCoordRep> {};
 
 namespace dv {
 
@@ -23,7 +26,8 @@ ResampleFromReference(const std::string IImage,
                       const unsigned int OutputSize,
                       const bool OutputSpacingExists,
                       const double OutputSpacing,
-                      const unsigned int& interpolator)
+                      const unsigned int& interpolator,
+                      const bool voting)
 {
 
   using TImage = itk::Image<TPixel, Dimension>;
@@ -37,9 +41,17 @@ ResampleFromReference(const std::string IImage,
   using LNInterpolateType = itk::LinearInterpolateImageFunction<TImage>;
   using BSInterpolateType = itk::BSplineInterpolateImageFunction<TImage>;
 
+  using GNNInterpolateType =
+    itk::LabelImageGenericInterpolateImageFunction<TImage,itk::NearestNeighborInterpolateImageFunction>;
+  using GLNInterpolateType =
+    itk::LabelImageGenericInterpolateImageFunction<TImage,itk::LinearInterpolateImageFunction>;
+  using GBSInterpolateType =
+    itk::LabelImageGenericInterpolateImageFunction<TImage,ReducedBSplineInterpolateImageFunction>;
+
   const auto iReader = TReader::New();
   const auto rReader = TReader::New();
   iReader->SetFileName(IImage);
+  iReader->Update();
   rReader->SetFileName(RImage);
   rReader->Update();
 
@@ -93,19 +105,37 @@ ResampleFromReference(const std::string IImage,
   resample->SetOutputDirection(ReferenceDirection);
   switch (interpolator) {
     case 0: {
-      const auto interp = NNInterpolateType::New();
-      resample->SetInterpolator(interp);
+      if (voting) {
+        const auto interp = GNNInterpolateType::New();
+        resample->SetInterpolator(interp);
+      } else {
+        const auto interp = NNInterpolateType::New();
+        resample->SetInterpolator(interp);
+      }
       break;
     }
     case 1: {
-      const auto interp = LNInterpolateType::New();
-      resample->SetInterpolator(interp);
+      if (voting) {
+        const auto interp = GLNInterpolateType::New();
+        resample->SetInterpolator(interp);
+      } else {
+        const auto interp = LNInterpolateType::New();
+        resample->SetInterpolator(interp);
+      }
       break;
     }
     default: {
-      const auto interp = BSInterpolateType::New();
-      interp->SetSplineOrder(interpolator);
-      resample->SetInterpolator(interp);
+      if (voting) {
+        const auto interp = GBSInterpolateType::New();
+// TODO: Setting spline order is not currently supported.
+// https://discourse.itk.org/t/labelimagegenericinterpolateimagefunction-and-bsplineinterpolateimagefunction/2668
+//        interp->SetSplineOrder(interpolator);
+        resample->SetInterpolator(interp);
+      } else {
+        const auto interp = BSInterpolateType::New();
+        interp->SetSplineOrder(interpolator);
+        resample->SetInterpolator(interp);
+      }
       break;
     }
   }

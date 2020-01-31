@@ -70,6 +70,7 @@ RUN mkdir -p /Developer/ITK/bin \
     -DModule_SubdivisionQuadEdgeMeshFilter=ON \
     -DModule_ITKVtkGlue=ON \
     -DModule_Cuberille=ON \
+    -DModule_GenericLabelInterpolator=ON \
   && make -j$(nproc) \
   && make install \
   && cd /Developer \
