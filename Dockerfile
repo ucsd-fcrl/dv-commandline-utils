@@ -64,13 +64,14 @@ RUN mkdir -p /Developer/VTK/bin/ \
 # Build ITK
 RUN mkdir -p /Developer/ITK/bin \
   && cd /Developer/ITK \
-  && curl -L https://github.com/InsightSoftwareConsortium/ITK/archive/305fc7.zip --output archive.zip \
+  && curl -L https://github.com/InsightSoftwareConsortium/ITK/archive/33f8089.zip --output archive.zip \
   && unzip archive.zip \
   && mv ./ITK*/ ./src/ \
   && cd /Developer/ITK/bin \
   && cmake ../src \
     -DCMAKE_CXX_STANDARD=14 \
     -DCMAKE_CXX_FLAGS=-std=c++14 \
+    -DITK_MINIMUM_COMPLIANCE_LEVEL=2 \
     -DBUILD_TESTING=OFF \
     -DBUILD_EXAMPLES=OFF \
     -DBUILD_SHARED_LIBS=OFF \
