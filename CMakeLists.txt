@@ -52,7 +52,27 @@ else()
                X11Extras)
 endif()
 
-find_package(ITK REQUIRED)
+find_package(ITK COMPONENTS
+  ITKCommon
+  ITKIOGDCM
+  ITKIOImageBase
+  ITKIOMeshBase
+  ITKImageFusion
+  ITKImageGrid
+  ITKLabelMap
+  ITKMesh
+  ITKQuadEdgeMesh
+  ITKQuadEdgeMeshFiltering
+  ITKRegistrationCommon
+  ITKTransform
+  MeshNoise
+  SubdivisionQuadEdgeMeshFilter
+  ITKImageIO
+  ITKMeshIO
+  ITKVtkGlue
+  Cuberille REQUIRED
+)
+
 include(${ITK_USE_FILE})
 
 find_package(Boost COMPONENTS program_options filesystem system REQUIRED)
@@ -156,8 +176,8 @@ set(EXNAME "dv-visualize-meshes")
 add_executable(${EXNAME} utils/${EXNAME}.cxx)
 target_link_libraries(${EXNAME}
                       dv-commandline-utils-lib
-                      ${VTK_LIBRARIES}
                       ${ITK_LIBRARIES}
+                      ${VTK_LIBRARIES}
                       ${Boost_PROGRAM_OPTIONS_LIBRARY}
                       ${Boost_FILESYSTEM_LIBRARY}
                       ${Boost_SYSTEM_LIBRARY}

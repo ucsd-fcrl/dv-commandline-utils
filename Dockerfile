@@ -32,6 +32,16 @@ RUN apt-get update \
 
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
+# Build Boost
+RUN mkdir -p /Developer/boost \
+  && cd /Developer/boost \
+  && curl -L https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.gz -o ./boost.tar.gz \
+  && tar -xvzf ./boost.tar.gz -C ./ --strip-components=1 \
+  && ./bootstrap.sh \
+  && ./b2 link=static --with-program_options --with-filesystem install --with-system \
+  && cd /Developer \
+  && rm -rf ./boost
+
 # Build VTK
 RUN mkdir -p /Developer/VTK/bin/ \
   && cd /Developer/VTK \
@@ -54,7 +64,7 @@ RUN mkdir -p /Developer/VTK/bin/ \
 # Build ITK
 RUN mkdir -p /Developer/ITK/bin \
   && cd /Developer/ITK \
-  && curl -L https://github.com/InsightSoftwareConsortium/ITK/archive/d5158e0.zip --output archive.zip \
+  && curl -L https://github.com/InsightSoftwareConsortium/ITK/archive/305fc7.zip --output archive.zip \
   && unzip archive.zip \
   && mv ./ITK*/ ./src/ \
   && cd /Developer/ITK/bin \
@@ -75,16 +85,6 @@ RUN mkdir -p /Developer/ITK/bin \
   && make install \
   && cd /Developer \
   && rm -rf ./ITK
-
-# Build Boost
-RUN mkdir -p /Developer/boost \
-  && cd /Developer/boost \
-  && curl -L https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.gz -o ./boost.tar.gz \
-  && tar -xvzf ./boost.tar.gz -C ./ --strip-components=1 \
-  && ./bootstrap.sh \
-  && ./b2 link=static --with-program_options --with-filesystem install --with-system \
-  && cd /Developer \
-  && rm -rf ./boost
 
 # Add the source for this repository
 ADD . /code/src/
