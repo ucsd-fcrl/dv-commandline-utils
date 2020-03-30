@@ -100,3 +100,5 @@ RUN mkdir -p /code/bin \
     -DBoost_USE_STATIC_LIBS=ON \
     -DBUILD_SHARED_LIBS=OFF \
   && make -j$(nproc)
+
+ENV PATH="/code/bin:${PATH}"
