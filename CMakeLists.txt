@@ -29,9 +29,8 @@ include(DVPreventInBuildInstalls)
 ## Options ##
 #############
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra" CACHE STRING "cxx debug compiler flags" FORCE)
+set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -O0 -fprofile-arcs -ftest-coverage" CACHE STRING "cxx debug compiler flags" FORCE)
+set(CMAKE_C_FLAGS_DEBUG "-g -Wall -Wextra -O0 -fprofile-arcs -ftest-coverage" CACHE STRING "cxx debug compiler flags" FORCE)
 
 ################################
 ## Utilities Depending on ITK ##
@@ -53,36 +52,47 @@ else()
 endif()
 
 find_package(ITK COMPONENTS
+  ITKAnisotropicSmoothing
+  ITKBinaryMathematicalMorphology
   ITKCommon
-  ITKIOGDCM
+  ITKConnectedComponents
   ITKIOImageBase
   ITKIOMeshBase
+  ITKIOXML
+  ITKImageCompose
+  ITKImageFunction
   ITKImageFusion
   ITKImageGrid
+  ITKImageIntensity
+  ITKImageStatistics
   ITKLabelMap
+  ITKMathematicalMorphology
   ITKMesh
   ITKQuadEdgeMesh
   ITKQuadEdgeMeshFiltering
-  ITKRegistrationCommon
+  ITKReview
+  ITKThresholding
   ITKTransform
-  MeshNoise
-  SubdivisionQuadEdgeMeshFilter
+  ITKVtkGlue
   ITKImageIO
   ITKMeshIO
-  ITKVtkGlue
-  Cuberille REQUIRED
+  Cuberille
+  MeshNoise
+  GenericLabelInterpolator
+  SubdivisionQuadEdgeMeshFilter REQUIRED
 )
 
 include(${ITK_USE_FILE})
 
 find_package(Boost COMPONENTS program_options filesystem system REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
 
 find_package(RapidJSON REQUIRED)
-include_directories(
-    "includes/"
-    ${Boost_INCLUDE_DIRS}
-    ${RapidJSON_INCLUDE_DIRS}
-    )
+include_directories(${RapidJSON_INCLUDE_DIRS})
+
+find_package(Ceres REQUIRED)
+
+include_directories("includes/")
 
 ##############################
 ## dv-commandline-utils-lib ##
@@ -92,8 +102,7 @@ file(GLOB SRC src/*.cxx)
 add_library(dv-commandline-utils-lib ${SRC})
 target_link_libraries(dv-commandline-utils-lib ${VTK_LIBRARIES})
 
-set(EXNAMES "dv-convert-dicom-series-to-volume"
-            "dv-convert-mesh"
+set(EXNAMES "dv-convert-mesh"
             "dv-scale-mesh"
             "dv-translate-mesh"
             "dv-binarize-mesh"
@@ -136,7 +145,6 @@ set(EXNAMES "dv-label-geometry"
             "dv-segmentation-error"
             "dv-change-labels"
             "dv-extract-orthogonal-slice"
-            "dv-read-dicom-tag"
             "dv-tile-images"
             "dv-window-image"
             "dv-overlay-labels"
@@ -187,29 +195,6 @@ vtk_module_autoinit(
   TARGETS dv-visualize-meshes
   MODULES ${VTK_LIBRARIES}
   )
-
-##
-## Utilities depending upon CPD
-##
-
-option(BUILD_CPD_UTILS "Build utilities depending upon CPD." OFF)
-
-if(${BUILD_CPD_UTILS})
-
-  find_package(Cpd REQUIRED)
-
-  set(EXNAME "dv-nonrigid-cpd")
-  add_executable(${EXNAME} utils/${EXNAME}.cxx)
-  target_link_libraries(${EXNAME}
-                        dv-commandline-utils-lib
-                        Cpd::Library-C++
-                        ${ITK_LIBRARIES}
-                        ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                        ${Boost_FILESYSTEM_LIBRARY}
-                        ${Boost_SYSTEM_LIBRARY}
-                       )
-
-endif()
 
 #############
 ## Testing ##

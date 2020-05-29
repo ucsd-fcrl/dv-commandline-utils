@@ -73,7 +73,7 @@ set(EXNAMES "dvAccelerationRegularizerTest"
 foreach(EXNAME ${EXNAMES})
 
   add_executable(${EXNAME} src/${EXNAME}.cxx)
-  target_link_libraries(${EXNAME} dv-commandline-utils-lib ${ITK_LIBRARIES} ${VTK_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY})
+  target_link_libraries(${EXNAME} dv-commandline-utils-lib ${ITK_LIBRARIES} ${VTK_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY} ${CERES_LIBRARIES})
   add_test(NAME ${EXNAME} COMMAND ${EXNAME} ${CMAKE_SOURCE_DIR}/tests/testdata/)
 
   vtk_module_autoinit(

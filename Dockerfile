@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -35,7 +35,7 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh
 # Build Boost
 RUN mkdir -p /Developer/boost \
   && cd /Developer/boost \
-  && curl -L https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.gz -o ./boost.tar.gz \
+  && curl -L https://dl.bintray.com/boostorg/release/1.73.0/source/boost_1_73_0.tar.gz -o ./boost.tar.gz \
   && tar -xvzf ./boost.tar.gz -C ./ --strip-components=1 \
   && ./bootstrap.sh \
   && ./b2 link=static --with-program_options --with-filesystem install --with-system \
@@ -45,13 +45,13 @@ RUN mkdir -p /Developer/boost \
 # Build VTK
 RUN mkdir -p /Developer/VTK/bin/ \
   && cd /Developer/VTK \
-  && curl -L https://github.com/Kitware/VTK/archive/c2f38ba.zip --output ./archive.zip \
+  && curl -L https://github.com/Kitware/VTK/archive/ab278e87b1.zip --output ./archive.zip \
   && unzip archive.zip \
   && mv ./VTK*/ ./src/ \
   && cd /Developer/VTK/bin \
   && cmake ../src \
+    -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_CXX_STANDARD=14 \
-    -DCMAKE_CXX_FLAGS=-std=c++14 \
     -DVTK_BUILD_TESTING=OFF \
     -DVTK_BUILD_EXAMPLES=OFF \
     -DBUILD_SHARED_LIBS=OFF \
@@ -64,13 +64,13 @@ RUN mkdir -p /Developer/VTK/bin/ \
 # Build ITK
 RUN mkdir -p /Developer/ITK/bin \
   && cd /Developer/ITK \
-  && curl -L https://github.com/InsightSoftwareConsortium/ITK/archive/33f8089.zip --output archive.zip \
+  && curl -L https://github.com/InsightSoftwareConsortium/ITK/archive/f981de6829.zip --output archive.zip \
   && unzip archive.zip \
   && mv ./ITK*/ ./src/ \
   && cd /Developer/ITK/bin \
   && cmake ../src \
+    -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_CXX_STANDARD=14 \
-    -DCMAKE_CXX_FLAGS=-std=c++14 \
     -DITK_MINIMUM_COMPLIANCE_LEVEL=2 \
     -DBUILD_TESTING=OFF \
     -DBUILD_EXAMPLES=OFF \
@@ -94,8 +94,8 @@ ADD . /code/src/
 RUN mkdir -p /code/bin \
   && cd /code/bin \
   && cmake ../src  \
+    -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_CXX_STANDARD=14 \
-    -DCMAKE_CXX_FLAGS=-std=c++14 \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
     -DBoost_USE_STATIC_LIBS=ON \
     -DBUILD_SHARED_LIBS=OFF \

@@ -28,7 +28,6 @@ SegmentationToLabeledPointSet(const std::string& input_image, const std::string&
   using TPointSet = itk::PointSet<TCoordinate, Dimension>;
   using TReader = itk::ImageFileReader<TImage>;
   using TPad = itk::ConstantPadImageFilter<TImage, TImage>;
-  using TMesh = itk::Mesh<double, TImage::ImageDimension>;
   using TExtract = itk::CuberilleImageToMeshFilter< TImage, TMesh >;
 
   const auto reader = TReader::New();
