@@ -9,7 +9,7 @@ namespace dv {
 
 template<unsigned int Dimension, typename TPixel>
 std::set<TPixel>
-ImageToSet(const typename itk::Image<TPixel, Dimension>::Pointer image)
+ImageToSet(const typename itk::Image<TPixel, Dimension>* image)
 {
 
   std::set<TPixel> labels;
