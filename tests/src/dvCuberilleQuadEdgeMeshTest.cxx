@@ -1,52 +1,61 @@
 // ITK
+#include <itkTestingMacros.h>
 #include <itkImage.h>
+#include <itkConstantPadImageFilter.h>
 #include <itkQuadEdgeMesh.h>
 #include <itkCuberilleImageToMeshFilter.h>
 
-// VTK
-#include <vtkPolyData.h>
-
-// Custom
-#include <dvITKTriangleMeshToVTKPolyData.h>
-#include <dvQuickViewPolyData.h>
-
-using TPixel = unsigned char;
-using TCoordinate = float;
-const unsigned int Dimension = 3;
-using TImage = itk::Image<TPixel, Dimension>;
-//using TMesh = itk::QuadEdgeMesh<TCoordinate, Dimension>;
-using TMesh = itk::Mesh<TCoordinate, Dimension>;
-using TExtract = itk::CuberilleImageToMeshFilter< TImage, TMesh >;
-
 int main() {
 
-  const auto image = TImage::New();
-  TImage::SizeType size;
-  size.Fill( 5 );
+  using TPixel = unsigned char;
+  using TCoordinate = float;
+  const unsigned int Dimension = 3;
+  using TImage = itk::Image<TPixel, Dimension>;
+  using TMesh = itk::QuadEdgeMesh<TCoordinate, Dimension>;
+  using TPad = itk::ConstantPadImageFilter<TImage, TImage>;
+  using TExtract = itk::CuberilleImageToMeshFilter< TImage, TMesh >;
 
-  TImage::IndexType origin;
-  origin.Fill( 0 );
+  for (size_t mask = 0; mask < std::pow(2, 8); ++mask) {
 
-  TImage::RegionType region(origin, size);
+    std::bitset<8> bitmask(mask);
 
-  image->SetRegions( region );
-  image->Allocate();
-  image->FillBuffer( 0 );
-  image->SetPixel( {{1, 1, 1}}, 1 );
-  image->SetPixel( {{2, 2, 2}}, 2 );
-  image->SetPixel( {{3, 3, 2}}, 3 );
+    std::cout << mask << ' ' << bitmask << std::endl;
 
-  const auto extract = TExtract::New();
-  extract->SetInput( image );
-  extract->GenerateTriangleFacesOn();
-  extract->ProjectVerticesToIsoSurfaceOff();
-  extract->SavePixelAsCellDataOn();
-  extract->Update();
+    const auto image = TImage::New();
+    TImage::SizeType size;
+    size.Fill( 2 );
 
-  // Visualize
-  const auto polydata = dv::ITKTriangleMeshToVTKPolyData<TMesh>( extract->GetOutput() );
+    TImage::IndexType origin;
+    origin.Fill( 0 );
 
-  dv::QuickViewPolyData( polydata );
+    TImage::RegionType region(origin, size);
+
+    image->SetRegions( region );
+    image->Allocate();
+    image->FillBuffer( 0 );
+
+    for (size_t index = 0; index < std::pow(2, 3); ++index) {
+      std::bitset<3> bitindex(index);
+      image->SetPixel( {{bitindex[0], bitindex[1], bitindex[2]}}, bitmask[index] );
+    }
+
+    typename TImage::SizeType padding;
+    padding.Fill(1);
+
+    const auto pad = TPad::New();
+    pad->SetInput(image);
+    pad->SetPadUpperBound(padding);
+    pad->SetPadLowerBound(padding);
+    pad->SetConstant(static_cast<TPixel>(0));
+
+    const auto extract = TExtract::New();
+    extract->SetInput( pad->GetOutput() );
+    extract->GenerateTriangleFacesOn();
+    extract->ProjectVerticesToIsoSurfaceOff();
+    extract->SavePixelAsCellDataOn();
+    ITK_TRY_EXPECT_NO_EXCEPTION(extract->Update());
+
+  }
 
   return EXIT_SUCCESS;
 
