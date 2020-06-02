@@ -4,9 +4,7 @@
 // ITK
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
-
-// Custom
-#include <itkChangeLabelsImageFilter.h>
+#include <itkChangeLabelImageFilter.h>
 
 // STD
 #include <map>
@@ -22,7 +20,7 @@ ChangeLabels(const std::string& IImage,
 
   using TImage = itk::Image<TPixel, Dimension>;
   using TReader = itk::ImageFileReader<TImage>;
-  using TFilter = itk::ChangeLabelsImageFilter<TImage>;
+  using TFilter = itk::ChangeLabelImageFilter<TImage,TImage>;
   using TWriter = itk::ImageFileWriter<TImage>;
 
   //
@@ -37,7 +35,7 @@ ChangeLabels(const std::string& IImage,
   //
 
   const auto filter = TFilter::New();
-  filter->SetLabelMap(LabelMap);
+  filter->SetChangeMap(LabelMap);
   filter->SetInput(reader->GetOutput());
 
   //
