@@ -10,7 +10,6 @@ namespace po = boost::program_options;
 #include <vector>
 
 const unsigned int Dimension = 3;
-using TCoordinate = float;
 using TPixel = unsigned char;
 
 int
@@ -67,13 +66,13 @@ main(int argc, char* argv[])
   //
   // make Set from labels given
   //
-  dv::EnforceBoundaryBetweenLabels<Dimension, TPixel, TCoordinate>(IImage,
-                                                                   OImage,
-                                                                   labels_set_1,
-                                                                   labels_set_2,
-                                                                   radius_1,
-                                                                   radius_2,
-                                                                   replacement);
+  dv::EnforceBoundaryBetweenLabels<Dimension, TPixel>(IImage,
+                                                      OImage,
+                                                      labels_set_1,
+                                                      labels_set_2,
+                                                      radius_1,
+                                                      radius_2,
+                                                      replacement);
 
   return EXIT_SUCCESS;
 }

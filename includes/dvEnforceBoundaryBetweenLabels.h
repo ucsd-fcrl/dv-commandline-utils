@@ -16,10 +16,10 @@
 
 namespace dv {
 
-template<unsigned int Dimension, typename TPixel, typename TCoordinate>
+template<unsigned int Dimension, typename TPixel>
 void
 EnforceBoundaryBetweenLabels(const std::string& IImage,
-                             const std::string& OMesh,
+                             const std::string& OImage,
                              const std::set<TPixel>& labels_1,
                              const std::set<TPixel>& labels_2,
                              const short radius_1,
@@ -80,7 +80,7 @@ EnforceBoundaryBetweenLabels(const std::string& IImage,
 
       const auto writer = TWriter::New();
       writer->SetInput(reader->GetOutput());
-      writer->SetFileName(OMesh);
+      writer->SetFileName(OImage);
       writer->Update();
 
       return;
@@ -93,13 +93,13 @@ EnforceBoundaryBetweenLabels(const std::string& IImage,
     stats->Update();
 
     if (stats->GetSum() == 0) {
-      std::cerr << "WARNING: No pixels corresponding to label set 1; output is "
+      std::cerr << "WARNING: No pixels corresponding to label set 2; output is "
                    "unchanged."
                 << std::endl;
 
       const auto writer = TWriter::New();
       writer->SetInput(reader->GetOutput());
-      writer->SetFileName(OMesh);
+      writer->SetFileName(OImage);
       writer->Update();
 
       return;
@@ -139,7 +139,7 @@ EnforceBoundaryBetweenLabels(const std::string& IImage,
 
   const auto writer = TWriter::New();
   writer->SetInput(mask->GetOutput());
-  writer->SetFileName(OMesh);
+  writer->SetFileName(OImage);
   writer->Update();
 }
 
