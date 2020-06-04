@@ -1,12 +1,12 @@
-// Custom
-#include <dvEnforceBoundaryBetweenLabels.h>
-#include <dvExtractConnectedComponents.h>
-#include <dvGenerateInitialModel.h>
-#include <dvQuickViewPolyData.h>
+// ITK
+#include <itkImage.h>
+#include <itkQuadEdgeMesh.h>
+#include <itkImageFileReader.h>
 
-// VTK
-#include <vtkPolyDataReader.h>
-#include <vtkSmartPointer.h>
+// Custom
+#include <itkGenerateInitialModelImageToMeshFilter.h>
+#include <dvITKTriangleMeshToVTKPolyData.h>
+#include <dvQuickViewPolyData.h>
 
 int main() {
 
@@ -15,15 +15,28 @@ int main() {
   const unsigned int count = 1000;
   const unsigned int radius = 10;
 
-  dv::GenerateInitialModel(
-    file_name, "out.vtk", count, sigma, radius
-  );
+  using TPixel = unsigned char;
+  const unsigned int Dimension = 3;
+  using TCoordinate = float;
+  using TMesh = itk::QuadEdgeMesh<TCoordinate, Dimension>;
 
-  const auto reader = vtkSmartPointer<vtkPolyDataReader>::New();
-  reader->SetFileName( "out.vtk" );
-  reader->Update();
+  using TImage = itk::Image<TPixel, Dimension>;
+  using TReader = itk::ImageFileReader<TImage>;
+  using TModel = itk::GenerateInitialModelImageToMeshFilter<TImage,TMesh>;
 
-  dv::QuickViewPolyData( reader->GetOutput() );
+  const auto reader = TReader::New();
+  reader->SetFileName(file_name);
+
+  const auto model = TModel::New();
+  model->SetInput(reader->GetOutput());
+  model->SetNumberOfCellsInDecimatedMesh(count);
+  model->SetMeshNoiseSigma(sigma);
+  model->SetLVClosingRadius(radius);
+  model->Update();
+
+  const auto poly_data = dv::ITKTriangleMeshToVTKPolyData< TMesh >( model->GetOutput() );
+
+  dv::QuickViewPolyData( poly_data );
 
   return EXIT_SUCCESS;
 
