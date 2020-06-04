@@ -12,7 +12,7 @@
 using TMesh = itk::Mesh<float, 3>;
 using TSource = itk::RegularSphereMeshSource< TMesh >;
 
-int main(int argc, char* argv[]) {
+int main() {
 
   const auto source = TSource::New();
   source->Update();

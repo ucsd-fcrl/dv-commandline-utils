@@ -8,7 +8,7 @@
 #include <dvVTKPolyDataToITKTriangleMesh.h>
 #include <dvQuickViewPolyData.h>
 
-int main(int argc, char ** argv)
+int main()
 {
 
   vtkPolyDataReader * reader = vtkPolyDataReader::New();

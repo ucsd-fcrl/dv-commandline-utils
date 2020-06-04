@@ -1,4 +1,5 @@
 // ITK
+#include <itkTestingMacros.h>
 #include <itkQuadEdgeMesh.h>
 #include <itkRegularSphereMeshSource.h>
 #include <itkDelaunayConformingQuadEdgeMeshFilter.h>
@@ -101,6 +102,9 @@ DelaunayCellDataTestHelper() {
   // Assert one CellData entry for each Cell
   const auto o_cell = o_mesh->GetNumberOfCells();
   const auto o_data = o_mesh->GetCellData()->Size();
+  if (o_cell != o_data) {
+    itkGenericExceptionMacro("o_cell != o_data");
+  }
 
   // Visualize
   const auto i_polydata = dv::ITKTriangleMeshToVTKPolyData<TQEMesh>( i_mesh );
