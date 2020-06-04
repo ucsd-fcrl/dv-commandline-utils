@@ -30,6 +30,7 @@ main() {
   using TMesh = itk::Mesh<TCoordinate, Dimension>;
   using TSource = itk::RegularSphereMeshSource< TMesh >;
   using TTriangleHelper = itk::TriangleHelper< typename TMesh::PointType >;
+  using TReader = itk::VTKPolyDataReader< TMesh >;
   using TWriter = itk::VTKPolyDataWriter< TMesh >;
 
   // Generate some input mesh data
@@ -82,7 +83,7 @@ main() {
 
   const auto i_polydata = dv::ITKTriangleMeshToVTKPolyData<TMesh>( i_mesh );
 
-  const auto writer = vtkSmartPointer<vtkPolyDataWriter>::New();
+  const auto writer = TWriter::New();
   writer->SetInputData( i_polydata );
   writer->SetFileName( "out.vtk");
   writer->Update();
