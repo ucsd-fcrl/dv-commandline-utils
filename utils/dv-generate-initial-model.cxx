@@ -23,7 +23,10 @@ main(int argc, char** argv)
     "Target number of cells in the decimated mesh.")(
     "sigma",
     po::value<double>()->default_value(0.1),
-    "Amount of gaussian noise to add to mesh vertices prior to decimation.");
+    "Amount of gaussian noise to add to mesh vertices prior to decimation.")(
+    "radius",
+    po::value<unsigned int>()->default_value(10),
+    "Radius of Kernel for Binary Closing of LV.");
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, description), vm);
@@ -39,6 +42,7 @@ main(int argc, char** argv)
   const std::string outputMeshName(vm["output-mesh"].as<std::string>());
   const unsigned int count = vm["count"].as<unsigned int>();
   const double sigma = vm["sigma"].as<double>();
+  const unsigned int radius = vm["radius"].as<unsigned int>();
 
   // => Connected
   // => Delete Unassigned
@@ -49,7 +53,7 @@ main(int argc, char** argv)
   // => Refine
   // => Loop
 
-  dv::GenerateInitialModel(inputMeshName, outputMeshName, count, sigma);
+  dv::GenerateInitialModel(inputMeshName, outputMeshName, count, sigma, radius);
 
   return EXIT_SUCCESS;
 }
