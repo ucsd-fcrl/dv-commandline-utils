@@ -4,7 +4,7 @@
 #include <itkAdditiveGaussianNoiseMeshFilter.h>
 #include <itkAdditiveGaussianNoiseQuadEdgeMeshFilter.h>
 #include <itkTriangleHelper.h>
-#include <itkVTKPolyDataWriter.h>
+#include <itkMeshFileWriter.h>
 
 // VTK
 #include <vtkPolyData.h>
@@ -16,7 +16,6 @@
 #include <vtkLookupTable.h>
 #include <vtkNamedColors.h>
 #include <vtkPolyDataReader.h>
-#include <vtkPolyDataWriter.h>
 
 // Custom
 #include <dvITKTriangleMeshToVTKPolyData.h>
@@ -30,8 +29,7 @@ main() {
   using TMesh = itk::Mesh<TCoordinate, Dimension>;
   using TSource = itk::RegularSphereMeshSource< TMesh >;
   using TTriangleHelper = itk::TriangleHelper< typename TMesh::PointType >;
-  using TReader = itk::VTKPolyDataReader< TMesh >;
-  using TWriter = itk::VTKPolyDataWriter< TMesh >;
+  using TWriter = itk::MeshFileWriter< TMesh >;
 
   // Generate some input mesh data
   const auto sphere = TSource::New();
@@ -84,7 +82,7 @@ main() {
   const auto i_polydata = dv::ITKTriangleMeshToVTKPolyData<TMesh>( i_mesh );
 
   const auto writer = TWriter::New();
-  writer->SetInputData( i_polydata );
+  writer->SetInput( i_mesh );
   writer->SetFileName( "out.vtk");
   writer->Update();
 

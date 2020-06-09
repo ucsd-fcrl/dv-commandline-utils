@@ -115,6 +115,7 @@ GenerateInitialModelImageToMeshFilter<TInputImage, TOutputMesh>
   const auto criterion = TCriterion::New();
   const auto decimate = TDecimation::New();
 
+  criterion->SetTopologicalChange(false);
   criterion->SetNumberOfElements(this->GetNumberOfCellsInDecimatedMesh());
 
   decimate->SetInput(noise->GetOutput());
