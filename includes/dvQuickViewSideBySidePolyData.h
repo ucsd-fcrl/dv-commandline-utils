@@ -1,5 +1,5 @@
-#ifndef dv_QuickViewPolyData_h
-#define dv_QuickViewPolyData_h
+#ifndef dv_QuickViewSideBySidePolyData_h
+#define dv_QuickViewSideBySidePolyData_h
 
 // VTK
 #include <vtkPolyData.h>
