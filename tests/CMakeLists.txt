@@ -64,7 +64,6 @@ set(EXNAMES "dvAccelerationRegularizerTest"
             "dvCuberilleQuadEdgeMeshTest"
             "dvPolyDataWriterCellDataTest"
             "dvVTKPolyDataToITKTriangleMeshTest"
-            "dvRefineValenceThreeVerticesTest"
             "dvRefineThenLoopTest"
    )
 

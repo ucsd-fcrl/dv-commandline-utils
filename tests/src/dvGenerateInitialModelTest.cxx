@@ -10,9 +10,9 @@
 
 int main() {
 
-  const std::string file_name = "/home/davis/Dropbox/datasets/valve-plane-detection/derived_dir/00-spacing-2.0-multiplier-4/predictions/ucsd_toshiba/005/seg-nii-sm/0.nii.gz";
-  const double sigma = 0.5;
-  const unsigned int count = 1000;
+  const std::string file_name = "/Users/davisvigneault/Dropbox/datasets/valve-plane-detection/derived_dir/00-spacing-2.0-multiplier-4/predictions/ucsd_toshiba/005/seg-nii-sm/0.nii.gz";
+  const double sigma = 0.1;
+  const unsigned int count = 1024;
   const unsigned int radius = 10;
 
   using TPixel = unsigned char;

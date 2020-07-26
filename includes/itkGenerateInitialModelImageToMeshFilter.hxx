@@ -19,6 +19,7 @@
 #include <itkEnforceBoundaryBetweenLabelsImageFilter.h>
 #include <itkFillHolesInSegmentationImageFilter.h>
 #include <itkExtractConnectedComponentsImageFilter.h>
+#include <itkRefineValenceThreeVerticesQuadEdgeMeshFilter.h>
 
 namespace itk
 {
@@ -66,7 +67,9 @@ GenerateInitialModelImageToMeshFilter<TInputImage, TOutputMesh>
   using TNoise = itk::AdditiveGaussianNoiseQuadEdgeMeshFilter<OutputMeshType>;
   using TCriterion = itk::NumberOfFacesCriterion<OutputMeshType>;
   using TDecimation = itk::SquaredEdgeLengthDecimationQuadEdgeMeshFilter<OutputMeshType, OutputMeshType, TCriterion>;
+  using TDelaunay = itk::DelaunayConformingQuadEdgeMeshFilter<OutputMeshType>;
   using TLoop = itk::LoopTriangleCellSubdivisionQuadEdgeMeshFilter<OutputMeshType>;
+  using TRefine = itk::RefineValenceThreeVerticesQuadEdgeMeshFilter<OutputMeshType>;
 
   const auto enforce0 = TEnforce::New();
   enforce0->SetInput( image );
@@ -82,13 +85,13 @@ GenerateInitialModelImageToMeshFilter<TInputImage, TOutputMesh>
   closeKernel.SetRadius(this->GetLVClosingRadius());
   closeKernel.CreateStructuringElement();
 
-  const auto closing = TClose::New();
-  closing->SetInput( enforce1->GetOutput() );
-  closing->SetKernel( closeKernel );
-  closing->SetForegroundValue( 1 );
+  const auto closing_lv = TClose::New();
+  closing_lv->SetInput( enforce1->GetOutput() );
+  closing_lv->SetKernel( closeKernel );
+  closing_lv->SetForegroundValue( 1 );
 
   const auto connected = TConnected::New();
-  connected->SetInput( closing->GetOutput() );
+  connected->SetInput( closing_lv->GetOutput() );
 
   const auto fill = TFill::New();
   fill->SetInput( connected->GetOutput() );
@@ -111,18 +114,25 @@ GenerateInitialModelImageToMeshFilter<TInputImage, TOutputMesh>
   const auto noise = TNoise::New();
   noise->SetInput(cuberille->GetOutput());
   noise->SetSigma(this->GetMeshNoiseSigma());
+  noise->SetSeed( 0 );
 
   const auto criterion = TCriterion::New();
-  const auto decimate = TDecimation::New();
 
   criterion->SetTopologicalChange(false);
   criterion->SetNumberOfElements(this->GetNumberOfCellsInDecimatedMesh());
 
+  const auto decimate = TDecimation::New();
   decimate->SetInput(noise->GetOutput());
   decimate->SetCriterion(criterion);
 
+  const auto delaunay = TDelaunay::New();
+  delaunay->SetInput( decimate->GetOutput() );
+
+  const auto refine = TRefine::New();
+  refine->SetInput( decimate->GetOutput() );
+
   const auto loop = TLoop::New();
-  loop->SetInput( decimate->GetOutput() );
+  loop->SetInput( refine->GetOutput() );
   loop->Update();
 
   mesh->Graft( loop->GetOutput() );
