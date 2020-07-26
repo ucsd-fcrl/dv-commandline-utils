@@ -66,7 +66,7 @@ ExtractConnectedComponentsImageFilter<TInputImage, TOutputImage>
     // Connected Components:
     const auto connected = TLabel::New();
     connected->SetInput(thresh->GetOutput());
-    connected->FullyConnectedOn();
+    connected->FullyConnectedOff();
     connected->Update();
 
     const auto NumObjects = connected->GetObjectCount();
