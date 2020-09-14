@@ -79,6 +79,7 @@ find_package(ITK COMPONENTS
   Cuberille
   MeshNoise
   GenericLabelInterpolator
+  IOMeshSTL
   SubdivisionQuadEdgeMeshFilter REQUIRED
 )
 
@@ -142,6 +143,7 @@ set(EXNAMES "dv-label-geometry"
             "dv-extract-connected-components"
             "dv-fill-holes-in-binary-image"
             "dv-fill-holes-in-segmentation"
+            "dv-fill-holes-in-mesh"
             "dv-binary-opening"
             "dv-segmentation-error"
             "dv-change-labels"
