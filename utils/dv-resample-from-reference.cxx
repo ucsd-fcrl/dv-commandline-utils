@@ -24,10 +24,16 @@ main(int argc, char* argv[])
     "Filename of the output image.")(
     "output-size", po::value<unsigned int>(), "Output image size in pixels.")(
     "output-spacing", po::value<double>(), "Output pixel size in mm.")(
-    "outside-value", po::value<double>()->default_value(0.0), "Outside value.")(
-    "interpolator",
-    po::value<unsigned int>()->default_value(1),
-    "Order of BSpline interpolation (0 to 5 allowed).");
+    "outside-value", po::value<double>()->default_value(0.0), "Outside value.")
+    (
+      "interpolator",
+      po::value<unsigned int>()->default_value(1),
+      "Order of BSpline interpolation (0 to 5 allowed)."
+    )
+    (
+      "voting",
+      "Interpolate labels separately and then find max."
+    );
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, description), vm);
@@ -53,6 +59,7 @@ main(int argc, char* argv[])
     output_spacing_exists ? vm["output-spacing"].as<double>() : -1;
 
   const auto OutsideValue = vm["outside-value"].as<double>();
+  const bool voting = vm.count("voting");
 
   switch (dv::ReadImageIOBase(IImage)->GetComponentType()) {
     case itk::ImageIOBase::UCHAR:
@@ -64,7 +71,8 @@ main(int argc, char* argv[])
                                                   OutputSize,
                                                   output_spacing_exists,
                                                   OutputSpacing,
-                                                  interpolator);
+                                                  interpolator,
+                                                  voting);
       break;
     case itk::ImageIOBase::CHAR:
       dv::ResampleFromReference<3, char>(IImage,
@@ -75,7 +83,8 @@ main(int argc, char* argv[])
                                          OutputSize,
                                          output_spacing_exists,
                                          OutputSpacing,
-                                         interpolator);
+                                         interpolator,
+                                         voting);
       break;
     case itk::ImageIOBase::USHORT:
       dv::ResampleFromReference<3, unsigned short>(IImage,
@@ -86,7 +95,8 @@ main(int argc, char* argv[])
                                                    OutputSize,
                                                    output_spacing_exists,
                                                    OutputSpacing,
-                                                   interpolator);
+                                                   interpolator,
+                                                   voting);
       break;
     case itk::ImageIOBase::SHORT:
       dv::ResampleFromReference<3, short>(IImage,
@@ -97,7 +107,8 @@ main(int argc, char* argv[])
                                           OutputSize,
                                           output_spacing_exists,
                                           OutputSpacing,
-                                          interpolator);
+                                          interpolator,
+                                          voting);
       break;
     case itk::ImageIOBase::UINT:
       dv::ResampleFromReference<3, unsigned int>(IImage,
@@ -108,7 +119,8 @@ main(int argc, char* argv[])
                                                  OutputSize,
                                                  output_spacing_exists,
                                                  OutputSpacing,
-                                                 interpolator);
+                                                 interpolator,
+                                                 voting);
       break;
     case itk::ImageIOBase::INT:
       dv::ResampleFromReference<3, int>(IImage,
@@ -119,7 +131,8 @@ main(int argc, char* argv[])
                                         OutputSize,
                                         output_spacing_exists,
                                         OutputSpacing,
-                                        interpolator);
+                                        interpolator,
+                                        voting);
       break;
     case itk::ImageIOBase::ULONG:
       dv::ResampleFromReference<3, unsigned long>(IImage,
@@ -130,7 +143,8 @@ main(int argc, char* argv[])
                                                   OutputSize,
                                                   output_spacing_exists,
                                                   OutputSpacing,
-                                                  interpolator);
+                                                  interpolator,
+                                                  voting);
       break;
     case itk::ImageIOBase::LONG:
       dv::ResampleFromReference<3, long>(IImage,
@@ -141,9 +155,13 @@ main(int argc, char* argv[])
                                          OutputSize,
                                          output_spacing_exists,
                                          OutputSpacing,
-                                         interpolator);
+                                         interpolator,
+                                         voting);
       break;
     case itk::ImageIOBase::FLOAT:
+      if (voting) {
+        std::cerr << "WARNING: Voting only available for integral pixel types...switching off." << std::endl;
+      }
       dv::ResampleFromReference<3, float>(IImage,
                                           RImage,
                                           OImage,
@@ -152,9 +170,13 @@ main(int argc, char* argv[])
                                           OutputSize,
                                           output_spacing_exists,
                                           OutputSpacing,
-                                          interpolator);
+                                          interpolator,
+                                          false);
       break;
     case itk::ImageIOBase::DOUBLE:
+      if (voting) {
+        std::cerr << "WARNING: Voting only available for integral pixel types...switching off." << std::endl;
+      }
       dv::ResampleFromReference<3, double>(IImage,
                                            RImage,
                                            OImage,
@@ -163,7 +185,8 @@ main(int argc, char* argv[])
                                            OutputSize,
                                            output_spacing_exists,
                                            OutputSpacing,
-                                           interpolator);
+                                           interpolator,
+                                           false);
       break;
     default:
       std::cerr << "ERROR: Unrecognized pixel type." << std::endl;

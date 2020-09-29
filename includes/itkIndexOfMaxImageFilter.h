@@ -28,7 +28,7 @@ namespace itk
 
         int maxIndex = 0;
         double maxVal = 0;
-        for (int i = 0; i < A.Size(); i++) {
+        for (size_t i = 0; i < A.Size(); i++) {
           if (A.GetElement(i) > maxVal && A.GetElement(i) > 0.5) {
             maxVal = A.GetElement(i);
             maxIndex = i + 1;

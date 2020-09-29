@@ -175,7 +175,7 @@ struct GetByteOrderFunction : public GetInfoFunction
     : GetInfoFunction("--byte-order"){};
   std::string GetInfo(itk::ImageIOBase::Pointer imageIO) final
   {
-    return std::to_string(imageIO->GetByteOrder());
+    return std::to_string(static_cast<uint8_t>(imageIO->GetByteOrder()));
   }
 };
 

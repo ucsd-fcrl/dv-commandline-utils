@@ -13,7 +13,7 @@
 #include <itkLinearInterpolateImageFunction.h>
 #include <itkBSplineInterpolateImageFunction.h>
 
-#include <itkChangeLabelsImageFilter.h>
+#include <itkChangeLabelImageFilter.h>
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkImageFileWriter.h>
 #include <itkComposeImageFilter.h>
@@ -43,7 +43,7 @@ void ResampleVolume(const std::string &IImage,
   using ResampleTypeML = itk::ResampleImageFilter<ImageType, ImageTypeML, float, float>;
  
   using VectorImageType = itk::VectorImage<float, Dimension>;
-  using ChangeLabelsFilterType = itk::ChangeLabelsImageFilter<ImageType>;
+  using ChangeLabelFilterType = itk::ChangeLabelImageFilter<ImageType,ImageType>;
   using ImageToVectorImageFilterType = itk::ComposeImageFilter<ImageTypeML>;
   using MaxFilterType = itk::IndexOfMaxImageFilter<VectorImageType, ImageType>;
 
@@ -133,8 +133,8 @@ void ResampleVolume(const std::string &IImage,
       // change current label s to map to 1 in label_map
       label_map[s] = 1;
 
-      const auto filter = ChangeLabelsFilterType::New();
-      filter->SetLabelMap(label_map);
+      const auto filter = ChangeLabelFilterType::New();
+      filter->SetChangeMap(label_map);
       filter->SetInput(reader->GetOutput());
 
       auto resample = ResampleTypeML::New();

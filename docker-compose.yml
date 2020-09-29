@@ -6,3 +6,4 @@ services:
       context: .
     image: sudomakeinstall/dv-commandline-utils
     working_dir: /code/bin
+    network_mode: none

@@ -10,8 +10,35 @@
 #include <itkBSplineInterpolateImageFunction.h>
 #include <itkLinearInterpolateImageFunction.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
+#include <itkLabelImageGenericInterpolateImageFunction.h>
 
 namespace dv {
+
+template<class TImage,typename TCoordRep, unsigned int SplineOrder> class BSplineInterpolator : public itk::BSplineInterpolateImageFunction<TImage,TCoordRep> {
+  public:
+  /** Standard class type aliases. */
+  using Self = BSplineInterpolator;
+  using Superclass =
+    itk::BSplineInterpolateImageFunction<TImage,TCoordRep>;
+  using Pointer = itk::SmartPointer<Self>;
+  using ConstPointer = itk::SmartPointer<const Self>;
+
+  /** Method for creation through the object factory. */
+  itkNewMacro(Self);
+
+  /** Run-time type information (and related methods). */
+  itkTypeMacro(Self, Superclass);
+
+  BSplineInterpolator() {
+    this->SetSplineOrder( SplineOrder );
+  }
+
+};
+
+template<class TImage, typename TCoordRep> class BSplineInterpolator2 : public BSplineInterpolator<TImage, TCoordRep, 2>{};
+template<class TImage, typename TCoordRep> class BSplineInterpolator3 : public BSplineInterpolator<TImage, TCoordRep, 3>{};
+template<class TImage, typename TCoordRep> class BSplineInterpolator4 : public BSplineInterpolator<TImage, TCoordRep, 4>{};
+template<class TImage, typename TCoordRep> class BSplineInterpolator5 : public BSplineInterpolator<TImage, TCoordRep, 5>{};
 
 template<unsigned int Dimension, typename TPixel>
 void
@@ -23,7 +50,8 @@ ResampleFromReference(const std::string IImage,
                       const unsigned int OutputSize,
                       const bool OutputSpacingExists,
                       const double OutputSpacing,
-                      const unsigned int& interpolator)
+                      const unsigned int& interpolator,
+                      const bool voting)
 {
 
   using TImage = itk::Image<TPixel, Dimension>;
@@ -37,9 +65,23 @@ ResampleFromReference(const std::string IImage,
   using LNInterpolateType = itk::LinearInterpolateImageFunction<TImage>;
   using BSInterpolateType = itk::BSplineInterpolateImageFunction<TImage>;
 
+  using GNNInterpolateType =
+    itk::LabelImageGenericInterpolateImageFunction<TImage,itk::NearestNeighborInterpolateImageFunction>;
+  using GLNInterpolateType =
+    itk::LabelImageGenericInterpolateImageFunction<TImage,itk::LinearInterpolateImageFunction>;
+  using GBSInterpolateType2 =
+    itk::LabelImageGenericInterpolateImageFunction<TImage,BSplineInterpolator2>;
+  using GBSInterpolateType3 =
+    itk::LabelImageGenericInterpolateImageFunction<TImage,BSplineInterpolator3>;
+  using GBSInterpolateType4 =
+    itk::LabelImageGenericInterpolateImageFunction<TImage,BSplineInterpolator4>;
+  using GBSInterpolateType5 =
+    itk::LabelImageGenericInterpolateImageFunction<TImage,BSplineInterpolator5>;
+
   const auto iReader = TReader::New();
   const auto rReader = TReader::New();
   iReader->SetFileName(IImage);
+  iReader->Update();
   rReader->SetFileName(RImage);
   rReader->Update();
 
@@ -93,19 +135,71 @@ ResampleFromReference(const std::string IImage,
   resample->SetOutputDirection(ReferenceDirection);
   switch (interpolator) {
     case 0: {
-      const auto interp = NNInterpolateType::New();
-      resample->SetInterpolator(interp);
+      if (voting) {
+        const auto interp = GNNInterpolateType::New();
+        resample->SetInterpolator(interp);
+      } else {
+        const auto interp = NNInterpolateType::New();
+        resample->SetInterpolator(interp);
+      }
       break;
     }
     case 1: {
-      const auto interp = LNInterpolateType::New();
-      resample->SetInterpolator(interp);
+      if (voting) {
+        const auto interp = GLNInterpolateType::New();
+        resample->SetInterpolator(interp);
+      } else {
+        const auto interp = LNInterpolateType::New();
+        resample->SetInterpolator(interp);
+      }
+      break;
+    }
+    case 2: {
+      if (voting) {
+        const auto interp = GBSInterpolateType2::New();
+        resample->SetInterpolator(interp);
+      } else {
+        const auto interp = BSInterpolateType::New();
+        interp->SetSplineOrder(interpolator);
+        resample->SetInterpolator(interp);
+      }
+      break;
+    }
+    case 3: {
+      if (voting) {
+        const auto interp = GBSInterpolateType3::New();
+        resample->SetInterpolator(interp);
+      } else {
+        const auto interp = BSInterpolateType::New();
+        interp->SetSplineOrder(interpolator);
+        resample->SetInterpolator(interp);
+      }
+      break;
+    }
+    case 4: {
+      if (voting) {
+        const auto interp = GBSInterpolateType4::New();
+        resample->SetInterpolator(interp);
+      } else {
+        const auto interp = BSInterpolateType::New();
+        interp->SetSplineOrder(interpolator);
+        resample->SetInterpolator(interp);
+      }
+      break;
+    }
+    case 5: {
+      if (voting) {
+        const auto interp = GBSInterpolateType5::New();
+        resample->SetInterpolator(interp);
+      } else {
+        const auto interp = BSInterpolateType::New();
+        interp->SetSplineOrder(interpolator);
+        resample->SetInterpolator(interp);
+      }
       break;
     }
     default: {
-      const auto interp = BSInterpolateType::New();
-      interp->SetSplineOrder(interpolator);
-      resample->SetInterpolator(interp);
+      itkAssertOrThrowMacro(false, "This interpolator is not supported.");
       break;
     }
   }

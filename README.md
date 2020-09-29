@@ -17,7 +17,7 @@ $ cd ~/Developer/repositories/dv-commandline-utils/src
 $ ./docker-build.sh
 ```
 
-`dv-commandline-utils` depends on quite a few packages, and two large c++ libraries (ITK and VTK), which must be built from source--so this command could take a while to finish.  Once it finishes, you should be able to see `sudomakeinstall/dv-commandline-utils` in the list of docker images on your computer:
+`dv-commandline-utils` depends on quite a few packages, and three large c++ libraries (Boost, ITK, and VTK), which must be built from source--so this command could take a while to finish.  Once it finishes, you should be able to see `sudomakeinstall/dv-commandline-utils` in the list of docker images on your computer:
 
 ```bash
 $ docker image ls
@@ -44,6 +44,20 @@ Congrats, you're up and running!  However, in order to access data on your host 
 ```bash
 $ cp ./docker-compose.override.yml.example ./docker-compose.override.yml
 $ vim ./docker-compose.override.yml # Edit paths; this file will be ignored by git.
+```
+
+In `./docker-compose.override.yml`, change the `source` to the path on your host machine that you would like to be available inside your container, and change the `target` to the path on your container where you would like your data to be available:
+
+```bash
+      # Mount a directory to access data
+      - type: bind
+        source: ${HOME}/Dropbox/datasets/
+        target: /data
+```
+
+And that's it, you're ready to run your container!
+
+```bash
 $ ./docker-run.sh
 ```
 
@@ -54,8 +68,16 @@ Unit tests are not automatically built in the docker image.  The steps to build 
 ```bash
 $ cd ~/Developer/repositories/dv-commandline-utils/src
 $ ./docker-run.sh
-(dkr) $ ccmake ../src
-# Set BUILD_TESTING=ON in the curses GUI, configure, configure, generate.
+(dkr) $ ccmake ../src -DBUILD_TESTING=ON
+# configure, configure, generate in the curses GUI.
 (dkr) $ make -j$(nproc)
 (dkr) $ ctest
+```
+
+You can also make and run one specific test:
+
+```
+(dkr) $ make dvCameraStateTest
+# V for Verboase, R for Regex
+(dkr) $ ctest -V -R dvCameraState
 ```
